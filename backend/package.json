@@ -1,0 +1,19 @@
+{
+  "name": "mock-json-data-generator",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "faker": "^4.1.0",
+    "lodash": "^4.17.19",
+    "nodemon": "^2.0.4"
+  }
+}
