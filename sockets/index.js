@@ -58,13 +58,14 @@ io.on("connection", (socket) => {
     if (user) {
       users.setUserOffline(user.name);
       console.log("user disconnected");
+      
+      socket.emit("signal", { "type": "userStatus", "user": {
+        name: user.name,
+        isOffline: true,
+        lastSeen: new Date()
+      } });
     }
 
-    socket.emit("signal", { type: "userStatus", user: {
-      name: user.name,
-      isOffline: true,
-      lastSeen: new Date()
-    } });
   });
 
   socket.on("message", (newMessage) => {
