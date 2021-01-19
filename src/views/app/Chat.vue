@@ -51,17 +51,12 @@
                 <span class="font-bold">
                   {{ contact.name }}
                 </span>
-                <span class="font-thin">
-                  {{ m(contact.date).fromNow() }}
+                <span class="font-thin" v-if="contact.lastMessage">
+                  {{ m(contact.lastMessage.timeStamp).fromNow() }}
                 </span>
               </p>
-              <p
-                class="font-thin text-accent"
-                v-if="i % Math.floor(Math.random() * Math.floor(5)) == 0"
-              >
-                Is typing...
-              </p>
-              <p class="font-thin" v-else>{{ truncate(contact.message) }}</p>
+              <p class="font-thin" v-if="contact.lastMessage">{{ truncate(contact.lastMessage.body) }}</p>
+              <p class="font-thin" v-else>No messages yet</p>
             </div>
           </div>
         </div>
@@ -85,45 +80,51 @@
         <div class="col-span-10 py-8">
           <p class="font-bold font">{{ contacts[selected].name }}</p>
           <p class="font-thin">
-            Last seen {{ m(contacts[selected].date).fromNow() }}
+            <span v-if="contacts[selected].isOnline">Is online</span>
+            <span v-else>
+              Last seen {{ m(contacts[selected].lastSeen).fromNow() }}
+            </span>
           </p>
         </div>
       </div>
       <div class="row-span-4 relative overflow-y-auto">
         <div class="absolute w-full px-4">
           <div
-            v-for="(message, i) in messages"
+            v-for="(message, i) in messages[contacts[selected].name]"
             class="my-2 flex"
             :class="{
-              'justify-end': isMine(i),
+              'justify-end': isMine(message),
             }"
             :key="i"
           >
             <div class="bg-white p-4 rounded-lg">
-              {{ message.message }}
+              {{ message.body }}
               <p
                 class="font-thin"
                 :class="{
-                  'text-right': isMine(i),
+                  'text-right': isMine(message),
                 }"
               >
-                {{ m(message.date).fromNow() }}
+                {{ m(message.date).fromNow()  }}
               </p>
             </div>
           </div>
         </div>
       </div>
       <div class="p4 grid grid-rows-3">
-        <span class="mx-6 pt-4 font-thin"
-          >{{ contacts[selected].name }} is typing ...</span
-        >
+        <p class="mx-6 pt-4 font-thin">
+          <span 
+          v-if="contacts[selected].istyping"
+            >{{ contacts[selected].name }} is typing ...
+            </span>
+          </p>
         <form
-          @submit.prevent="sendMessage"
+          @submit.prevent="messageSend"
           class="row-span-2 rounded-xl grid grid-cols-12 h place-items-center bg-white mx-4"
         >
           <span>+</span>
           <input class="col-span-10 w-full h-full pl-4" type="text" v-model="message"/>
-          <button class="px-2 py-8" type="submit" value="Send" @click="sendMessage">Send </button>
+          <button class="px-2 py-8" type="submit" value="Send" >Send </button>
         </form>
       </div>
     </div>
@@ -143,37 +144,49 @@
 
 <script lang="ts">
 import moment from "moment";
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted, ref, computed, inject } from "vue";
 import { useMessagesState, useMessagesActions } from "../../store/messageStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
+import {useAuthState} from "../../store/authStore";
+import { useSocketActions } from "../../store/socketStore"
+
 export default defineComponent({
   name: "Apps",
-  setup() {
+  setup(_, context) {
     const { messages } = useMessagesState();
     const { contacts } = useContactsState();
-    const { retrieveMessages } = useMessagesActions();
+    const { retrieveMessages, sendMessage } = useMessagesActions();
     const { retrieveContacts } = useContactsActions();
+    const { initializeSocket } = useSocketActions();
+    const {user} = useAuthState();
 
     const m = (val) => moment(val);
     const selected = ref(1);
     const searchValue = ref("");
     const message = ref("");
 
-    const isMine = (i) => {
-      return i % 3 == 0;
+    const isMine = (message) => {
+      return message.from == user.name ;
     };
     const truncate = (value, limit = 40) => {
       if (value.length > limit) {
         value = value.substring(0, limit - 3) + "...";
       }
-
       return value;
     };
     
-    const sendMessage = (e) => {
+    const messageSend = (e) => {
+      const contact:any = contacts.value[selected.value]
+      sendMessage(contact.name, message.value)
       message.value = ""
     }
 
+    const filteredContacts = computed(() => {
+      return contacts
+    })
+    onMounted(() => {
+      initializeSocket(user.name)
+    })
     onMounted(retrieveMessages);
     onMounted(retrieveContacts);
 
@@ -182,8 +195,9 @@ export default defineComponent({
       messages,
       contacts,
       truncate,
-      sendMessage,
+      messageSend,
       searchValue,
+      filteredContacts,
       message,
       isMine,
       m,

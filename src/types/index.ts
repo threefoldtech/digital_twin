@@ -3,7 +3,6 @@ export interface User {
     image: string,
     email: string
 }
-
 export interface App {
     id: string,
     name: string,
@@ -16,4 +15,17 @@ export interface App {
 export interface Tab {
     name: string,
     icon: string
+}
+
+export interface Message {
+    from: string,
+    to: string,
+    body: string,
+    timeStamp: Date,
+}
+
+export interface Contact {
+    name:string,
+    lastMessage: Message,
+    isTyping: false
 }
