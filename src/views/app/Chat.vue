@@ -144,7 +144,7 @@
 
 <script lang="ts">
 import moment from "moment";
-import { defineComponent, onMounted, ref, computed, inject } from "vue";
+import { defineComponent, onMounted, ref, computed, inject, watch } from "vue";
 import { useMessagesState, useMessagesActions } from "../../store/messageStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
 import {useAuthState} from "../../store/authStore";
@@ -161,7 +161,7 @@ export default defineComponent({
     const {user} = useAuthState();
 
     const m = (val) => moment(val);
-    const selected = ref(1);
+    let selected = ref(1);
     const searchValue = ref("");
     const message = ref("");
 
@@ -179,6 +179,8 @@ export default defineComponent({
       const contact:any = contacts.value[selected.value]
       sendMessage(contact.name, message.value)
       message.value = ""
+      //todo clean this up
+      selected.value = 0
     }
 
     const filteredContacts = computed(() => {

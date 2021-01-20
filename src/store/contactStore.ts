@@ -11,8 +11,8 @@ const state = reactive<State>({
 });
 
 const retrieveContacts = () => {
-    console.log(axios.get(`${config.baseUrl}contacts?count=100`).then(function(response) {
-        const contacts= response.data
+    console.log(axios.get(`${config.baseUrl}api/contacts`).then(function(response) {
+        const contacts = response.data
         contacts.sort((a,b)=> {
             var adate = a.lastMessage? a.lastMessage.timeStamp : new Date()
             var bdate = b.lastMessage? b.lastMessage.timeStamp : new Date()
