@@ -38,6 +38,17 @@ const setLastMessage= (username, message) => {
     //TODO: Sort contacts
 }
 
+const addContact = (username, location) => {
+    console.log(`adding contact, ${username}`)
+    axios.post(`${config.baseUrl}api/contacts`, {username,location}).then( (res) => {
+        // @todo check how to fix this
+        // @ts-ignore
+        state.contacts.push({name: username})
+        console.log("added contact")
+    })
+    console.log(state.contacts)
+}
+
 export const useContactsState = () => {
     return {
         ...toRefs(state),
@@ -47,7 +58,8 @@ export const useContactsState = () => {
 export const useContactsActions = () => {
     return {
         retrieveContacts,
-        setLastMessage
+        setLastMessage,
+        addContact
     }
 }
 

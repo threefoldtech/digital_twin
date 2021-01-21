@@ -11,6 +11,17 @@
             <i class="fas fa-plus"></i>
           </button>
         </div>
+        <div v-if="showDialog" class="flex mb-4">
+          <form
+          @submit.prevent="contactAdd"
+          >
+            <label for="username">Username: </label>
+            <input v-model="usernameAdd" id="username" class="mb-2" placeholder="Username"> <br>
+            <label for="location">Location: </label>
+            <input id="location" disabled=true class="mb-2" :placeholder="location"> <br>
+            <button>Add contact</button>
+          </form>
+        </div>
         <div class="relative full">
           <div
             class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
@@ -149,14 +160,17 @@ import { useMessagesState, useMessagesActions } from "../../store/messageStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
 import {useAuthState} from "../../store/authStore";
 import { useSocketActions } from "../../store/socketStore"
+// import contactpopup from "../../components/ContactPopup.vue";
+
 
 export default defineComponent({
   name: "Apps",
+  // components: {contactpopup},
   setup(_, context) {
     const { messages } = useMessagesState();
     const { contacts } = useContactsState();
     const { retrieveMessages, sendMessage } = useMessagesActions();
-    const { retrieveContacts } = useContactsActions();
+    const { retrieveContacts, addContact } = useContactsActions();
     const { initializeSocket } = useSocketActions();
     const {user} = useAuthState();
 
@@ -164,6 +178,8 @@ export default defineComponent({
     let selected = ref(0);
     const searchValue = ref("");
     const message = ref("");
+    let showDialog = ref(false);
+    let usernameAdd = ref("")
 
     const isMine = (message) => {
       return message.from == user.name ;
@@ -176,12 +192,21 @@ export default defineComponent({
     };
     
     const messageSend = (e) => {
-      const contact:any = contacts.value[selected.value]
+      const contact = contacts.value[selected.value]
       sendMessage(contact.name, message.value)
       message.value = ""
       //todo clean this up
       selected.value = 0
     }
+
+    const contactAdd = () => {
+      console.log("sadfsdf")
+      addContact(usernameAdd.value, location)
+    }
+    
+    const location = computed(() => {
+      return `${usernameAdd.value}-chat`
+    })
 
     const filteredContacts = computed(() => {
       return contacts
@@ -202,6 +227,10 @@ export default defineComponent({
       filteredContacts,
       message,
       isMine,
+      showDialog,
+      usernameAdd,
+      location,
+      contactAdd,
       m,
     };
   },

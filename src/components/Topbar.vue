@@ -1,7 +1,7 @@
 <template>
  <div class="grid grid-cols-12 h-12 items-center">
    <div class="bg-icon mr-4 h-full place-items-center grid">
-     LOGO
+     DIGITALTWIN
    </div>
    <div class="col-span-2 col-end-13 text-right mr-5 text-gray-500 flex items-center justify-end">
     <img :src="user.image" alt="User image" class="h-10 mr-4 bg-icon rounded-full">

@@ -2,6 +2,7 @@ import { createApp } from 'vue';
 import App from './App.vue';
 import './assets/index.css';
 import router from "./router";
+import '@fortawesome/fontawesome-free/js/all'
 
 import socketIo from './plugins/SocketIo'
 import config from './common/config'

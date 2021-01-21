@@ -1,18 +1,19 @@
 <template>
-  <router-view/>
+    <router-view />
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'App'
-})
+  name: "App",
+  
+});
 </script>
 
 <style>
 a {
-  text-decoration: none!important;
+  text-decoration: none !important;
 }
 #app .prose h1,
 #app .prose h2,
