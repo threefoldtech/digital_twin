@@ -161,7 +161,7 @@ export default defineComponent({
     const {user} = useAuthState();
 
     const m = (val) => moment(val);
-    let selected = ref(1);
+    let selected = ref(0);
     const searchValue = ref("");
     const message = ref("");
 

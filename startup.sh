@@ -1,5 +1,5 @@
 # /bin/bash
-cd /sockets 
+cd /backend 
 nginx
 node index.js &
 tail -f /dev/null

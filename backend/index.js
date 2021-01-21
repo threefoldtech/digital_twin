@@ -1,194 +1,113 @@
-const express = require('express');
-const faker = require('faker');
-const _ = require('lodash');
-cors = require('cors')
+const app = require("express")();
+const httpServer = require("http").createServer(app);
+const io = require("socket.io")(httpServer);
+const bodyParser = require("body-parser");
+const axios = require('axios');
+const cors = require('cors')
 
-const app = express();
+const Message = require("./message");
+const Connections = require("./connections");
+const Contact = require("./contact");
 
-const corsOptions = {
-  origin: '*'
+let connections = new Connections([]);
+dummycontact = new Contact("Jason parser", "localhost:3000");
+let contacts = [dummycontact];
+let messages = [];
+
+var corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200 
 }
+app.use(cors(corsOptions))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use(express.static('public'));
-
-  app.get('/messages', cors(corsOptions), (req, res) => {
-      const count = req.query.count;
-      if (!count) {
-        return res.status(400).send({
-          errorMsg: 'count query parameter is missing.'
-        });
-      }
-    
-      const name = faker.name.firstName();
-      res.send(
-        _.times(count, () => {
-          const message = faker.lorem.sentence()
-          const date = faker.date.past()
-          return {
-            name,
-            message,
-            date
-          };
-        }),
-      );
-    });
-
-app.get('/contacts', cors(corsOptions), (req, res) => {
-  const count = req.query.count;
-  if (!count) {
-    return res.status(400).send({
-      errorMsg: 'count query parameter is missing.'
-    });
-  }
-
-  res.send(
-    _.times(count, () => {
-      const name = faker.name;
-      const message = faker.lorem.sentence()
-      const date = faker.date.past()
-      return {
-        name: name.firstName() + " " +name.lastName(),
-        message,
-        date
-      };
-    })
-  );
+app.get("/api/messages", (req, res) => {
+  res.json(messages);
 });
 
-// app.get('/products', (req, res) => {
-//   const count = req.query.count;
-//   if (!count) {
-//     return res.status(400).send({
-//       errorMsg: 'count query parameter is missing.'
-//     });
-//   }
+app.get("/api/contacts", (req, res) => {
+  const resp = contacts.map((contact) => {
+    return {
+      name: contact.username
+    };
+  });
+  res.json(resp);
+});
 
-//   res.send(
-//     _.times(count, () => {
-//       const commerce = faker.commerce;
-//       return {
-//         product: commerce.product(),
-//         price: commerce.price(),
-//         color: commerce.color()
-//       };
-//     })
-//   );
-// });
+app.post("/api/messages", (req, res) => {
+  // @ TODO check if valid
+  mes = req.body;
+  const message = new Message(mes.from, mes.to, mes.body);
+  console.log(`received new message from ${message.from}`);
 
-// app.get('/images', (req, res) => {
-//   const count = req.query.count;
-//   if (!count) {
-//     return res.status(400).send({
-//       errorMsg: 'count query parameter is missing.'
-//     });
-//   }
+  // @TODO implement db here
+  messages.push(message);
 
-//   res.send(
-//     _.times(count, () => {
-//       const image = faker.image;
-//       return {
-//         image: image.image(),
-//         avatar: image.avatar()
-//       };
-//     })
-//   );
-// });
 
-// app.get('/random', (req, res) => {
-//   const count = req.query.count;
-//   if (!count) {
-//     return res.status(400).send({
-//       errorMsg: 'count query parameter is missing.'
-//     });
-//   }
+  connections.getConnections().forEach((connection) => {
+    io.to(connection).emit("message", message);
+    console.log(`send message to ${connection}`);
+  });
+  res.sendStatus(200);
+});
 
-//   res.send(
-//     _.times(count, () => {
-//       const random = faker.random;
-//       return {
-//         word: random.word(),
-//         words: random.words()
-//       };
-//     })
-//   );
-// });
+app.post("/api/contacts", (req, res) => {
+  // @ TODO check if valid
+  con = req.body;
+  const contact = new Contact(con.username, con.location);
+  console.log(`Adding contact  ${contact.username}`);
 
-// app.get('/users', (req, res) => {
-//   const count = req.query.count;
-//   if (!count) {
-//     return res.status(400).send({
-//       errorMsg: 'count query parameter is missing.'
-//     });
-//   }
+  // @TODO implement db here
+  contacts.push(contact);
 
-//   res.send(
-//     _.times(count, () => {
-//       const user = faker.name;
-//       return {
-//         firstName: user.firstName(),
-//         lastName: user.lastName(),
-//         jobTitle: user.jobTitle()
-//       };
-//     })
-//   );
-// });
+  res.sendStatus(200);
+});
 
-// app.get('/lorem', (req, res) => {
-//   const count = req.query.count;
-//   if (!count) {
-//     return res.status(400).send({
-//       errorMsg: 'count query parameter is missing.'
-//     });
-//   }
+io.on("connection", (socket) => {
+  console.log(`${socket.id} connected`);
+  connections.add(socket.id);
 
-//   res.send(
-//     _.times(count, () => {
-//       const lorem = faker.lorem;
-//       return {
-//         paragraph: lorem.paragraph(),
-//         sentence: lorem.sentence(),
-//         paragraphs: lorem.paragraphs()
-//       };
-//     })
-//   );
-// });
+  messages.forEach((message) => {
+    socket.emit("message", message);
+  });
 
-// app.get('/userCard', (req, res) => {
-//   const count = req.query.count;
-//   if (!count) {
-//     return res.status(400).send({
-//       errorMsg: 'count query parameter is missing.'
-//     });
-//   }
+  socket.on("disconnect", () => {
+    console.log(`${socket.id} disconnected`);
+    connections.delete(socket.id);
+  });
 
-//   res.send(
-//     _.times(count, () => {
-//       const helpers = faker.helpers;
-//       return {
-//         userCard: helpers.userCard()
-//       };
-//     })
-//   );
-// });
+  socket.on("message", (newMessage) => {
+    console.log('new message')
+    receiver = contacts.find((c) => c.username == newMessage.to);
+    if (!receiver) {
+      console.log("receiver not found")
+      return "receiver not found";
+    }
 
-// app.get('/createCard', (req, res) => {
-//   const count = req.query.count;
-//   if (!count) {
-//     return res.status(400).send({
-//       errorMsg: 'count query parameter is missing.'
-//     });
-//   }
+    // @TODO implement db here
+    messages.push(newMessage);
 
-//   res.send(
-//     _.times(count, () => {
-//       const helpers = faker.helpers;
-//       return {
-//         createCard: helpers.createCard()
-//       };
-//     })
-//   );
-// });
+    const url = `http://${receiver.location}/api/messages`
+    console.log(`sending message ${ newMessage.body } to ${ url }`);
+    
+    connections.getConnections().forEach((connection) => {
+      if (connection == socket .id){
+        // this is me
+        return
+      }
+      io.to(connection).emit("message", newMessage);
+      console.log(`send message to ${connection}`);
+    });
 
-app.listen(3031, () => {
-  console.log('server started on port 3031');
+    axios.post(url, newMessage)
+      .then(response => {
+        console.log(response.data)
+        // console.log(response)
+      });
+  });
+});
+
+httpServer.listen(3000, "localhost", () => {
+  console.log("go to http://localhost:3000");
 });

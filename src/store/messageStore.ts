@@ -16,11 +16,11 @@ const state = reactive<MessageState>({
 });
 
 const retrieveMessages = () => {  
-    // console.log(axios.get(`${config.baseUrl}api/messages?count=10`).then(function(response) {
-    //     let messages= response.data
-    //     messages.sort((a,b)=>  moment(a.date).unix() - moment(b.date).unix())
-    //     state.messages = messages;
-    // }))
+    console.log(axios.get(`${config.baseUrl}api/messages`).then(function(response) {
+        let messages= response.data
+        messages.sort((a,b)=>  moment(a.date).unix() - moment(b.date).unix())
+        state.messages = messages;
+    }))
 }
 
 const addMessage= (message) => {

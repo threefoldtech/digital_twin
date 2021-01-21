@@ -17,7 +17,7 @@ RUN apt-get install -y curl
 
 COPY --from=builder /app/dist /usr/share/nginx/html
 COPY --from=builder /app/nginx.conf /etc/nginx/conf.d/default.conf
-COPY ./sockets /sockets
+COPY ./backend /backend
 
 COPY ./startup.sh /startup.sh
 RUN chmod +x /startup.sh
@@ -25,6 +25,6 @@ RUN chmod +x /startup.sh
 
 RUN curl -sL https://deb.nodesource.com/setup_15.x | bash -
 RUN apt-get install -y nodejs
-RUN cd /sockets && npm i
+RUN cd /backend && npm i
 
 CMD /startup.sh

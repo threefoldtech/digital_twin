@@ -26,6 +26,7 @@ const initializeSocket = (username: string) => {
 };
 
 const sendSocketMessage = (message) => {
+  console.log('sending',  message)
   state.socket.emit("message", message);
 };
 
