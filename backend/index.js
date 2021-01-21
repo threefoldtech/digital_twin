@@ -99,12 +99,19 @@ io.on("connection", (socket) => {
       io.to(connection).emit("message", newMessage);
       console.log(`send message to ${connection}`);
     });
+    try{
 
-    axios.post(url, newMessage)
+      axios.post(url, newMessage)
       .then(response => {
         console.log(response.data)
         // console.log(response)
+      })
+      .catch( error => {
+        console.log("couldn't send message")
       });
+    } catch (e) {
+      console.log(e)
+    }
   });
 });
 
