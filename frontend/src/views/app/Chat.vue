@@ -202,6 +202,8 @@ export default defineComponent({
     const contactAdd = () => {
       console.log("sadfsdf")
       addContact(usernameAdd.value, location)
+      usernameAdd.value = ""
+      showDialog.value = false
     }
     
     const location = computed(() => {
