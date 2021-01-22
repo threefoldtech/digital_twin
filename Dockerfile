@@ -6,7 +6,7 @@ COPY yarn.lock yarn.lock
 
 RUN yarn install
 
-COPY . . 
+COPY ./frontend . 
 COPY ./src/common/productionConfig.ts ./src/common/config.ts
 RUN yarn build
 
