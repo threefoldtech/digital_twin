@@ -6,8 +6,7 @@ COPY ./frontend/yarn.lock yarn.lock
 
 RUN yarn install
 
-COPY ./frontend . 
-COPY ./frontend/src/common/productionConfig.ts ./src/common/config.ts
+COPY ./frontend .
 RUN yarn build
 
 FROM node:alpine as backend_builder
