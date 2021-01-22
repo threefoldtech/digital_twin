@@ -1,18 +1,24 @@
-const app = require("express")();
-const httpServer = require("http").createServer(app);
-const io = require("socket.io")(httpServer);
-const bodyParser = require("body-parser");
-const axios = require('axios');
-const cors = require('cors')
+import express from "express"
+import http from "http"
+// import ioserver, {Socket} from "socket.io"
+const socketio = require("socket.io");
+import bodyParser from "body-parser";
+import axios from "axios";
+import cors from "cors"
 
-const Message = require("./message");
-const Connections = require("./connections");
-const Contact = require("./contact");
+import Message from "./models/message";
+import Connections from "./models/connections";
+import Contact from "./models/contact";
+import {Socket} from "socket.io"
+
+const app = express();
+const httpServer = http.createServer(app)
+const io = socketio(httpServer)
 
 let connections = new Connections([]);
-dummycontact = new Contact("Jason parser", "localhost:3000");
+const dummycontact = new Contact("Jason parser", "localhost:3000");
 let contacts = [dummycontact];
-let messages = [];
+let messages:Array<Message> = [];
 
 var corsOptions = {
   origin: '*',
@@ -21,6 +27,10 @@ var corsOptions = {
 app.use(cors(corsOptions))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.get("/api/login", (req,res) => {
+  console.log("to implement")
+})
 
 app.get("/api/messages", (req, res) => {
   res.json(messages);
@@ -37,15 +47,14 @@ app.get("/api/contacts", (req, res) => {
 
 app.post("/api/messages", (req, res) => {
   // @ TODO check if valid
-  mes = req.body;
+  const mes = req.body;
   const message = new Message(mes.from, mes.to, mes.body);
   console.log(`received new message from ${message.from}`);
 
   // @TODO implement db here
   messages.push(message);
 
-
-  connections.getConnections().forEach((connection) => {
+  connections.getConnections().forEach((connection: String) => {
     io.to(connection).emit("message", message);
     console.log(`send message to ${connection}`);
   });
@@ -54,7 +63,7 @@ app.post("/api/messages", (req, res) => {
 
 app.post("/api/contacts", (req, res) => {
   // @ TODO check if valid
-  con = req.body;
+  const con = req.body;
   const contact = new Contact(con.username, con.location);
   console.log(`Adding contact  ${contact.username}`);
 
@@ -64,7 +73,7 @@ app.post("/api/contacts", (req, res) => {
   res.sendStatus(200);
 });
 
-io.on("connection", (socket) => {
+io.on("connection", (socket: Socket) => {
   console.log(`${socket.id} connected`);
   connections.add(socket.id);
 
@@ -79,7 +88,7 @@ io.on("connection", (socket) => {
 
   socket.on("message", (newMessage) => {
     console.log('new message')
-    receiver = contacts.find((c) => c.username == newMessage.to);
+    const receiver = contacts.find((c) => c.username == newMessage.to);
     if (!receiver) {
       console.log("receiver not found")
       return "receiver not found";
@@ -91,7 +100,7 @@ io.on("connection", (socket) => {
     const url = `http://${receiver.location}/api/messages`
     console.log(`sending message ${ newMessage.body } to ${ url }`);
     
-    connections.getConnections().forEach((connection) => {
+    connections.getConnections().forEach((connection: String) => {
       if (connection == socket .id){
         // this is me
         return
