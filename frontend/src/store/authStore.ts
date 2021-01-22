@@ -3,7 +3,8 @@ import { User } from '../types';
 import {popupCenter} from "@/services/popupService";
 
 const authState = reactive<AuthState>({
-    user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
+    // user: localStorage.getItem('user') ? JSON.parse(localStorage.getItem('user')) : null
+    user: {"name":window.location.host.split('.')[0],"image":"https://avatars.dicebear.com/4.5/api/avataaars/tobias3.svg","email":"testemail"}
 });
 
 export const useAuthState = () => {

@@ -14,8 +14,9 @@ const app = createApp(App)
     .use(socketIo, {
         connection: '/',
         options: {
-            debug: true
-        }
+            debug: true,
+        },
+        transports: ['websocket']        
     })
     .mount('#app');
 
