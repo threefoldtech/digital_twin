@@ -5,7 +5,6 @@ import router from "./router";
 import '@fortawesome/fontawesome-free/js/all'
 
 import socketIo from './plugins/SocketIo'
-import config from './common/config'
 
 
 // console.log(Socketio)
@@ -13,7 +12,7 @@ import config from './common/config'
 const app = createApp(App)
     .use(router)
     .use(socketIo, {
-        connection: config.baseUrl,
+        connection: '/',
         options: {
             debug: true
         }

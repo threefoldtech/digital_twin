@@ -10,6 +10,8 @@ import Message from "./models/message";
 import Connections from "./models/connections";
 import Contact from "./models/contact";
 import {Socket} from "socket.io"
+import {appCallback, getAppLoginUrl} from "./service/authService";
+import session from "express-session";
 
 const app = express();
 const httpServer = http.createServer(app)
@@ -17,20 +19,46 @@ const io = socketio(httpServer)
 
 let connections = new Connections([]);
 const dummycontact = new Contact("Jason parser", "localhost:3000");
-let contacts = [dummycontact];
+let contacts: Array<Contact> = [dummycontact];
 let messages:Array<Message> = [];
 
-var corsOptions = {
-  origin: '*',
-  optionsSuccessStatus: 200 
-}
-app.use(cors(corsOptions))
+// var corsOptions = {
+//   origin: '*',
+//   optionsSuccessStatus: 200
+// }
+
+app.enable('trust proxy');
+
+app.use(session({
+  secret: 'secretpassphrase',
+  resave: false,
+  saveUninitialized: false,
+  proxy: true,
+  cookie: {
+    path: "/api",
+    secure: true,
+    httpOnly: true
+  }
+}));
+
+// app.use(cors(corsOptions))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.get("/api/login", (req,res) => {
-  console.log("to implement")
-})
+app.get('/api/signin', async (request, respose) => {
+  console.log(request.rawHeaders)
+  console.log(request.cookies)
+  const loginUrl = await getAppLoginUrl(request, `/api/callback`);
+  respose.redirect(loginUrl);
+});
+
+
+app.get('/api/callback', async (request, respose) => {
+  console.log(request.rawHeaders)
+  console.log(request.cookies)
+  const callback = await appCallback(request);
+  respose.redirect(callback);
+});
 
 app.get("/api/messages", (req, res) => {
   res.json(messages);
@@ -99,7 +127,7 @@ io.on("connection", (socket: Socket) => {
 
     const url = `http://${receiver.location}/api/messages`
     console.log(`sending message ${ newMessage.body } to ${ url }`);
-    
+
     connections.getConnections().forEach((connection: String) => {
       if (connection == socket .id){
         // this is me

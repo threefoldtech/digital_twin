@@ -1,7 +1,6 @@
 import { reactive } from "@vue/reactivity";
 import { toRefs } from "vue";
 import axios from "axios";
-import config from '../common/config'
 import moment from 'moment'
 import { Contact } from '../types'
 
@@ -11,7 +10,7 @@ const state = reactive<State>({
 });
 
 const retrieveContacts = () => {
-    console.log(axios.get(`${config.baseUrl}api/contacts`).then(function(response) {
+    console.log(axios.get(`/api/contacts`).then(function(response) {
         const contacts = response.data
         console.log(`here are the contacts`, contacts)
         contacts.sort((a,b)=> {
@@ -40,7 +39,7 @@ const setLastMessage= (username, message) => {
 
 const addContact = (username, location) => {
     console.log(`adding contact, ${username}`)
-    axios.post(`${config.baseUrl}api/contacts`, {username,location}).then( (res) => {
+    axios.post(`/api/contacts`, {username,location}).then( (res) => {
         // @todo check how to fix this
         // @ts-ignore
         state.contacts.push({name: username})

@@ -2,7 +2,6 @@ import { reactive } from "@vue/reactivity";
 import { Socket } from "socket.io-client";
 import { toRefs, inject } from "vue";
 import {useAuthState} from './authStore'
-import config from "../common/config";
 import { useMessagesActions } from "./messageStore";
 
 const state = reactive<State>({

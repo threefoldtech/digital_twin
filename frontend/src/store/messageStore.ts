@@ -1,7 +1,6 @@
 import { reactive } from "@vue/reactivity";
 import { toRefs } from "vue";
 import axios from "axios";
-import config from '../common/config';
 import moment from "moment";
 import { Message } from "../types";
 import {useSocketActions} from './socketStore'
@@ -11,12 +10,11 @@ import {useContactsActions} from './contactStore'
 const state = reactive<MessageState>({
     messages:
     {
-        "Jason Parser":[]
     }
 });
 
-const retrieveMessages = () => {  
-    console.log(axios.get(`${config.baseUrl}api/messages`).then(function(response) {
+const retrieveMessages = () => {
+    console.log(axios.get(`/api/messages`).then(function(response) {
         let messages= response.data
         messages.sort((a,b)=>  moment(a.date).unix() - moment(b.date).unix())
         state.messages = messages;
@@ -50,7 +48,7 @@ const sendMessage = (contactName, message) => {
         from: user.name
     }
     sendSocketMessage(msg)
-    
+
     addMessage(msg)
 }
 

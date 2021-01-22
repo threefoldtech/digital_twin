@@ -1,4 +1,13 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -9,10 +18,11 @@ const http_1 = __importDefault(require("http"));
 const socketio = require("socket.io");
 const body_parser_1 = __importDefault(require("body-parser"));
 const axios_1 = __importDefault(require("axios"));
-const cors_1 = __importDefault(require("cors"));
 const message_1 = __importDefault(require("./models/message"));
 const connections_1 = __importDefault(require("./models/connections"));
 const contact_1 = __importDefault(require("./models/contact"));
+const authService_1 = require("./service/authService");
+const express_session_1 = __importDefault(require("express-session"));
 const app = express_1.default();
 const httpServer = http_1.default.createServer(app);
 const io = socketio(httpServer);
@@ -20,16 +30,37 @@ let connections = new connections_1.default([]);
 const dummycontact = new contact_1.default("Jason parser", "localhost:3000");
 let contacts = [dummycontact];
 let messages = [];
-var corsOptions = {
-    origin: '*',
-    optionsSuccessStatus: 200
-};
-app.use(cors_1.default(corsOptions));
+// var corsOptions = {
+//   origin: '*',
+//   optionsSuccessStatus: 200
+// }
+app.enable('trust proxy');
+app.use(express_session_1.default({
+    secret: 'secretpassphrase',
+    resave: false,
+    saveUninitialized: false,
+    proxy: true,
+    cookie: {
+        path: "/api",
+        secure: true,
+        httpOnly: true
+    }
+}));
+// app.use(cors(corsOptions))
 app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: true }));
-app.get("/api/login", (req, res) => {
-    console.log("to implement");
-});
+app.get('/api/signin', (request, respose) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(request.rawHeaders);
+    console.log(request.cookies);
+    const loginUrl = yield authService_1.getAppLoginUrl(request, `/api/callback`);
+    respose.redirect(loginUrl);
+}));
+app.get('/api/callback', (request, respose) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(request.rawHeaders);
+    console.log(request.cookies);
+    const callback = yield authService_1.appCallback(request);
+    respose.redirect(callback);
+}));
 app.get("/api/messages", (req, res) => {
     res.json(messages);
 });
