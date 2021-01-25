@@ -157,5 +157,5 @@ io.on("connection", (socket: Socket) => {
 });
 
 httpServer.listen(3000, "localhost", () => {
-  console.log("go to http://localhost:3000");
+  console.log("go to http://localhost:3001");
 });
