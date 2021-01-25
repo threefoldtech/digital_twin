@@ -3,14 +3,14 @@ import { toRefs } from "vue";
 import axios from "axios";
 import moment from 'moment'
 import { Contact } from '../types'
-
+import config from "../../public/config/config"
 
 const state = reactive<State>({
     contacts:[]
 });
 
 const retrieveContacts = () => {
-    console.log(axios.get(`/api/contacts`).then(function(response) {
+    console.log(axios.get(`${config.baseUrl}api/contacts`).then(function(response) {
         const contacts = response.data
         console.log(`here are the contacts`, contacts)
         contacts.sort((a,b)=> {
@@ -37,15 +37,26 @@ const setLastMessage= (username, message) => {
     //TODO: Sort contacts
 }
 
-const addContact = (username, location) => {
-    console.log(`adding contact, ${username}`)
-    axios.post(`/api/contacts`, {username,location}).then( (res) => {
+const contactIsHealthy = (location) => {
+    let isAvailable = false
+    axios.get(`https://${location}/api/healthcheck`).then( (res) => {
+        console.log(res)
+        isAvailable = true
+    }).catch( res => {
+        isAvailable = false
+    })
+    return isAvailable
+}
+
+const addContact = (username, location, dontCheck = false) => { 
+    if(!dontCheck && !contactIsHealthy(location)){ 
+        throw "Peer is not healthy"
+    }
+    axios.post(`${config.baseUrl}api/contacts`, {username,location}).then( (res) => {
         // @todo check how to fix this
         // @ts-ignore
         state.contacts.push({name: username})
-        console.log("added contact")
     })
-    console.log(state.contacts)
 }
 
 export const useContactsState = () => {

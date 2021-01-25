@@ -60,6 +60,10 @@ app.get('/api/callback', async (request, respose) => {
   respose.redirect(callback);
 });
 
+app.get('api/healthcheck', async(req, res) => {
+  res.sendStatus(200);
+})
+
 app.get("/api/messages", (req, res) => {
   res.json(messages);
 });

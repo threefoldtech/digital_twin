@@ -61,6 +61,9 @@ app.get('/api/callback', (request, respose) => __awaiter(void 0, void 0, void 0,
     const callback = yield authService_1.appCallback(request);
     respose.redirect(callback);
 }));
+app.get('api/healthcheck', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    res.sendStatus(200);
+}));
 app.get("/api/messages", (req, res) => {
     res.json(messages);
 });

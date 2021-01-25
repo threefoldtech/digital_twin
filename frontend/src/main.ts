@@ -12,7 +12,7 @@ import socketIo from './plugins/SocketIo'
 const app = createApp(App)
     .use(router)
     .use(socketIo, {
-        connection: '/',
+        connection: 'http://localhost:3000',
         options: {
             debug: true,
         },

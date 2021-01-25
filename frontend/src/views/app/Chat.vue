@@ -11,17 +11,7 @@
             <i class="fas fa-plus"></i>
           </button>
         </div>
-        <div v-if="showDialog" class="flex mb-4">
-          <form
-          @submit.prevent="contactAdd"
-          >
-            <label for="username">Username: </label>
-            <input v-model="usernameAdd" id="username" class="mb-2" placeholder="Username"> <br>
-            <label for="location">Location: </label>
-            <input id="location" disabled=true class="mb-2" :placeholder="location"> <br>
-            <button>Add contact</button>
-          </form>
-        </div>
+        <addContactComponent v-if="showDialog" @closeDialog="showDialog=false"> </addContactComponent>
         <div class="relative full">
           <div
             class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
@@ -66,7 +56,9 @@
                   {{ m(contact.lastMessage.timeStamp).fromNow() }}
                 </span>
               </p>
-              <p class="font-thin" v-if="contact.lastMessage">{{ truncate(contact.lastMessage.body) }}</p>
+              <p class="font-thin" v-if="contact.lastMessage">
+                {{ truncate(contact.lastMessage.body) }}
+              </p>
               <p class="font-thin" v-else>No messages yet</p>
             </div>
           </div>
@@ -116,7 +108,7 @@
                   'text-right': isMine(message),
                 }"
               >
-                {{ m(message.date).fromNow()  }}
+                {{ m(message.date).fromNow() }}
               </p>
             </div>
           </div>
@@ -124,18 +116,21 @@
       </div>
       <div class="p4 grid grid-rows-3">
         <p class="mx-6 pt-4 font-thin">
-          <span 
-          v-if="contacts[selected].istyping"
+          <span v-if="contacts[selected].istyping"
             >{{ contacts[selected].name }} is typing ...
-            </span>
-          </p>
+          </span>
+        </p>
         <form
           @submit.prevent="messageSend"
           class="row-span-2 rounded-xl grid grid-cols-12 h place-items-center bg-white mx-4"
         >
           <span>+</span>
-          <input class="col-span-10 w-full h-full pl-4" type="text" v-model="message"/>
-          <button class="px-2 py-8" type="submit" value="Send" >Send </button>
+          <input
+            class="col-span-10 w-full h-full pl-4"
+            type="text"
+            v-model="message"
+          />
+          <button class="px-2 py-8" type="submit" value="Send">Send</button>
         </form>
       </div>
     </div>
@@ -158,31 +153,30 @@ import moment from "moment";
 import { defineComponent, onMounted, ref, computed, inject, watch } from "vue";
 import { useMessagesState, useMessagesActions } from "../../store/messageStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
-import {useAuthState} from "../../store/authStore";
-import { useSocketActions } from "../../store/socketStore"
+import { useAuthState } from "../../store/authStore";
+import { useSocketActions } from "../../store/socketStore";
+import addContactComponent from "../../components/ContactAdd.vue"
 // import contactpopup from "../../components/ContactPopup.vue";
-
 
 export default defineComponent({
   name: "Apps",
-  // components: {contactpopup},
+  components: {addContactComponent},
   setup(_, context) {
     const { messages } = useMessagesState();
     const { contacts } = useContactsState();
     const { retrieveMessages, sendMessage } = useMessagesActions();
     const { retrieveContacts, addContact } = useContactsActions();
     const { initializeSocket } = useSocketActions();
-    const {user} = useAuthState();
+    const { user } = useAuthState();
 
     const m = (val) => moment(val);
     let selected = ref(0);
     const searchValue = ref("");
     const message = ref("");
     let showDialog = ref(false);
-    let usernameAdd = ref("")
 
     const isMine = (message) => {
-      return message.from == user.name ;
+      return message.from == user.name;
     };
     const truncate = (value, limit = 40) => {
       if (value.length > limit) {
@@ -190,31 +184,21 @@ export default defineComponent({
       }
       return value;
     };
-    
-    const messageSend = (e) => {
-      const contact = contacts.value[selected.value]
-      sendMessage(contact.name, message.value)
-      message.value = ""
-      //todo clean this up
-      selected.value = 0
-    }
 
-    const contactAdd = () => {
-      addContact(usernameAdd.value, location.value)
-      usernameAdd.value = ""
-      showDialog.value = false
-    }
-    
-    const location = computed(() => {
-      return `${usernameAdd.value}-chat`
-    })
+    const messageSend = (e) => {
+      const contact = contacts.value[selected.value];
+      sendMessage(contact.name, message.value);
+      message.value = "";
+      //todo clean this up
+      selected.value = 0;
+    };
 
     const filteredContacts = computed(() => {
-      return contacts
-    })
+      return contacts;
+    });
     onMounted(() => {
-      initializeSocket(user.name)
-    })
+      initializeSocket(user.name);
+    });
     onMounted(retrieveMessages);
     onMounted(retrieveContacts);
 
@@ -229,9 +213,6 @@ export default defineComponent({
       message,
       isMine,
       showDialog,
-      usernameAdd,
-      location,
-      contactAdd,
       m,
     };
   },

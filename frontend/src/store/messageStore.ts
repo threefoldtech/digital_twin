@@ -6,6 +6,7 @@ import { Message } from "../types";
 import {useSocketActions} from './socketStore'
 import { useAuthState } from "./authStore";
 import {useContactsActions} from './contactStore'
+import config from '../../public/config/config'
 
 const state = reactive<MessageState>({
     messages:
@@ -14,7 +15,7 @@ const state = reactive<MessageState>({
 });
 
 const retrieveMessages = () => {
-    console.log(axios.get(`/api/messages`).then(function(response) {
+    console.log(axios.get(`${config.baseUrl}api/messages`).then(function(response) {
         let messages= response.data
         messages.sort((a,b)=>  moment(a.date).unix() - moment(b.date).unix())
         state.messages = messages;
