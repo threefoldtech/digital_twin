@@ -60,7 +60,7 @@ app.get('/api/callback', async (request, respose) => {
   respose.redirect(callback);
 });
 
-app.get('api/healthcheck', async(req, res) => {
+app.get('/api/healthcheck', async(req, res) => {
   res.sendStatus(200);
 })
 
@@ -157,5 +157,5 @@ io.on("connection", (socket: Socket) => {
 });
 
 httpServer.listen(3000, "localhost", () => {
-  console.log("go to http://localhost:3001");
+  console.log("go to http://localhost:3000");
 });
