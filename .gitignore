@@ -1,7 +1,8 @@
 .DS_Store
 node_modules/
 /dist/
-
+# Ignore built ts files
+dist/**/*
 # local env files
 .env.local
 .env.*.local

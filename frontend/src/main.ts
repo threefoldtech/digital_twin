@@ -16,7 +16,7 @@ const app = createApp(App)
         options: {
             debug: true,
         },
-        transports: ['websocket']        
+        transports: ['websocket']
     })
     .mount('#app');
 

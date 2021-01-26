@@ -4,13 +4,14 @@ import axios from "axios";
 import moment from 'moment'
 import { Contact } from '../types'
 import config from "../../public/config/config"
+import {uuidv4} from "../../src/common/index"
 
 const state = reactive<State>({
     contacts:[]
 });
 
-const retrieveContacts = () => {
-    console.log(axios.get(`${config.baseUrl}api/contacts`).then(function(response) {
+const retrieveContacts = async () => {
+    return axios.get(`${config.baseUrl}api/contacts`).then(function(response) {
         const contacts = response.data
         console.log(`here are the contacts`, contacts)
         contacts.sort((a,b)=> {
@@ -19,7 +20,7 @@ const retrieveContacts = () => {
             return moment(bdate).unix() - moment(adate).unix()
         })
         state.contacts = contacts;
-    }))
+    })
 }
 const setLastMessage= (username, message) => {
     if(!state.contacts.length || !state.contacts.find(u => u.name == username)) return
@@ -52,10 +53,11 @@ const addContact = (username, location, dontCheck = false) => {
     if(!dontCheck && !contactIsHealthy(location)){ 
         throw "Peer is not healthy"
     }
-    axios.post(`${config.baseUrl}api/contacts`, {username,location}).then( (res) => {
+    const id = uuidv4()
+    axios.post(`${config.baseUrl}api/contacts`, {id, username,location}).then( (res) => {
         // @todo check how to fix this
         // @ts-ignore
-        state.contacts.push({name: username})
+        state.contacts.push({id, name: username})
     })
 }
 

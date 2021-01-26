@@ -11,7 +11,7 @@
             <i class="fas fa-plus"></i>
           </button>
         </div>
-        <addContactComponent v-if="showDialog" @closeDialog="showDialog=false"> </addContactComponent>
+        <add-contact v-if="showDialog" @closeDialog="showDialog=false"> </add-contact>
         <div class="relative full">
           <div
             class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
@@ -36,7 +36,7 @@
               'bg-white': i !== selected,
               'bg-icon': i === selected,
             }"
-            @click="selected = i"
+            @click="setSelected(i)"
           >
             <div class="col-span-2 place-items-center grid">
               <img
@@ -70,69 +70,7 @@
       class="col-span-6 h-full w-full grid grid-rows-6"
       v-if="contacts.length"
     >
-      <div class="grid grid-cols-12 bg-white rounded-lg m-4">
-        <div class="col-span-2 place-items-center grid">
-          <img
-            :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-              contacts[selected].name
-            )}.svg`"
-            alt="User image"
-            class="h-12 bg-icon rounded-full"
-          />
-        </div>
-        <div class="col-span-10 py-8">
-          <p class="font-bold font">{{ contacts[selected].name }}</p>
-          <p class="font-thin">
-            <span v-if="contacts[selected].isOnline">Is online</span>
-            <span v-else>
-              Last seen {{ m(contacts[selected].lastSeen).fromNow() }}
-            </span>
-          </p>
-        </div>
-      </div>
-      <div class="row-span-4 relative overflow-y-auto">
-        <div class="absolute w-full px-4">
-          <div
-            v-for="(message, i) in messages[contacts[selected].name]"
-            class="my-2 flex"
-            :class="{
-              'justify-end': isMine(message),
-            }"
-            :key="i"
-          >
-            <div class="bg-white p-4 rounded-lg">
-              {{ message.body }}
-              <p
-                class="font-thin"
-                :class="{
-                  'text-right': isMine(message),
-                }"
-              >
-                {{ m(message.date).fromNow() }}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="p4 grid grid-rows-3">
-        <p class="mx-6 pt-4 font-thin">
-          <span v-if="contacts[selected].istyping"
-            >{{ contacts[selected].name }} is typing ...
-          </span>
-        </p>
-        <form
-          @submit.prevent="messageSend"
-          class="row-span-2 rounded-xl grid grid-cols-12 h place-items-center bg-white mx-4"
-        >
-          <span>+</span>
-          <input
-            class="col-span-10 w-full h-full pl-4"
-            type="text"
-            v-model="message"
-          />
-          <button class="px-2 py-8" type="submit" value="Send">Send</button>
-        </form>
-      </div>
+    <chat-view :selected="selected"></chat-view>
     </div>
     <div
       class="col-span-3 relative h-full w-full overflow-y-auto flex flex-col"
@@ -142,7 +80,7 @@
           class="bg-white h-96 w-full relative rounded-lg mb-4 mt-0"
           v-for="i in 3"
           :key="i"
-        ></div>
+        >{{selectedId}}</div>
       </div>
     </div>
   </div>
@@ -155,42 +93,47 @@ import { useMessagesState, useMessagesActions } from "../../store/messageStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
 import { useAuthState } from "../../store/authStore";
 import { useSocketActions } from "../../store/socketStore";
-import addContactComponent from "../../components/ContactAdd.vue"
+import addContact from "../../components/ContactAdd.vue"
+import chatView from "../../components/ChatView.vue"
 // import contactpopup from "../../components/ContactPopup.vue";
 
 export default defineComponent({
   name: "Apps",
-  components: {addContactComponent},
+  components: {addContact, chatView},
   setup(_, context) {
     const { messages } = useMessagesState();
     const { contacts } = useContactsState();
-    const { retrieveMessages, sendMessage } = useMessagesActions();
-    const { retrieveContacts, addContact } = useContactsActions();
+    const { retrieveMessages } = useMessagesActions();
+    const { retrieveContacts } = useContactsActions();
     const { initializeSocket } = useSocketActions();
     const { user } = useAuthState();
 
     const m = (val) => moment(val);
-    let selected = ref(0);
     const searchValue = ref("");
-    const message = ref("");
     let showDialog = ref(false);
+    
+    let selected = ref(0);
+    let selectedId = ref("")
+    const setSelected = (i) => {
+      selected.value = i
+      // @ts-ignore
+      selectedId = contacts.value[i].id
+    }
+    watch(contacts, () => {
+      // @ts-ignore
+      let index = contacts.value.findIndex((c)=> c.id == selectedId )
+      if(index == -1){
+        index = 0
+      }
+      selected.value = index
+      
+    })
 
-    const isMine = (message) => {
-      return message.from == user.name;
-    };
     const truncate = (value, limit = 40) => {
       if (value.length > limit) {
         value = value.substring(0, limit - 3) + "...";
       }
       return value;
-    };
-
-    const messageSend = (e) => {
-      const contact = contacts.value[selected.value];
-      sendMessage(contact.name, message.value);
-      message.value = "";
-      //todo clean this up
-      selected.value = 0;
     };
 
     const filteredContacts = computed(() => {
@@ -200,18 +143,22 @@ export default defineComponent({
       initializeSocket(user.name);
     });
     onMounted(retrieveMessages);
-    onMounted(retrieveContacts);
+    onMounted(() => {
+      retrieveContacts().then(()=> {
+        //@ts-ignore
+        selectedId =  contacts.value[selected.value].id
+      })
+    });
 
     return {
       selected,
+      selectedId,
+      setSelected,
       messages,
       contacts,
       truncate,
-      messageSend,
       searchValue,
       filteredContacts,
-      message,
-      isMine,
       showDialog,
       m,
     };

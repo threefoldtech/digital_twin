@@ -13,19 +13,24 @@ import {Socket} from "socket.io"
 import {appCallback, getAppLoginUrl} from "./service/authService";
 import session from "express-session";
 
+var corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200
+}
+
 const app = express();
 const httpServer = http.createServer(app)
-const io = socketio(httpServer)
+// @todo fix cors in prod -> config
+const io = socketio(httpServer, { cors: {
+  origin: '*',
+}})
+app.use(cors(corsOptions))
 
 let connections = new Connections([]);
-const dummycontact = new Contact("Jason parser", "localhost:3000");
+const dummycontact = new Contact("c2ef210a-f68c-44f4-98e3-a62e1d7d28e9", "Jason parser", "localhost:3000");
 let contacts: Array<Contact> = [dummycontact];
 let messages:Array<Message> = [];
 
-// var corsOptions = {
-//   origin: '*',
-//   optionsSuccessStatus: 200
-// }
 
 app.enable('trust proxy');
 
@@ -41,7 +46,6 @@ app.use(session({
   }
 }));
 
-// app.use(cors(corsOptions))
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -71,6 +75,7 @@ app.get("/api/messages", (req, res) => {
 app.get("/api/contacts", (req, res) => {
   const resp = contacts.map((contact) => {
     return {
+      id: contact.id,
       name: contact.username
     };
   });
@@ -96,7 +101,7 @@ app.post("/api/messages", (req, res) => {
 app.post("/api/contacts", (req, res) => {
   // @ TODO check if valid
   const con = req.body;
-  const contact = new Contact(con.username, con.location);
+  const contact = new Contact(con.id, con.username, con.location);
   console.log(`Adding contact  ${contact.username}`);
 
   // @TODO implement db here

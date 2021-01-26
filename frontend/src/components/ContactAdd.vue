@@ -22,8 +22,7 @@
     <div v-if="contactAddError">
       <span class="red"
         >Failed to reach digitaltwin of the contact. Do you still want to add
-        the contact?</span
-      >
+        the contact?</span>
       <button @click="forceAddContact">Add</button>
     </div>
   </div>
@@ -34,7 +33,7 @@ import { defineComponent, ref, computed } from "vue";
 import { useContactsActions } from "../store/contactStore";
 
 export default defineComponent({
-  name: "Apps",
+  name: "ContactAdd",
   setup(props, {emit}) {
     const { addContact } = useContactsActions();
     let usernameAdd = ref("");
