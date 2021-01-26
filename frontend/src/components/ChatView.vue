@@ -59,7 +59,7 @@
         type="text"
         v-model="message"
       />
-      <button class="px-2 py-8" type="submit" value="Send">Send {{selected}} </button>
+      <button class="px-2 py-8" type="submit" value="Send">Send</button>
     </form>
   </div>
 </template>
