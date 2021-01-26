@@ -2,14 +2,16 @@
   <div class="grid grid-cols-12">
     <div class="col-span-3 grid grid-rows-6">
       <div>
-        <div class="flex mb-4">
+        <div class="flex mb-2">
           <h1 style="font-size: 1.75em">Chats</h1>
+        </div>
+        <div class="flex items-center mb-2">
           <button
-            class="ml-2 h-10 w-10 rounded-full"
+            class="h-10 w-10 rounded-full"
             @click="showDialog = true"
           >
-            <i class="fas fa-plus"></i>
-          </button>
+            <i class="fas fa-plus"></i> 
+          </button><span> Add a contact </span>
         </div>
         <add-contact v-if="showDialog" @closeDialog="showDialog=false"> </add-contact>
         <div class="relative full">
@@ -49,15 +51,15 @@
             </div>
             <div class="col-span-10 pr-4">
               <p class="flex place-content-between">
-                <span class="font-bold">
+                <span class="font-bold ">
                   {{ contact.name }}
                 </span>
                 <span class="font-thin" v-if="contact.lastMessage">
                   {{ m(contact.lastMessage.timeStamp).fromNow() }}
                 </span>
               </p>
-              <p class="font-thin" v-if="contact.lastMessage">
-                {{ truncate(contact.lastMessage.body) }}
+              <p class="font-thin truncate" v-if="contact.lastMessage">
+                {{ contact.lastMessage.body }}
               </p>
               <p class="font-thin" v-else>No messages yet</p>
             </div>
@@ -77,7 +79,7 @@
     >
       <div class="absolute max-w-full w-full px-4 pb-4">
         <div
-          class="bg-white h-96 w-full relative rounded-lg mb-4 mt-0"
+          class="bg-white h-52 w-full relative rounded-lg mb-4 mt-0"
           v-for="i in 3"
           :key="i"
         >{{selectedId}}</div>
@@ -143,12 +145,7 @@ export default defineComponent({
       initializeSocket(user.name);
     });
     onMounted(retrieveMessages);
-    onMounted(() => {
-      retrieveContacts().then(()=> {
-        //@ts-ignore
-        selectedId =  contacts.value[selected.value].id
-      })
-    });
+    onMounted(retrieveContacts);
 
     return {
       selected,

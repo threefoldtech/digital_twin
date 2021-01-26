@@ -12,6 +12,7 @@ import Contact from "./models/contact";
 import {Socket} from "socket.io"
 import {appCallback, getAppLoginUrl} from "./service/authService";
 import session from "express-session";
+import {config} from "./config/config"
 
 var corsOptions = {
   origin: '*',
@@ -20,6 +21,7 @@ var corsOptions = {
 
 const app = express();
 const httpServer = http.createServer(app)
+// const io = socketio(httpServer)
 // @todo fix cors in prod -> config
 const io = socketio(httpServer, { cors: {
   origin: '*',
@@ -27,7 +29,7 @@ const io = socketio(httpServer, { cors: {
 app.use(cors(corsOptions))
 
 let connections = new Connections([]);
-const dummycontact = new Contact("c2ef210a-f68c-44f4-98e3-a62e1d7d28e9", "Jason parser", "localhost:3000");
+const dummycontact = new Contact("c2ef210a-f68c-44f4-98e3-a62e1d7d28e9", "Jason Parser", "localhost:3000");
 let contacts: Array<Contact> = [dummycontact];
 let messages:Array<Message> = [];
 
@@ -125,6 +127,7 @@ io.on("connection", (socket: Socket) => {
 
   socket.on("message", (newMessage) => {
     console.log('new message')
+    newMessage = new Message(newMessage.from, newMessage.to, newMessage.body)
     const receiver = contacts.find((c) => c.username == newMessage.to);
     if (!receiver) {
       console.log("receiver not found")
@@ -145,6 +148,10 @@ io.on("connection", (socket: Socket) => {
       io.to(connection).emit("message", newMessage);
       console.log(`send message to ${connection}`);
     });
+
+    if(newMessage.to == newMessage.from){
+      return
+    }
     try{
 
       axios.post(url, newMessage)

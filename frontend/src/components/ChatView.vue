@@ -19,7 +19,7 @@
       </p>
     </div>
   </div>
-  <div class="row-span-4 relative overflow-y-auto">
+  <div class="row-span-4 relative overflow-y-auto" id="messageBox">
     <div class="absolute w-full px-4">
       <div
         v-for="(message, i) in messages[contacts[selected].name]"
@@ -29,7 +29,7 @@
         }"
         :key="i"
       >
-        <div class="bg-white p-4 rounded-lg">
+        <div class="bg-white p-4 rounded-lg truncate">
           {{ message.body }}
           <p
             class="font-thin"
@@ -37,7 +37,7 @@
               'text-right': isMine(message),
             }"
           >
-            {{ m(message.date).fromNow() }}
+            {{ m(message.timeStamp).fromNow() }}
           </p>
         </div>
       </div>
@@ -66,7 +66,7 @@
 
 <script lang="ts">
 import moment from "moment";
-import { defineComponent, ref, toRefs } from "vue";
+import { defineComponent, onMounted, ref, toRefs } from "vue";
 import { useMessagesState, useMessagesActions } from "../store/messageStore";
 import { useContactsState } from "../store/contactStore";
 import { useAuthState } from "../store/authStore";
@@ -74,33 +74,42 @@ import { useAuthState } from "../store/authStore";
 export default defineComponent({
   name: "ChatView",
   props: {
-      selected: Number
+    selected: Number,
   },
-  setup(props) {
+  setup(props, {}) {
     const { messages } = useMessagesState();
     const { sendMessage } = useMessagesActions();
     const { user } = useAuthState();
     const { contacts } = useContactsState();
     const m = (val) => moment(val);
 
-    const propRefs = toRefs(props)
+    const propRefs = toRefs(props);
 
     const isMine = (message) => {
       return message.from == user.name;
     };
-    const truncate = (value, limit = 40) => {
+    const truncate = (value, limit = 20) => {
       if (value.length > limit) {
         value = value.substring(0, limit - 3) + "...";
       }
       return value;
     };
 
-const message = ref("");
+    const scrollToBottom = () =>{
+      var container = document.getElementById("messageBox");
+      container.scrollTop = container.scrollHeight;
+    }
+
+    const message = ref("");
     const messageSend = (e) => {
-      console.log(`sending to`, props.selected)
+      if(message.value == ""){
+        return
+      }
       sendMessage(contacts.value[props.selected].name, message.value);
       message.value = "";
+      scrollToBottom()
     };
+
 
     return {
       messages,

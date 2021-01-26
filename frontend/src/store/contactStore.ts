@@ -40,7 +40,7 @@ const setLastMessage= (username, message) => {
 
 const contactIsHealthy = (location) => {
     let isAvailable = false
-    axios.get(`https://${location}/api/healthcheck`).then( (res) => {
+    axios.get(`https://${location}.digitaltwin.jimbertesting.be/api/healthcheck`).then( (res) => {
         console.log(res)
         isAvailable = true
     }).catch( res => {
@@ -50,7 +50,7 @@ const contactIsHealthy = (location) => {
 }
 
 const addContact = (username, location, dontCheck = false) => { 
-    if(!dontCheck && !contactIsHealthy(location)){ 
+    if(!dontCheck && !contactIsHealthy(username)){ 
         throw "Peer is not healthy"
     }
     const id = uuidv4()

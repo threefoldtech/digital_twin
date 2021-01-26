@@ -3,8 +3,8 @@ import App from './App.vue';
 import './assets/index.css';
 import router from "./router";
 import '@fortawesome/fontawesome-free/js/all'
-
 import socketIo from './plugins/SocketIo'
+import config from "../public/config/config"
 
 
 // console.log(Socketio)
@@ -12,7 +12,7 @@ import socketIo from './plugins/SocketIo'
 const app = createApp(App)
     .use(router)
     .use(socketIo, {
-        connection: 'http://localhost:3000',
+        connection: config.baseUrl,
         options: {
             debug: true,
         },

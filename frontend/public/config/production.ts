@@ -1,4 +1,4 @@
 let config = {
-    baseUrl: "/"
+    baseUrl: `${window.location.origin}/`
 }
 export default config 

@@ -16,6 +16,7 @@ const state = reactive<MessageState>({
 
 const retrieveMessages = () => {
     console.log(axios.get(`${config.baseUrl}api/messages`).then(function(response) {
+        console.log("retreivedmessages: ", response.data)
         let messages= response.data
         messages.sort((a,b)=>  moment(a.date).unix() - moment(b.date).unix())
         state.messages = messages;
@@ -49,7 +50,6 @@ const sendMessage = (contactName, message) => {
         from: user.name
     }
     sendSocketMessage(msg)
-
     addMessage(msg)
 }
 
