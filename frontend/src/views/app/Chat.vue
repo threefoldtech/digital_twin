@@ -6,14 +6,29 @@
           <h1 style="font-size: 1.75em">Chats</h1>
         </div>
         <div class="flex items-center mb-2">
-          <button
-            class="h-10 w-10 rounded-full"
-            @click="showDialog = true"
-          >
-            <i class="fas fa-plus"></i> 
-          </button><span> Add a contact </span>
+          <button class="h-10 w-10 rounded-full" @click="showDialog = true">
+            <i class="fas fa-plus"></i></button
+          ><span> Add a contact </span>
         </div>
-        <add-contact v-if="showDialog" @closeDialog="showDialog=false"> </add-contact>
+        <add-contact v-if="showDialog" @closeDialog="showDialog = false">
+        </add-contact>
+        <div v-if="connectionRequests.length > 0">
+          <h2 style="font-size: 1.5em">
+            You have
+            <span style="color: red"> {{ connectionRequests.length }} </span>
+            new connection request<span v-if="connectionRequests.length > 1"
+              >s</span
+            >
+          </h2>
+          <div v-for="(connRequest, i) in connectionRequests" :key="i">
+            <div class="grid grid-cols-12 w-full rounded-lg mb-2 py-2">
+              <span class="truncate col-span-8">{{ connRequest.username }}</span>
+              <button class="col-span-4" @click="addConnectionRequestToContacts(connRequest.id)">
+                Add to contacts
+              </button>
+            </div>
+          </div>
+        </div>
         <div class="relative full">
           <div
             class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
@@ -51,7 +66,7 @@
             </div>
             <div class="col-span-10 pr-4">
               <p class="flex place-content-between">
-                <span class="font-bold ">
+                <span class="font-bold">
                   {{ contact.name }}
                 </span>
                 <span class="font-thin" v-if="contact.lastMessage">
@@ -72,7 +87,7 @@
       class="col-span-6 h-full w-full grid grid-rows-6"
       v-if="contacts.length"
     >
-    <chat-view :selected="selected"></chat-view>
+      <chat-view :selected="selected"></chat-view>
     </div>
     <div
       class="col-span-3 relative h-full w-full overflow-y-auto flex flex-col"
@@ -82,7 +97,9 @@
           class="bg-white h-52 w-full relative rounded-lg mb-4 mt-0"
           v-for="i in 3"
           :key="i"
-        >{{selectedId}}</div>
+        >
+          {{ selectedId }}
+        </div>
       </div>
     </div>
   </div>
@@ -90,53 +107,56 @@
 
 <script lang="ts">
 import moment from "moment";
-import { defineComponent, onMounted, ref, computed, inject, watch, onBeforeMount } from "vue";
+import {
+  defineComponent,
+  onMounted,
+  ref,
+  computed,
+  inject,
+  watch,
+  onBeforeMount,
+} from "vue";
 import { useMessagesState, useMessagesActions } from "../../store/messageStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
 import { useAuthState } from "../../store/authStore";
 import { useSocketActions } from "../../store/socketStore";
-import addContact from "../../components/ContactAdd.vue"
-import chatView from "../../components/ChatView.vue"
+import addContact from "../../components/ContactAdd.vue";
+import chatView from "../../components/ChatView.vue";
 // import contactpopup from "../../components/ContactPopup.vue";
 
 export default defineComponent({
   name: "Apps",
-  components: {addContact, chatView},
+  components: { addContact, chatView },
   setup(_, context) {
     const { messages } = useMessagesState();
-    const { contacts } = useContactsState();
+    const { contacts, connectionRequests } = useContactsState();
     const { retrieveMessages } = useMessagesActions();
-    const { retrieveContacts } = useContactsActions();
+    const {
+      retrieveContacts,
+      moveConnectionRequestToContacts,
+    } = useContactsActions();
     const { initializeSocket } = useSocketActions();
     const { user } = useAuthState();
 
     const m = (val) => moment(val);
     const searchValue = ref("");
     let showDialog = ref(false);
-    
+
     let selected = ref(0);
-    let selectedId = ref("")
+    let selectedId = ref("");
     const setSelected = (i) => {
-      selected.value = i
+      selected.value = i;
       // @ts-ignore
-      selectedId = contacts.value[i].id
-    }
+      selectedId = contacts.value[i].id;
+    };
     watch(contacts, () => {
       // @ts-ignore
-      let index = contacts.value.findIndex((c)=> c.id == selectedId )
-      if(index == -1){
-        index = 0
+      let index = contacts.value.findIndex((c) => c.id == selectedId);
+      if (index == -1) {
+        index = 0;
       }
-      selected.value = index
-      
-    })
-
-    const truncate = (value, limit = 40) => {
-      if (value.length > limit) {
-        value = value.substring(0, limit - 3) + "...";
-      }
-      return value;
-    };
+      selected.value = index;
+    });
 
     const filteredContacts = computed(() => {
       return contacts;
@@ -146,14 +166,18 @@ export default defineComponent({
     });
     onBeforeMount(retrieveMessages);
     onBeforeMount(retrieveContacts);
-
+    const addConnectionRequestToContacts = (id) => {
+      moveConnectionRequestToContacts(id);
+      console.log(id);
+    };
     return {
       selected,
       selectedId,
       setSelected,
       messages,
       contacts,
-      truncate,
+      connectionRequests,
+      addConnectionRequestToContacts,
       searchValue,
       filteredContacts,
       showDialog,

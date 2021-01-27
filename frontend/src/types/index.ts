@@ -25,7 +25,9 @@ export interface Message {
 }
 
 export interface Contact {
+    id: string,
     name:string,
+    location:string,
     lastMessage: Message,
     isTyping: false
 }

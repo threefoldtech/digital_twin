@@ -13,6 +13,8 @@ import {Socket} from "socket.io"
 import {appCallback, getAppLoginUrl} from "./service/authService";
 import session from "express-session";
 import {config} from "./config/config"
+import {uuidv4} from "./common/index"
+import {sendEventToConnectedSockets} from "./service/socketService"
 
 var corsOptions = {
   origin: '*',
@@ -21,16 +23,17 @@ var corsOptions = {
 
 const app = express();
 const httpServer = http.createServer(app)
-// const io = socketio(httpServer)
+const io = socketio(httpServer)
 // @todo fix cors in prod -> config
-const io = socketio(httpServer, { cors: {
-  origin: '*',
-}})
-app.use(cors(corsOptions))
+// const io = socketio(httpServer, { cors: {
+//   origin: '*',
+// }})
+// app.use(cors(corsOptions))
 
 let connections = new Connections([]);
 const dummycontact = new Contact("c2ef210a-f68c-44f4-98e3-a62e1d7d28e9", "Jason Parser", "localhost:3000");
 let contacts: Array<Contact> = [dummycontact];
+let contactRequests: Array<Contact> = [];
 let messages:Array<Message> = [];
 
 
@@ -84,6 +87,43 @@ app.get("/api/contacts", (req, res) => {
   res.json(resp);
 });
 
+app.get("/api/contactRequests", (req, res) => {
+  res.json(contactRequests);
+});
+
+app.get("/api/contacts", (req, res) => {
+  const resp = contacts.map((contact) => {
+    return {
+      id: contact.id,
+      name: contact.username
+    };
+  });
+  res.json(resp);
+});
+
+app.post("/api/contacts", (req, res) => {
+  if(req.query.id){
+    const id = req.query.id
+    console.log("adding from requests to contacts: ", id)
+    const index = contactRequests.findIndex(c=>c.id==id)
+    // @TODO implement db here
+    contacts.push(contactRequests[index]);
+    contactRequests.splice(index,1)
+    res.sendStatus(200)
+    return
+  }
+  const con = req.body;
+  const contact = new Contact(con.id, con.username, con.location);
+  console.log(`Adding contact  ${contact.username}`);
+
+  // @TODO implement db here
+  contacts.push(contact);
+
+  res.sendStatus(200);
+  
+});
+
+// Should be externally availble
 app.post("/api/messages", (req, res) => {
   // @ TODO check if valid
   const mes = req.body;
@@ -92,22 +132,15 @@ app.post("/api/messages", (req, res) => {
 
   // @TODO implement db here
   messages.push(message);
+  sendEventToConnectedSockets(io, connections, "message", message)
 
-  connections.getConnections().forEach((connection: String) => {
-    io.to(connection).emit("message", message);
-    console.log(`send message to ${connection}`);
-  });
-  res.sendStatus(200);
-});
-
-app.post("/api/contacts", (req, res) => {
-  // @ TODO check if valid
-  const con = req.body;
-  const contact = new Contact(con.id, con.username, con.location);
-  console.log(`Adding contact  ${contact.username}`);
-
-  // @TODO implement db here
-  contacts.push(contact);
+  if(!contacts.find(c=> c.username == message.from) ){
+    const id = uuidv4()
+    const contact = new Contact(id, message.from, req.get('host'));
+    console.log("adding contact to contactrequest", contact )
+    contactRequests.push(contact);
+    sendEventToConnectedSockets(io, connections, "connectionRequest", contact)
+  }
 
   res.sendStatus(200);
 });

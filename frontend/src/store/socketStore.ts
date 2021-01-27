@@ -3,6 +3,7 @@ import { Socket } from "socket.io-client";
 import { toRefs, inject } from "vue";
 import {useAuthState} from './authStore'
 import { useMessagesActions } from "./messageStore";
+import { useContactsActions } from "./contactStore";
 
 const state = reactive<State>({
   socket: "",
@@ -21,6 +22,10 @@ const initializeSocket = (username: string) => {
     const {addMessage} = useMessagesActions()
     addMessage(message)
   });
+  state.socket.on("connectionRequest", (newContactRequest)=> {
+    const {addConnectionRequests} = useContactsActions()
+    addConnectionRequests(newContactRequest)
+  })
 };
 
 const sendSocketMessage = async (message) => {
