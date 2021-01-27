@@ -1,6 +1,6 @@
 <template>
   <div class="grid grid-cols-12">
-    <div class="col-span-3 grid grid-rows-6">
+    <div class="col-span-3">
       <div>
         <div class="flex mb-2">
           <h1 style="font-size: 1.75em">Chats</h1>
@@ -85,10 +85,15 @@
 
     <div
       class="col-span-6 h-full w-full grid grid-rows-6"
-      v-if="contacts.length"
+      
     >
-      <chat-view :selected="selected"></chat-view>
+      <chat-view v-if="contacts.length" :selected="selected"></chat-view>
+      <div v-else class="text-center">
+        It feels lonely over here :( <br>
+        Use the top left button <b>Add a contact</b> button to add a contact 
+      </div>
     </div>
+
     <div
       class="col-span-3 relative h-full w-full overflow-y-auto flex flex-col"
     >

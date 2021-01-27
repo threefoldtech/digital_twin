@@ -32,7 +32,7 @@ const io = socketio(httpServer)
 
 let connections = new Connections([]);
 const dummycontact = new Contact("c2ef210a-f68c-44f4-98e3-a62e1d7d28e9", "Jason Parser", "localhost:3000");
-let contacts: Array<Contact> = [dummycontact];
+let contacts: Array<Contact> = [];
 let contactRequests: Array<Contact> = [];
 let messages:Array<Message> = [];
 
