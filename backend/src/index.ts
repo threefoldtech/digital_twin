@@ -116,9 +116,9 @@ io.on("connection", (socket: Socket) => {
   console.log(`${socket.id} connected`);
   connections.add(socket.id);
 
-  messages.forEach((message) => {
-    socket.emit("message", message);
-  });
+  // messages.forEach((message) => {
+  //   socket.emit("message", message);
+  // });
 
   socket.on("disconnect", () => {
     console.log(`${socket.id} disconnected`);

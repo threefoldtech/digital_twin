@@ -18,15 +18,14 @@ const initializeSocket = (username: string) => {
   });
   state.socket.on("message", (message) => {
     console.log(message);
-    console.log("incoming")
     const {addMessage} = useMessagesActions()
     addMessage(message)
   });
 };
 
-const sendSocketMessage = (message) => {
+const sendSocketMessage = async (message) => {
   console.log('sending',  message)
-  state.socket.emit("message", message);
+  await state.socket.emit("message", message);
 };
 
 const getSocket = () => {

@@ -90,7 +90,7 @@
 
 <script lang="ts">
 import moment from "moment";
-import { defineComponent, onMounted, ref, computed, inject, watch } from "vue";
+import { defineComponent, onMounted, ref, computed, inject, watch, onBeforeMount } from "vue";
 import { useMessagesState, useMessagesActions } from "../../store/messageStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
 import { useAuthState } from "../../store/authStore";
@@ -141,11 +141,11 @@ export default defineComponent({
     const filteredContacts = computed(() => {
       return contacts;
     });
-    onMounted(() => {
+    onBeforeMount(() => {
       initializeSocket(user.name);
     });
-    onMounted(retrieveMessages);
-    onMounted(retrieveContacts);
+    onBeforeMount(retrieveMessages);
+    onBeforeMount(retrieveContacts);
 
     return {
       selected,

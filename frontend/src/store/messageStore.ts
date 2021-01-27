@@ -9,21 +9,21 @@ import {useContactsActions} from './contactStore'
 import config from '../../public/config/config'
 
 const state = reactive<MessageState>({
-    messages:
-    {
-    }
+    messages:[]
 });
 
 const retrieveMessages = () => {
     console.log(axios.get(`${config.baseUrl}api/messages`).then(function(response) {
         console.log("retreivedmessages: ", response.data)
-        let messages= response.data
-        messages.sort((a,b)=>  moment(a.date).unix() - moment(b.date).unix())
-        state.messages = messages;
+        const incommingMessages:Array<Message> =  response.data
+        incommingMessages.sort((a,b)=>  moment(a.timeStamp).unix() - moment(b.timeStamp).unix())
+        incommingMessages.forEach( message =>{
+            addMessage(message)
+        })
     }))
 }
 
-const addMessage= (message) => {
+const addMessage= (message:Message) => {
     console.log('in addmessage', message)
     const {setLastMessage} = useContactsActions()
     const {user} = useAuthState()
@@ -38,19 +38,19 @@ const addMessage= (message) => {
         setLastMessage(message.from, message)
     }
     console.log(state.messages)
-
 }
 
 const sendMessage = (contactName, message) => {
     const {sendSocketMessage} = useSocketActions()
     const {user} = useAuthState()
-    const msg = {
+    const msg:Message = {
         to: contactName,
         body: message,
-        from: user.name
+        from: user.name,
+        timeStamp: new Date()
     }
-    sendSocketMessage(msg)
     addMessage(msg)
+    sendSocketMessage(msg)
 }
 
 export const useMessagesState = () => {
@@ -68,5 +68,5 @@ export const useMessagesActions = () => {
 }
 
 interface MessageState {
-    messages: any
+    messages: Array<Message>
 }

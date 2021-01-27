@@ -50,9 +50,9 @@ const contactIsHealthy = (location) => {
 }
 
 const addContact = (username, location, dontCheck = false) => { 
-    if(!dontCheck && !contactIsHealthy(username)){ 
-        throw "Peer is not healthy"
-    }
+    // if(!dontCheck && !contactIsHealthy(username)){ 
+    //     throw "Peer is not healthy"
+    // }
     const id = uuidv4()
     axios.post(`${config.baseUrl}api/contacts`, {id, username,location}).then( (res) => {
         // @todo check how to fix this

@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-12 bg-white rounded-lg m-4">
+  <div class="grid grid-cols-12 bg-white rounded-lg mx-4">
     <div class="col-span-2 place-items-center grid">
       <img
         :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
@@ -19,7 +19,7 @@
       </p>
     </div>
   </div>
-  <div class="row-span-4 relative overflow-y-auto" id="messageBox">
+  <div class="row-span-4 relative overflow-y-auto" ref="messageBox">
     <div class="absolute w-full px-4">
       <div
         v-for="(message, i) in messages[contacts[selected].name]"
@@ -66,7 +66,7 @@
 
 <script lang="ts">
 import moment from "moment";
-import { defineComponent, onMounted, ref, toRefs } from "vue";
+import { defineComponent, onMounted, watch, ref, toRefs, nextTick } from "vue";
 import { useMessagesState, useMessagesActions } from "../store/messageStore";
 import { useContactsState } from "../store/contactStore";
 import { useAuthState } from "../store/authStore";
@@ -76,14 +76,17 @@ export default defineComponent({
   props: {
     selected: Number,
   },
-  setup(props, {}) {
+  setup(props) {
     const { messages } = useMessagesState();
     const { sendMessage } = useMessagesActions();
     const { user } = useAuthState();
     const { contacts } = useContactsState();
     const m = (val) => moment(val);
+    const messageBox = ref(null);
 
     const propRefs = toRefs(props);
+
+    console.log("messages in chatview", messages);
 
     const isMine = (message) => {
       return message.from == user.name;
@@ -95,21 +98,25 @@ export default defineComponent({
       return value;
     };
 
-    const scrollToBottom = () =>{
-      var container = document.getElementById("messageBox");
-      container.scrollTop = container.scrollHeight;
-    }
+    const scrollToBottom = () => {
+      messageBox.value.scrollTop = messageBox.value.scrollHeight;
+    };
 
     const message = ref("");
     const messageSend = (e) => {
-      if(message.value == ""){
-        return
+      if (message.value == "") {
+        return;
       }
       sendMessage(contacts.value[props.selected].name, message.value);
       message.value = "";
-      scrollToBottom()
+      nextTick(() => {
+        scrollToBottom();
+      });
     };
 
+    onMounted(()=>{
+      scrollToBottom()
+    })
 
     return {
       messages,
@@ -119,6 +126,7 @@ export default defineComponent({
       isMine,
       contacts,
       m,
+      messageBox,
       ...propRefs,
     };
   },
