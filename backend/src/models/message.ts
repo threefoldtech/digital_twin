@@ -1,10 +1,12 @@
 export default class Message {
+  chatId: String;
   from: string;
   to: string;
   body: string;
   timeStamp: Date;
 
-  constructor(from: string, to: string, body: string) {
+  constructor(chatId:String, from: string, to: string, body: string) {
+    this.chatId = chatId;
     this.from = from;
     this.to = to;
     this.body = body;

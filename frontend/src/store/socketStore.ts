@@ -2,7 +2,7 @@ import { reactive } from "@vue/reactivity";
 import { Socket } from "socket.io-client";
 import { toRefs, inject } from "vue";
 import {useAuthState} from './authStore'
-import { useMessagesActions } from "./messageStore";
+import { usechatsActions } from "./chatStore";
 import { useContactsActions } from "./contactStore";
 
 const state = reactive<State>({
@@ -19,7 +19,7 @@ const initializeSocket = (username: string) => {
   });
   state.socket.on("message", (message) => {
     console.log(message);
-    const {addMessage} = useMessagesActions()
+    const {addMessage} = usechatsActions()
     addMessage(message)
   });
   state.socket.on("connectionRequest", (newContactRequest)=> {

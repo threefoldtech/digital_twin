@@ -50,10 +50,10 @@
             :key="i"
             class="grid grid-cols-12 rounded-lg mb-2 py-2"
             :class="{
-              'bg-white': i !== selected,
-              'bg-icon': i === selected,
+              'bg-white': contact.id !== selectedId,
+              'bg-icon': contact.id === selectedId,
             }"
-            @click="setSelected(i)"
+            @click="setSelected(contact.id)"
           >
             <div class="col-span-2 place-items-center grid">
               <img
@@ -76,7 +76,7 @@
               <p class="font-thin truncate" v-if="contact.lastMessage">
                 {{ contact.lastMessage.body }}
               </p>
-              <p class="font-thin" v-else>No messages yet</p>
+              <p class="font-thin" v-else>No chats yet</p>
             </div>
           </div>
         </div>
@@ -87,10 +87,10 @@
       class="col-span-6 h-full w-full grid grid-rows-6"
       
     >
-      <chat-view v-if="contacts.length" :selected="selected"></chat-view>
+      <chat-view v-if="selectedId" :selectedId="selectedId"></chat-view>
       <div v-else class="text-center">
         It feels lonely over here :( <br>
-        Use the top left button <b>Add a contact</b> button to add a contact 
+        Use the top left button <b>Add a contact</b> to add a contact 
       </div>
     </div>
 
@@ -103,7 +103,6 @@
           v-for="i in 3"
           :key="i"
         >
-          {{ selectedId }}
         </div>
       </div>
     </div>
@@ -114,14 +113,11 @@
 import moment from "moment";
 import {
   defineComponent,
-  onMounted,
   ref,
   computed,
-  inject,
-  watch,
   onBeforeMount,
 } from "vue";
-import { useMessagesState, useMessagesActions } from "../../store/messageStore";
+import { usechatsState, usechatsActions } from "../../store/chatStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
 import { useAuthState } from "../../store/authStore";
 import { useSocketActions } from "../../store/socketStore";
@@ -133,9 +129,9 @@ export default defineComponent({
   name: "Apps",
   components: { addContact, chatView },
   setup(_, context) {
-    const { messages } = useMessagesState();
+    const { chats } = usechatsState();
     const { contacts, connectionRequests } = useContactsState();
-    const { retrieveMessages } = useMessagesActions();
+    const { retrievechats } = usechatsActions();
     const {
       retrieveContacts,
       moveConnectionRequestToContacts,
@@ -147,21 +143,12 @@ export default defineComponent({
     const searchValue = ref("");
     let showDialog = ref(false);
 
-    let selected = ref(0);
     let selectedId = ref("");
-    const setSelected = (i) => {
-      selected.value = i;
-      // @ts-ignore
-      selectedId = contacts.value[i].id;
+    const setSelected = (id) => {
+      selectedId.value = id
+      console.log(id)
+      console.log(contacts.value)
     };
-    watch(contacts, () => {
-      // @ts-ignore
-      let index = contacts.value.findIndex((c) => c.id == selectedId);
-      if (index == -1) {
-        index = 0;
-      }
-      selected.value = index;
-    });
 
     const filteredContacts = computed(() => {
       return contacts;
@@ -169,17 +156,21 @@ export default defineComponent({
     onBeforeMount(() => {
       initializeSocket(user.name);
     });
-    onBeforeMount(retrieveMessages);
-    onBeforeMount(retrieveContacts);
+    onBeforeMount(retrievechats);
+    onBeforeMount(() => {
+      retrieveContacts().then(()=>{
+        selectedId.value = contacts.value[0].id
+      })
+    });
+    
     const addConnectionRequestToContacts = (id) => {
       moveConnectionRequestToContacts(id);
       console.log(id);
     };
     return {
-      selected,
       selectedId,
       setSelected,
-      messages,
+      chats,
       contacts,
       connectionRequests,
       addConnectionRequestToContacts,

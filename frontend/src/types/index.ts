@@ -18,11 +18,26 @@ export interface Tab {
 }
 
 export interface Message {
+    chatId: string,
     from: string,
-    to: string,
     body: string,
     timeStamp: Date,
 }
+
+export interface Chat {
+    chatId: string
+    chats: Message[]
+}
+
+// export interface GroupChat extends Chat {
+//     //todo
+// }
+// export interface Chat {
+//     chatId: string
+//     chats: Message[]
+//     lastMessage: Message,
+//     isTyping: false
+// }
 
 export interface Contact {
     id: string,

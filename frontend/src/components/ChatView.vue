@@ -3,18 +3,18 @@
     <div class="col-span-2 place-items-center grid">
       <img
         :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-          contacts[selected].name
+          contact.name
         )}.svg`"
         alt="User image"
         class="h-12 bg-icon rounded-full"
       />
     </div>
     <div class="col-span-10 py-8">
-      <p class="font-bold font">{{ contacts[selected].name }}</p>
+      <p class="font-bold font">{{ contact.name }}</p>
       <p class="font-thin">
-        <span v-if="contacts[selected].isOnline">Is online</span>
+        <span v-if="contact.isOnline">Is online</span>
         <span v-else>
-          Last seen {{ m(contacts[selected].lastSeen).fromNow() }}
+          Last seen {{ m(contact.lastSeen).fromNow() }}
         </span>
       </p>
     </div>
@@ -22,7 +22,7 @@
   <div class="row-span-4 relative overflow-y-auto" ref="messageBox">
     <div class="absolute w-full px-4">
       <div
-        v-for="(message, i) in messages[contacts[selected].name]"
+        v-for="(message, i) in chats[selectedId]"
         class="my-2 flex"
         :class="{
           'justify-end': isMine(message),
@@ -45,12 +45,12 @@
   </div>
   <div class="p4 grid grid-rows-3">
     <p class="mx-6 pt-4 font-thin">
-      <span v-if="contacts[selected].istyping"
-        >{{ contacts[selected].name }} is typing ...
+      <span v-if="contact.istyping"
+        >{{ contact.name }} is typing ...
       </span>
     </p>
     <form
-      @submit.prevent="messageSend"
+      @submit.prevent="chatsend"
       class="row-span-2 rounded-xl grid grid-cols-12 h place-items-center bg-white mx-4"
     >
       <span>+</span>
@@ -66,19 +66,20 @@
 
 <script lang="ts">
 import moment from "moment";
-import { defineComponent, onMounted, watch, ref, toRefs, nextTick } from "vue";
-import { useMessagesState, useMessagesActions } from "../store/messageStore";
+import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed } from "vue";
+import { usechatsState, usechatsActions } from "../store/chatStore";
 import { useContactsState } from "../store/contactStore";
 import { useAuthState } from "../store/authStore";
+import { Contact } from "../types/index"
 
 export default defineComponent({
   name: "ChatView",
   props: {
-    selected: Number,
+    selectedId: String,
   },
   setup(props) {
-    const { messages } = useMessagesState();
-    const { sendMessage } = useMessagesActions();
+    const { chats } = usechatsState();
+    const { sendMessage } = usechatsActions();
     const { user } = useAuthState();
     const { contacts } = useContactsState();
     const m = (val) => moment(val);
@@ -86,7 +87,7 @@ export default defineComponent({
 
     const propRefs = toRefs(props);
 
-    console.log("messages in chatview", messages);
+    console.log("chats in chatview", chats);
 
     const isMine = (message) => {
       return message.from == user.name;
@@ -103,28 +104,33 @@ export default defineComponent({
     };
 
     const message = ref("");
-    const messageSend = (e) => {
+    const chatsend = (e) => {
       if (message.value == "") {
         return;
       }
-      sendMessage(contacts.value[props.selected].name, message.value);
+      sendMessage(props.selectedId, message.value);
       message.value = "";
       nextTick(() => {
         scrollToBottom();
       });
     };
 
+    const contact = computed(()=>{
+      return contacts.value.find(c => c.id == props.selectedId)
+    })
+
     onMounted(()=>{
       scrollToBottom()
     })
 
     return {
-      messages,
+      chats,
       truncate,
-      messageSend,
+      chatsend,
       message,
       isMine,
       contacts,
+      contact,
       m,
       messageBox,
       ...propRefs,

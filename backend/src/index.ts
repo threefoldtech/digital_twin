@@ -32,7 +32,7 @@ const io = socketio(httpServer)
 
 let connections = new Connections([]);
 const dummycontact = new Contact("c2ef210a-f68c-44f4-98e3-a62e1d7d28e9", "Jason Parser", "localhost:3000");
-let contacts: Array<Contact> = [];
+let contacts: Array<Contact> = [dummycontact];
 let contactRequests: Array<Contact> = [];
 let messages:Array<Message> = [];
 
@@ -73,7 +73,7 @@ app.get('/api/healthcheck', async(req, res) => {
   res.sendStatus(200);
 })
 
-app.get("/api/messages", (req, res) => {
+app.get("/api/chats", (req, res) => {
   res.json(messages);
 });
 
@@ -89,16 +89,6 @@ app.get("/api/contacts", (req, res) => {
 
 app.get("/api/contactRequests", (req, res) => {
   res.json(contactRequests);
-});
-
-app.get("/api/contacts", (req, res) => {
-  const resp = contacts.map((contact) => {
-    return {
-      id: contact.id,
-      name: contact.username
-    };
-  });
-  res.json(resp);
 });
 
 app.post("/api/contacts", (req, res) => {
@@ -127,20 +117,25 @@ app.post("/api/contacts", (req, res) => {
 app.post("/api/messages", (req, res) => {
   // @ TODO check if valid
   const mes = req.body;
-  const message = new Message(mes.from, mes.to, mes.body);
+  const host = req.get('host')
+  const location = host.split(".")[0]
+  let contact = contacts.find(c => c.location == location)
+  
+  if(!contact){
+    const id = uuidv4()
+    contact = new Contact(id, mes.from, host);
+    if(!contactRequests.find(c=> c.username == mes.from)){
+      console.log("adding contact to contactrequest", contact )
+      contactRequests.push(contact);
+      sendEventToConnectedSockets(io, connections, "connectionRequest", contact)
+    }
+  }
+  const message = new Message(contact.id, mes.from, mes.to, mes.body);
   console.log(`received new message from ${message.from}`);
 
   // @TODO implement db here
   messages.push(message);
   sendEventToConnectedSockets(io, connections, "message", message)
-
-  if(!contacts.find(c=> c.username == message.from) ){
-    const id = uuidv4()
-    const contact = new Contact(id, message.from, req.get('host'));
-    console.log("adding contact to contactrequest", contact )
-    contactRequests.push(contact);
-    sendEventToConnectedSockets(io, connections, "connectionRequest", contact)
-  }
 
   res.sendStatus(200);
 });
@@ -149,10 +144,6 @@ io.on("connection", (socket: Socket) => {
   console.log(`${socket.id} connected`);
   connections.add(socket.id);
 
-  // messages.forEach((message) => {
-  //   socket.emit("message", message);
-  // });
-
   socket.on("disconnect", () => {
     console.log(`${socket.id} disconnected`);
     connections.delete(socket.id);
@@ -160,13 +151,14 @@ io.on("connection", (socket: Socket) => {
 
   socket.on("message", (newMessage) => {
     console.log('new message')
-    newMessage = new Message(newMessage.from, newMessage.to, newMessage.body)
-    const receiver = contacts.find((c) => c.username == newMessage.to);
+    newMessage = new Message(newMessage.chatId, newMessage.from, newMessage.to, newMessage.body)
+    console.log(contacts)
+    console.log(newMessage.chatId)
+    const receiver = contacts.find(c => c.id == newMessage.chatId);
     if (!receiver) {
       console.log("receiver not found")
       return "receiver not found";
     }
-
     // @TODO implement db here
     messages.push(newMessage);
 
@@ -174,23 +166,22 @@ io.on("connection", (socket: Socket) => {
     console.log(`sending message ${ newMessage.body } to ${ url }`);
 
     connections.getConnections().forEach((connection: String) => {
-      if (connection == socket .id){
+      if (connection == socket.id){
         // this is me
         return
       }
       io.to(connection).emit("message", newMessage);
       console.log(`send message to ${connection}`);
     });
-
-    if(newMessage.to == newMessage.from){
+    
+    if(config.userid == newMessage.from){
       return
     }
-    try{
 
+    try{
       axios.post(url, newMessage)
       .then(response => {
         console.log(response.data)
-        // console.log(response)
       })
       .catch( error => {
         console.log("couldn't send message")
