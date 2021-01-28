@@ -46,7 +46,7 @@
       <div class="row-span-5 relative overflow-y-auto w-full h-full">
         <div class="absolute w-full px-2">
           <div
-            v-for="(contact, i) in contacts"
+            v-for="(contact, i) in filteredContacts"
             :key="i"
             class="grid grid-cols-12 rounded-lg mb-2 py-2"
             :class="{
@@ -148,10 +148,14 @@ export default defineComponent({
       selectedId.value = id
       console.log(id)
       console.log(contacts.value)
+      searchValue.value = ""
     };
 
     const filteredContacts = computed(() => {
-      return contacts;
+      if(searchValue.value == ""){
+        return contacts.value
+      }
+      return contacts.value.filter(c => c.name.toLowerCase().includes(searchValue.value.toLowerCase()));
     });
     onBeforeMount(() => {
       initializeSocket(user.name);
