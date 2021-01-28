@@ -1,6 +1,6 @@
 <template>
   <div class="grid grid-cols-12">
-    <div class="col-span-3">
+    <div class="col-span-3" >
       <div>
         <div class="flex mb-2">
           <h1 style="font-size: 1.75em">Chats</h1>
@@ -85,7 +85,6 @@
 
     <div
       class="col-span-6 h-full w-full grid grid-rows-6"
-      
     >
       <chat-view v-if="selectedId" :selectedId="selectedId"></chat-view>
       <div v-else class="text-center">

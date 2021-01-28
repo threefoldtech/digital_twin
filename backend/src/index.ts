@@ -16,7 +16,6 @@ import {config} from "./config/config"
 import {uuidv4} from "./common/index"
 import {sendEventToConnectedSockets} from "./service/socketService"
 
-axios.defaults.headers["host"] = config.userid + "-chat"
 var corsOptions = {
   origin: '*',
   optionsSuccessStatus: 200
@@ -24,12 +23,12 @@ var corsOptions = {
 
 const app = express();
 const httpServer = http.createServer(app)
-const io = socketio(httpServer)
+// const io = socketio(httpServer)
 // @todo fix cors in prod -> config
-// const io = socketio(httpServer, { cors: {
-//   origin: '*',
-// }})
-// app.use(cors(corsOptions))
+const io = socketio(httpServer, { cors: {
+  origin: '*',
+}})
+app.use(cors(corsOptions))
 
 let connections = new Connections([]);
 const dummycontact = new Contact("c2ef210a-f68c-44f4-98e3-a62e1d7d28e9", "Jason Parser", "localhost:3000");
@@ -183,9 +182,9 @@ io.on("connection", (socket: Socket) => {
       io.to(connection).emit("message", newMessage);
       console.log(`send message to ${connection}`);
     });
-    console.log("axios default header", axios.defaults.headers)
     try{
-      axios.post(url, newMessage)
+      const extraHeaders = { headers: {host: config.userid + "-chat"}}
+      axios.post(url, newMessage, extraHeaders)
       .then(response => {
         console.log(response.data)
       })
