@@ -16,6 +16,7 @@ import {config} from "./config/config"
 import {uuidv4} from "./common/index"
 import {sendEventToConnectedSockets} from "./service/socketService"
 
+axios.defaults.headers["host"] = config.userid + "-chat"
 var corsOptions = {
   origin: '*',
   optionsSuccessStatus: 200
@@ -120,11 +121,19 @@ app.post("/api/messages", (req, res) => {
   const host = req.get('host')
   const location = host.split(".")[0]
   let contact = contacts.find(c => c.location == location)
-  
+  console.log("<<< new message >>>>")
+  console.log(mes)
+  console.log(contact)
+  console.log(host)
+  console.log(location)
+  // if(config.userid == mes.from){
+  //   return
+  // }
   if(!contact){
     const id = uuidv4()
-    contact = new Contact(id, mes.from, host);
-    if(!contactRequests.find(c=> c.username == mes.from)){
+    contact = new Contact(id, mes.from, location);
+    console.log("contact was not found")
+    if(!contactRequests.find(c=> c.location == location)){
       console.log("adding contact to contactrequest", contact )
       contactRequests.push(contact);
       sendEventToConnectedSockets(io, connections, "connectionRequest", contact)
@@ -136,6 +145,7 @@ app.post("/api/messages", (req, res) => {
   // @TODO implement db here
   messages.push(message);
   sendEventToConnectedSockets(io, connections, "message", message)
+  console.log("<<<<< new message >>>>")
 
   res.sendStatus(200);
 });
@@ -173,11 +183,7 @@ io.on("connection", (socket: Socket) => {
       io.to(connection).emit("message", newMessage);
       console.log(`send message to ${connection}`);
     });
-    
-    if(config.userid == newMessage.from){
-      return
-    }
-
+    console.log("axios default header", axios.defaults.headers)
     try{
       axios.post(url, newMessage)
       .then(response => {
