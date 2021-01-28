@@ -1,6 +1,6 @@
 <template>
   <div class="grid grid-cols-12">
-    <div class="col-span-3" >
+    <div class="col-span-3 flex flex-col">
       <div>
         <div class="flex mb-2">
           <h1 style="font-size: 1.75em">Chats</h1>
@@ -22,8 +22,13 @@
           </h2>
           <div v-for="(connRequest, i) in connectionRequests" :key="i">
             <div class="grid grid-cols-12 w-full rounded-lg mb-2 py-2">
-              <span class="truncate col-span-8">{{ connRequest.username }}</span>
-              <button class="col-span-4" @click="addConnectionRequestToContacts(connRequest.id)">
+              <span class="truncate col-span-8">{{
+                connRequest.username
+              }}</span>
+              <button
+                class="col-span-4"
+                @click="addConnectionRequestToContacts(connRequest.id)"
+              >
                 Add to contacts
               </button>
             </div>
@@ -43,7 +48,7 @@
           />
         </div>
       </div>
-      <div class="row-span-5 relative overflow-y-auto w-full h-full">
+      <div class="relative overflow-y-auto w-full max-h-full h-full mt-4">
         <div class="absolute w-full px-2">
           <div
             v-for="(contact, i) in filteredContacts"
@@ -83,13 +88,11 @@
       </div>
     </div>
 
-    <div
-      class="col-span-6 h-full w-full grid grid-rows-6"
-    >
+    <div class="col-span-6 h-full w-full grid grid-rows-6">
       <chat-view v-if="selectedId" :selectedId="selectedId"></chat-view>
       <div v-else class="text-center">
-        It feels lonely over here :( <br>
-        Use the top left button <b>Add a contact</b> to add a contact 
+        It feels lonely over here :( <br />
+        Use the top left button <b>Add a contact</b> to add a contact
       </div>
     </div>
 
@@ -101,8 +104,7 @@
           class="bg-white h-52 w-full relative rounded-lg mb-4 mt-0"
           v-for="i in 3"
           :key="i"
-        >
-        </div>
+        ></div>
       </div>
     </div>
   </div>
@@ -110,12 +112,7 @@
 
 <script lang="ts">
 import moment from "moment";
-import {
-  defineComponent,
-  ref,
-  computed,
-  onBeforeMount,
-} from "vue";
+import { defineComponent, ref, computed, onBeforeMount } from "vue";
 import { usechatsState, usechatsActions } from "../../store/chatStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
 import { useAuthState } from "../../store/authStore";
@@ -144,28 +141,30 @@ export default defineComponent({
 
     let selectedId = ref("");
     const setSelected = (id) => {
-      selectedId.value = id
-      console.log(id)
-      console.log(contacts.value)
-      searchValue.value = ""
+      selectedId.value = id;
+      console.log(id);
+      console.log(contacts.value);
+      searchValue.value = "";
     };
 
     const filteredContacts = computed(() => {
-      if(searchValue.value == ""){
-        return contacts.value
+      if (searchValue.value == "") {
+        return contacts.value;
       }
-      return contacts.value.filter(c => c.name.toLowerCase().includes(searchValue.value.toLowerCase()));
+      return contacts.value.filter((c) =>
+        c.name.toLowerCase().includes(searchValue.value.toLowerCase())
+      );
     });
     onBeforeMount(() => {
       initializeSocket(user.name);
     });
     onBeforeMount(retrievechats);
     onBeforeMount(() => {
-      retrieveContacts().then(()=>{
-        selectedId.value = contacts.value[0].id
-      })
+      retrieveContacts().then(() => {
+        selectedId.value = contacts.value[0].id;
+      });
     });
-    
+
     const addConnectionRequestToContacts = (id) => {
       moveConnectionRequestToContacts(id);
       console.log(id);
