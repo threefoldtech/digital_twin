@@ -106,6 +106,24 @@ app.post("/api/contacts", (req, res) => {
   const contact = new Contact(con.id, con.username, con.location);
   console.log(`Adding contact  ${contact.username}`);
 
+  const url = `http://${contact.location}/api/messageRequest`
+  const data = {
+    username:config.userid,
+    location: `${config.userid}-chat`
+  }
+  console.log("sending to ",url)
+  try{
+    axios.post(
+      url,
+      data).then( () => {
+        console.log("Send request to ", contact.location)
+      }).catch((e)=>{
+        console.log("couldnt send contact request")
+      })
+  }catch (e) {
+    console.log("couldn't send contact request")
+  }
+
   // @TODO implement db here
   contacts.push(contact);
 
@@ -117,26 +135,16 @@ app.post("/api/contacts", (req, res) => {
 app.post("/api/messages", (req, res) => {
   // @ TODO check if valid
   const mes = req.body;
-  const host = req.get('host')
-  const location = host.split(".")[0]
-  let contact = contacts.find(c => c.location == location)
-  console.log("<<< new message >>>>")
-  console.log(mes)
-  console.log(contact)
-  console.log(host)
-  console.log(location)
-  // if(config.userid == mes.from){
-  //   return
-  // }
+
+  let contact = contacts.find(c => c.username == mes.from)
   if(!contact){
-    const id = uuidv4()
-    contact = new Contact(id, mes.from, location);
-    console.log("contact was not found")
-    if(!contactRequests.find(c=> c.location == location)){
-      console.log("adding contact to contactrequest", contact )
-      contactRequests.push(contact);
-      sendEventToConnectedSockets(io, connections, "connectionRequest", contact)
+    contact = contactRequests.find(c=> c.username == mes.from)
+
+    if(!contact){
+      res.sendStatus(404)
+      return
     }
+    return
   }
   const message = new Message(contact.id, mes.from, mes.to, mes.body);
   console.log(`received new message from ${message.from}`);
@@ -148,6 +156,20 @@ app.post("/api/messages", (req, res) => {
 
   res.sendStatus(200);
 });
+
+app.post("/api/messageRequest", (req,res)=>{
+  const username = req.body.username
+  const location = req.body.location
+
+  if(!contactRequests.find(c=> c.location == location)){
+      const id = uuidv4()
+      const contact = new Contact(id, username, location);
+      console.log("adding contact to contactrequest", contact )
+      contactRequests.push(contact);
+      sendEventToConnectedSockets(io, connections, "connectionRequest", contact)
+    }
+  res.sendStatus(200)
+})
 
 io.on("connection", (socket: Socket) => {
   console.log(`${socket.id} connected`);
@@ -183,8 +205,7 @@ io.on("connection", (socket: Socket) => {
       console.log(`send message to ${connection}`);
     });
     try{
-      const extraHeaders = { headers: {host: config.userid + "-chat"}}
-      axios.post(url, newMessage, extraHeaders)
+      axios.post(url, newMessage)
       .then(response => {
         console.log(response.data)
       })

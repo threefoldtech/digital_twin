@@ -5,6 +5,7 @@ import moment from 'moment'
 import { Contact } from '../types'
 import config from "../../public/config/config"
 import {uuidv4} from "../../src/common/index"
+import {useAuthState} from "../store/authStore";
 
 const state = reactive<State>({
     contacts:[],
@@ -58,11 +59,12 @@ const contactIsHealthy = (location) => {
     return isAvailable
 }
 
-const addContact = (username, location, dontCheck = false) => { 
+const addContact = (username:string, location, dontCheck = false) => { 
     // if(!dontCheck && !contactIsHealthy(username)){ 
     //     throw "Peer is not healthy"
     // }
     const id = uuidv4()
+    
     axios.post(`${config.baseUrl}api/contacts`, {id, username,location}).then( (res) => {
         // @todo check how to fix this
         // @ts-ignore
