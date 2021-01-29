@@ -15,22 +15,25 @@ const state = reactive<chatstate>({
 const retrievechats = () => {
     console.log(axios.get(`${config.baseUrl}api/chats`).then(function(response) {
         console.log("retreived chats: ", response.data)
-        const incommingchats:Array<Message> =  response.data
-        incommingchats.sort((a,b)=>  moment(a.timeStamp).unix() - moment(b.timeStamp).unix())
-        incommingchats.forEach( message =>{
-            addMessage(message)
+        const incommingchats =  response.data.chats
+        Object.keys(incommingchats).forEach((key)=>{
+            addChat(incommingchats[key])
         })
     }))
 }
 
-const addMessage= (message:Message) => {
-    console.log('in addmessage', message)
-    const {setLastMessage} = useContactsActions()
-    
-    if(!state.chats[message.chatId]) state.chats[message.chatId] = []
-    state.chats[message.chatId].push(message)
+const addChat = (chat:Chat) => {
+    state.chats.push(chat)
+}
 
-    setLastMessage(message.from, message)
+const addMessage= (chatId, message) => {
+    console.log('in addmessage chatid', chatId)
+    console.log('in addmessage message', message)
+    
+    const chat:Chat = state.chats.find(chat=>chat.chatId == chatId)
+    chat.messages.push(message)
+
+    // setLastMessage(message.from, message)
     console.log(state.chats)
 }
 
@@ -38,13 +41,12 @@ const sendMessage = (chatId, message) => {
     const {sendSocketMessage} = useSocketActions()
     const {user} = useAuthState()
     const msg:Message = {
-        chatId: chatId,
         body: message,
         from: user.name,
         timeStamp: new Date()
     }
-    addMessage(msg)
-    sendSocketMessage(msg)
+    addMessage(chatId, msg)
+    sendSocketMessage(chatId, message)
 }
 
 export const usechatsState = () => {
@@ -55,6 +57,7 @@ export const usechatsState = () => {
 
 export const usechatsActions = () => {
     return {
+        addChat,
         retrievechats,
         sendMessage,
         addMessage

@@ -9,6 +9,8 @@ import cors from "cors"
 import Message from "./models/message";
 import Connections from "./models/connections";
 import Contact from "./models/contact";
+import Chat from "./models/chat";
+import Chats from "./models/chats";
 import {Socket} from "socket.io"
 import {appCallback, getAppLoginUrl} from "./service/authService";
 import session from "express-session";
@@ -31,10 +33,11 @@ const io = socketio(httpServer, { cors: {
 app.use(cors(corsOptions))
 
 let connections = new Connections([]);
-const dummycontact = new Contact("c2ef210a-f68c-44f4-98e3-a62e1d7d28e9", "Jason Parser", "localhost:3000");
-let contacts: Array<Contact> = [dummycontact];
+// const dummycontact = new Contact("c2ef210a-f68c-44f4-98e3-a62e1d7d28e9", "Jason Parser", "localhost:3000");
+let contacts: Array<Contact> = [];
 let contactRequests: Array<Contact> = [];
-let messages:Array<Message> = [];
+
+let chats:Chats = new Chats();
 
 
 app.enable('trust proxy');
@@ -74,7 +77,7 @@ app.get('/api/healthcheck', async(req, res) => {
 })
 
 app.get("/api/chats", (req, res) => {
-  res.json(messages);
+  res.json(chats);
 });
 
 app.get("/api/contacts", (req, res) => {
@@ -93,18 +96,24 @@ app.get("/api/contactRequests", (req, res) => {
 
 app.post("/api/contacts", (req, res) => {
   if(req.query.id){
+    //Flow to add contact request to contacts
     const id = req.query.id
     console.log("adding from requests to contacts: ", id)
     const index = contactRequests.findIndex(c=>c.id==id)
-    // @TODO implement db here
     contacts.push(contactRequests[index]);
     contactRequests.splice(index,1)
     res.sendStatus(200)
     return
   }
+
   const con = req.body;
   const contact = new Contact(con.id, con.username, con.location);
+
   console.log(`Adding contact  ${contact.username}`);
+  contacts.push(contact);
+
+  console.log(`creating chat`)
+  chats.addChat(contact.id,[contact],false,contact.username)
 
   const url = `http://${contact.location}/api/messageRequest`
   const data = {
@@ -123,12 +132,7 @@ app.post("/api/contacts", (req, res) => {
   }catch (e) {
     console.log("couldn't send contact request")
   }
-
-  // @TODO implement db here
-  contacts.push(contact);
-
   res.sendStatus(200);
-  
 });
 
 // Should be externally availble
@@ -146,12 +150,16 @@ app.post("/api/messages", (req, res) => {
     }
     return
   }
-  const message = new Message(contact.id, mes.from, mes.to, mes.body);
+  const message = new Message(mes.from, mes.to, mes.body);
   console.log(`received new message from ${message.from}`);
 
-  // @TODO implement db here
-  messages.push(message);
-  sendEventToConnectedSockets(io, connections, "message", message)
+  chats.sendMessage(contact.id, message);
+  const data = {
+    chatId: contact.id,
+    message: mes
+  }
+
+  sendEventToConnectedSockets(io, connections, "message", data)
   console.log("<<<<< new message >>>>")
 
   res.sendStatus(200);
@@ -164,8 +172,13 @@ app.post("/api/messageRequest", (req,res)=>{
   if(!contactRequests.find(c=> c.location == location)){
       const id = uuidv4()
       const contact = new Contact(id, username, location);
+
       console.log("adding contact to contactrequest", contact )
       contactRequests.push(contact);
+
+      console.log(`creating chat`)
+      chats.addChat(contact.id,[contact],false, contact.username)
+
       sendEventToConnectedSockets(io, connections, "connectionRequest", contact)
     }
   res.sendStatus(200)
@@ -180,18 +193,20 @@ io.on("connection", (socket: Socket) => {
     connections.delete(socket.id);
   });
 
-  socket.on("message", (newMessage) => {
+  socket.on("message", (messageData) => {
     console.log('new message')
-    newMessage = new Message(newMessage.chatId, newMessage.from, newMessage.to, newMessage.body)
+    const newMessage:Message = messageData.message
+    const chatId:string = messageData.chatId
+
     console.log(contacts)
-    console.log(newMessage.chatId)
-    const receiver = contacts.find(c => c.id == newMessage.chatId);
+    console.log(chatId)
+    const receiver = contacts.find(c => c.id == chatId);
     if (!receiver) {
       console.log("receiver not found")
       return "receiver not found";
     }
-    // @TODO implement db here
-    messages.push(newMessage);
+    
+    chats.sendMessage(receiver.id, newMessage);
 
     const url = `http://${receiver.location}/api/messages`
     console.log(`sending message ${ newMessage.body } to ${ url }`);
@@ -201,7 +216,11 @@ io.on("connection", (socket: Socket) => {
         // this is me
         return
       }
-      io.to(connection).emit("message", newMessage);
+      const data = {
+        chatId: newMessage.chatId,
+        message:newMessage
+      } 
+      io.to(connection).emit("message", data);
       console.log(`send message to ${connection}`);
     });
     try{
