@@ -25,11 +25,11 @@ var corsOptions = {
 
 const app = express();
 const httpServer = http.createServer(app)
-// const io = socketio(httpServer)
+const io = socketio(httpServer)
 // @todo fix cors in prod -> config
-const io = socketio(httpServer, { cors: {
-  origin: '*',
-}})
+// const io = socketio(httpServer, { cors: {
+//   origin: '*',
+// }})
 app.use(cors(corsOptions))
 
 let connections = new Connections([]);
@@ -78,6 +78,7 @@ app.get('/api/healthcheck', async(req, res) => {
 
 app.get("/api/chats", (req, res) => {
   const returnChats = chats.getAcceptedChats()
+  console.log(returnChats)
   res.json(returnChats);
 });
 

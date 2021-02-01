@@ -65,7 +65,7 @@ const addContact = (username:string, location, dontCheck = false) => {
         const {addChat} = usechatsActions()
         const chat:Chat = {
             chatId:id,
-            contacts: [],
+            contacts: [contact],
             isGroup: false,
             messages:[addMessage],
             name: username,
@@ -87,7 +87,7 @@ const moveConnectionRequestToContacts = (id) => {
         const messages:Message[] = res.data
         const chat:Chat = {
             chatId:id,
-            contacts: [],
+            contacts: [state.connectionRequests[index]],
             isGroup: false,
             messages:messages,
             //@ts-ignore
