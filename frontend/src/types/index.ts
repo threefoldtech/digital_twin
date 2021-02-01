@@ -29,6 +29,7 @@ export interface Chat {
     isGroup: boolean;
     messages: Message[];
     name: string;
+    lastMessage: Message;
 }
 
 export interface Contact {

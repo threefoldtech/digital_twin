@@ -7,6 +7,8 @@ import config from "../../public/config/config"
 import {uuidv4} from "../../src/common/index"
 import { Chat } from "../types";
 import {usechatsActions} from "./chatStore"
+import { useAuthState } from './authStore';
+import {Message} from "../types/index"
 
 
 const state = reactive<State>({
@@ -29,21 +31,6 @@ const retrieveContacts = async () => {
     })
     
 }
-// const setLastMessage= (username, message) => {
-//     if(!state.contacts.length || !state.contacts.find(u => u.name == username)) return
-
-//     if(!message.timeStamp) message.timeStamp = new Date()
-//     state.contacts.find(u => u.name == username).lastMessage = message
-
-//     const contacts = JSON.parse(JSON.stringify(state.contacts))
-//     contacts.sort((a,b)=> {
-//         var adate = a.lastMessage? a.lastMessage.timeStamp : new Date(-8640000000000000)
-//         var bdate = b.lastMessage? b.lastMessage.timeStamp : new Date(-8640000000000000)
-//         return moment(bdate).unix() - moment(adate).unix()
-//     })
-//     state.contacts = contacts;
-//     //TODO: Sort contacts
-// }
 
 const contactIsHealthy = (location) => {
     let isAvailable = false
@@ -60,21 +47,29 @@ const addContact = (username:string, location, dontCheck = false) => {
     // if(!dontCheck && !contactIsHealthy(username)){ 
     //     throw "Peer is not healthy"
     // }
+    const {user} = useAuthState()
     const id = uuidv4()
-    axios.post(`${config.baseUrl}api/contacts`, {id, username,location}).then( (res) => {
+    const addMessage:Message = {
+        body: `Request has been send to ${username}`,
+        from: user.name,
+        timeStamp: new Date()
+    }
+    axios.post(`${config.baseUrl}api/contacts`, {id, username,location,message:addMessage}).then( (res) => {
         const contact:Contact = {
             id,
             name: username,
             location
         } 
+
         state.contacts.push(contact)
         const {addChat} = usechatsActions()
         const chat:Chat = {
             chatId:id,
             contacts: [],
             isGroup: false,
-            messages:[],
-            name: username
+            messages:[addMessage],
+            name: username,
+            lastMessage: addMessage
         }
         addChat(chat)
     })
@@ -85,12 +80,25 @@ const addConnectionRequests = (contact:Contact) => {
 }
 
 const moveConnectionRequestToContacts = (id) => {
+    const {addChat} = usechatsActions()
     axios.post(`${config.baseUrl}api/contacts?id=${id}`).then( (res) => {
-    const index = state.connectionRequests.findIndex(c=>c.id==id)
-    console.log(state.connectionRequests[index])
-    // @ts-ignore
-    state.contacts.push({id: state.connectionRequests[index].id, name: state.connectionRequests[index].username})
-    state.connectionRequests.splice(index,1)
+        const index = state.connectionRequests.findIndex(c=>c.id==id)
+        console.log(state.connectionRequests[index])
+        const messages:Message[] = res.data
+        const chat:Chat = {
+            chatId:id,
+            contacts: [],
+            isGroup: false,
+            messages:messages,
+            //@ts-ignore
+            name: state.connectionRequests[index].username,
+            lastMessage: messages[messages.length - 1]
+        }
+        console.log(chat)
+        addChat(chat)
+        // @ts-ignore
+        state.contacts.push({id: state.connectionRequests[index].id, name: state.connectionRequests[index].username})
+        state.connectionRequests.splice(index,1)
     })
 }
 

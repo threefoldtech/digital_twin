@@ -126,7 +126,7 @@ export default defineComponent({
   components: { addContact, chatView },
   setup(_, context) {
     const { chats } = usechatsState();
-    const { contacts, connectionRequests } = useContactsState();
+    const { connectionRequests } = useContactsState();
     const { retrievechats } = usechatsActions();
     const {
       retrieveContacts,
@@ -143,7 +143,7 @@ export default defineComponent({
     const setSelected = (id) => {
       selectedId.value = id;
       console.log(id);
-      console.log(contacts.value);
+      console.log(chats.value);
       searchValue.value = "";
     };
 

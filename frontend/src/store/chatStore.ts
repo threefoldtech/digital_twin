@@ -15,25 +15,30 @@ const state = reactive<chatstate>({
 const retrievechats = () => {
     console.log(axios.get(`${config.baseUrl}api/chats`).then(function(response) {
         console.log("retreived chats: ", response.data)
-        const incommingchats =  response.data.chats
+        const incommingchats =  response.data
         Object.keys(incommingchats).forEach((key)=>{
             addChat(incommingchats[key])
         })
+        sortChats()
     }))
 }
 
 const addChat = (chat:Chat) => {
+    if(chat.messages.length){
+        chat.lastMessage = chat.messages[chat.messages.length -1]
+    }
     state.chats.push(chat)
+    sortChats()
 }
 
-const addMessage= (chatId, message) => {
+const addMessage = (chatId, message) => {
     console.log('in addmessage chatid', chatId)
     console.log('in addmessage message', message)
     
     const chat:Chat = state.chats.find(chat=>chat.chatId == chatId)
     chat.messages.push(message)
-
-    // setLastMessage(message.from, message)
+    console.log("before setLastmessage")
+    setLastMessage(chatId, message)
     console.log(state.chats)
 }
 
@@ -46,7 +51,25 @@ const sendMessage = (chatId, message) => {
         timeStamp: new Date()
     }
     addMessage(chatId, msg)
-    sendSocketMessage(chatId, message)
+    sendSocketMessage(chatId, msg)
+}
+
+const setLastMessage= (chatId:string, message:Message) => {
+    console.log("here", state.chats, chatId)
+    if(!state.chats) return
+    const chat = state.chats.find(c=> c.chatId == chatId)
+    if(!chat) return
+
+    chat.lastMessage = message
+    sortChats()    
+}
+
+const sortChats = () => {
+    state.chats.sort((a,b)=> {
+        var adate = a.lastMessage? a.lastMessage.timeStamp : new Date(-8640000000000000)
+        var bdate = b.lastMessage? b.lastMessage.timeStamp : new Date(-8640000000000000)
+        return moment(bdate).unix() - moment(adate).unix()
+    })
 }
 
 export const usechatsState = () => {

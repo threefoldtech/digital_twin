@@ -77,7 +77,8 @@ app.get('/api/healthcheck', async(req, res) => {
 })
 
 app.get("/api/chats", (req, res) => {
-  res.json(chats);
+  const returnChats = chats.getAcceptedChats()
+  res.json(returnChats);
 });
 
 app.get("/api/contacts", (req, res) => {
@@ -102,7 +103,11 @@ app.post("/api/contacts", (req, res) => {
     const index = contactRequests.findIndex(c=>c.id==id)
     contacts.push(contactRequests[index]);
     contactRequests.splice(index,1)
-    res.sendStatus(200)
+    //@ts-ignore
+    const messages = chats.getMessagesFromId(id)
+    //@ts-ignore
+    chats.setChatToAccepted(id)
+    res.json(messages)
     return
   }
 
@@ -112,8 +117,10 @@ app.post("/api/contacts", (req, res) => {
   console.log(`Adding contact  ${contact.username}`);
   contacts.push(contact);
 
+  const message:Message = con.message
   console.log(`creating chat`)
-  chats.addChat(contact.id,[contact],false,contact.username)
+  console.log(message)
+  chats.addChat(contact.id,[contact],false, message ,contact.username, true)
 
   const url = `http://${contact.location}/api/messageRequest`
   const data = {
@@ -177,7 +184,14 @@ app.post("/api/messageRequest", (req,res)=>{
       contactRequests.push(contact);
 
       console.log(`creating chat`)
-      chats.addChat(contact.id,[contact],false, contact.username)
+      const addMessage:Message = {
+        chatId: id,
+        to: config.userid,
+        body: `Request to connect received from ${username}`,
+        from: username,
+        timeStamp: new Date()
+      }
+      chats.addChat(contact.id, [contact], false, addMessage, contact.username, false)
 
       sendEventToConnectedSockets(io, connections, "connectionRequest", contact)
     }
