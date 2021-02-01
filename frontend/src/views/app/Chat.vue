@@ -51,19 +51,19 @@
       <div class="relative overflow-y-auto w-full max-h-full h-full mt-4">
         <div class="absolute w-full px-2">
           <div
-            v-for="(contact, i) in filteredContacts"
+            v-for="(chat, i) in filteredChats"
             :key="i"
             class="grid grid-cols-12 rounded-lg mb-2 py-2"
             :class="{
-              'bg-white': contact.id !== selectedId,
-              'bg-icon': contact.id === selectedId,
+              'bg-white': chat.chatId !== selectedId,
+              'bg-icon': chat.chatId === selectedId,
             }"
-            @click="setSelected(contact.id)"
+            @click="setSelected(chat.chatId)"
           >
             <div class="col-span-2 place-items-center grid">
               <img
                 :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-                  contact.name
+                  chat.name
                 )}.svg`"
                 alt="User image"
                 class="h-12 bg-icon rounded-full"
@@ -72,14 +72,14 @@
             <div class="col-span-10 pr-4">
               <p class="flex place-content-between">
                 <span class="font-bold">
-                  {{ contact.name }}
+                  {{ chat.name }}
                 </span>
-                <span class="font-thin" v-if="contact.lastMessage">
-                  {{ m(contact.lastMessage.timeStamp).fromNow() }}
+                <span class="font-thin" v-if="chat.lastMessage">
+                  {{ m(chat.lastMessage.timeStamp).fromNow() }}
                 </span>
               </p>
-              <p class="font-thin truncate" v-if="contact.lastMessage">
-                {{ contact.lastMessage.body }}
+              <p class="font-thin truncate" v-if="chat.lastMessage">
+                {{ chat.lastMessage.body }}
               </p>
               <p class="font-thin" v-else>No chats yet</p>
             </div>
@@ -126,7 +126,7 @@ export default defineComponent({
   components: { addContact, chatView },
   setup(_, context) {
     const { chats } = usechatsState();
-    const { contacts, connectionRequests } = useContactsState();
+    const { connectionRequests } = useContactsState();
     const { retrievechats } = usechatsActions();
     const {
       retrieveContacts,
@@ -143,15 +143,16 @@ export default defineComponent({
     const setSelected = (id) => {
       selectedId.value = id;
       console.log(id);
-      console.log(contacts.value);
+      console.log(chats.value);
       searchValue.value = "";
     };
 
-    const filteredContacts = computed(() => {
+    const filteredChats = computed(() => {
       if (searchValue.value == "") {
-        return contacts.value;
+        return chats.value;
       }
-      return contacts.value.filter((c) =>
+      console.log("filtered", chats.value)
+      return chats.value.filter((c) =>
         c.name.toLowerCase().includes(searchValue.value.toLowerCase())
       );
     });
@@ -161,7 +162,7 @@ export default defineComponent({
     onBeforeMount(retrievechats);
     onBeforeMount(() => {
       retrieveContacts().then(() => {
-        selectedId.value = contacts.value[0].id;
+        selectedId.value = chats.value[0].chatId;
       });
     });
 
@@ -173,11 +174,11 @@ export default defineComponent({
       selectedId,
       setSelected,
       chats,
-      contacts,
+      // contacts,
       connectionRequests,
       addConnectionRequestToContacts,
       searchValue,
-      filteredContacts,
+      filteredChats,
       showDialog,
       m,
     };

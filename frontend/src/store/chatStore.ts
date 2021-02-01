@@ -15,22 +15,30 @@ const state = reactive<chatstate>({
 const retrievechats = () => {
     console.log(axios.get(`${config.baseUrl}api/chats`).then(function(response) {
         console.log("retreived chats: ", response.data)
-        const incommingchats:Array<Message> =  response.data
-        incommingchats.sort((a,b)=>  moment(a.timeStamp).unix() - moment(b.timeStamp).unix())
-        incommingchats.forEach( message =>{
-            addMessage(message)
+        const incommingchats =  response.data
+        Object.keys(incommingchats).forEach((key)=>{
+            addChat(incommingchats[key])
         })
+        sortChats()
     }))
 }
 
-const addMessage= (message:Message) => {
-    console.log('in addmessage', message)
-    const {setLastMessage} = useContactsActions()
-    
-    if(!state.chats[message.chatId]) state.chats[message.chatId] = []
-    state.chats[message.chatId].push(message)
+const addChat = (chat:Chat) => {
+    if(chat.messages.length){
+        chat.lastMessage = chat.messages[chat.messages.length -1]
+    }
+    state.chats.push(chat)
+    sortChats()
+}
 
-    setLastMessage(message.from, message)
+const addMessage = (chatId, message) => {
+    console.log('in addmessage chatid', chatId)
+    console.log('in addmessage message', message)
+    
+    const chat:Chat = state.chats.find(chat=>chat.chatId == chatId)
+    chat.messages.push(message)
+    console.log("before setLastmessage")
+    setLastMessage(chatId, message)
     console.log(state.chats)
 }
 
@@ -38,13 +46,30 @@ const sendMessage = (chatId, message) => {
     const {sendSocketMessage} = useSocketActions()
     const {user} = useAuthState()
     const msg:Message = {
-        chatId: chatId,
         body: message,
         from: user.name,
         timeStamp: new Date()
     }
-    addMessage(msg)
-    sendSocketMessage(msg)
+    addMessage(chatId, msg)
+    sendSocketMessage(chatId, msg)
+}
+
+const setLastMessage= (chatId:string, message:Message) => {
+    console.log("here", state.chats, chatId)
+    if(!state.chats) return
+    const chat = state.chats.find(c=> c.chatId == chatId)
+    if(!chat) return
+
+    chat.lastMessage = message
+    sortChats()    
+}
+
+const sortChats = () => {
+    state.chats.sort((a,b)=> {
+        var adate = a.lastMessage? a.lastMessage.timeStamp : new Date(-8640000000000000)
+        var bdate = b.lastMessage? b.lastMessage.timeStamp : new Date(-8640000000000000)
+        return moment(bdate).unix() - moment(adate).unix()
+    })
 }
 
 export const usechatsState = () => {
@@ -55,6 +80,7 @@ export const usechatsState = () => {
 
 export const usechatsActions = () => {
     return {
+        addChat,
         retrievechats,
         sendMessage,
         addMessage

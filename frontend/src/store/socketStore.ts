@@ -1,7 +1,6 @@
+import { Message } from "@/types";
 import { reactive } from "@vue/reactivity";
-import { Socket } from "socket.io-client";
-import { toRefs, inject } from "vue";
-import {useAuthState} from './authStore'
+import { inject } from "vue";
 import { usechatsActions } from "./chatStore";
 import { useContactsActions } from "./contactStore";
 
@@ -20,7 +19,7 @@ const initializeSocket = (username: string) => {
   state.socket.on("message", (message) => {
     console.log(message);
     const {addMessage} = usechatsActions()
-    addMessage(message)
+    addMessage(message.chatId, message.message)
   });
   state.socket.on("connectionRequest", (newContactRequest)=> {
     const {addConnectionRequests} = useContactsActions()
@@ -28,9 +27,13 @@ const initializeSocket = (username: string) => {
   })
 };
 
-const sendSocketMessage = async (message) => {
-  console.log('sending',  message)
-  await state.socket.emit("message", message);
+const sendSocketMessage = async (chatId:string, message:Message) => {
+  console.log('sending ', message)
+  const data = {
+    chatId,
+    message
+  }
+  await state.socket.emit("message", data);
 };
 
 const getSocket = () => {

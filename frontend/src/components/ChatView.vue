@@ -3,26 +3,26 @@
     <div class="col-span-2 place-items-center grid">
       <img
         :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-          contact.name
+          chat.name
         )}.svg`"
         alt="User image"
         class="h-12 bg-icon rounded-full"
       />
     </div>
     <div class="col-span-10 py-8">
-      <p class="font-bold font">{{ contact.name }}</p>
+      <p class="font-bold font">{{ chat.name }}</p>
       <p class="font-thin">
-        <span v-if="contact.isOnline">Is online</span>
+        <!-- <span v-if=".isOnline">Is online</span>
         <span v-else>
           Last seen {{ m(contact.lastSeen).fromNow() }}
-        </span>
+        </span> -->
       </p>
     </div>
   </div>
   <div class="row-span-4 relative overflow-y-auto" ref="messageBox">
     <div class="absolute w-full px-4">
       <div
-        v-for="(message, i) in chats[selectedId]"
+        v-for="(message, i) in chat.messages"
         class="my-2 flex"
         :class="{
           'justify-end': isMine(message),
@@ -45,9 +45,9 @@
   </div>
   <div class="p4 grid grid-rows-3">
     <p class="mx-6 pt-4 font-thin">
-      <span v-if="contact.istyping"
+      <!-- <span v-if="contact.istyping"
         >{{ contact.name }} is typing ...
-      </span>
+      </span> -->
     </p>
     <form
       @submit.prevent="chatsend"
@@ -115,8 +115,8 @@ export default defineComponent({
       });
     };
 
-    const contact = computed(()=>{
-      return contacts.value.find(c => c.id == props.selectedId)
+    const chat = computed(()=>{
+      return chats.value.find(c => c.chatId == props.selectedId)
     })
 
     onMounted(()=>{
@@ -125,12 +125,11 @@ export default defineComponent({
 
     return {
       chats,
+      chat,
       truncate,
       chatsend,
       message,
       isMine,
-      contacts,
-      contact,
       m,
       messageBox,
       ...propRefs,
