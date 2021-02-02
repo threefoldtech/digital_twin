@@ -1,23 +1,30 @@
 <template>
-  <div class="flex mb-4">
-    <form @submit.prevent="contactAdd">
-      <label for="username">Username: </label>
-      <input
-        v-model="usernameAdd"
-        id="username"
-        class="mb-2"
-        placeholder="Username"
-      />
-      <br />
-      <label for="location">Location: </label>
+  <div class="flex">
+    <form @submit.prevent="contactAdd" class="w-full">
+      <div class="flex place-items-center">
+        <label class="mr-2" for="username">Username: </label>
+        <input
+          v-model="usernameAdd"
+          id="username"
+          class="mb-2"
+          placeholder="Username"
+        />
+      </div>
+      <div class="flex place-items-center">
+
+      <label class="mr-2" for="location">Location: </label>
       <input
         id="location"
         disabled="true"
         class="mb-2"
         :placeholder="location"
       />
-      <br />
-      <button>Add contact</button>
+      </div>
+
+      <div class="flex mt-4 justify-end w-full">
+        <button @click="$emit('closeDialog')">Cancel</button>
+        <button>Add contact</button>
+      </div>
     </form>
     <div v-if="contactAddError">
       <span class="red"

@@ -6,12 +6,11 @@
           <h1 style="font-size: 1.75em">Chats</h1>
         </div>
         <div class="flex items-center mb-2">
-          <button class="h-10 w-10 rounded-full" @click="showDialog = true">
-            <i class="fas fa-plus"></i></button
-          ><span> Add a contact </span>
+          <button class="h-10 rounded-full" @click="showDialog = true">
+            <i class="fas fa-plus"></i><span> Add a contact </span>
+          </button>
         </div>
-        <add-contact v-if="showDialog" @closeDialog="showDialog = false">
-        </add-contact>
+        
         <div v-if="connectionRequests.length > 0">
           <h2 style="font-size: 1.5em">
             You have
@@ -107,6 +106,13 @@
         ></div>
       </div>
     </div>
+    <jdialog v-model="showDialog" @close="showDialog = false" noActions>
+      <template v-slot:title>
+        <h1>Add a contact</h1>
+      </template>
+      <add-contact @closeDialog="showDialog = false">
+        </add-contact>
+    </jdialog>
   </div>
 </template>
 
@@ -119,11 +125,12 @@ import { useAuthState } from "../../store/authStore";
 import { useSocketActions } from "../../store/socketStore";
 import addContact from "../../components/ContactAdd.vue";
 import chatView from "../../components/ChatView.vue";
+import Dialog from "../../components/Dialog.vue";
 // import contactpopup from "../../components/ContactPopup.vue";
 
 export default defineComponent({
   name: "Apps",
-  components: { addContact, chatView },
+  components: { addContact, chatView, jdialog: Dialog },
   setup(_, context) {
     const { chats } = usechatsState();
     const { connectionRequests } = useContactsState();
