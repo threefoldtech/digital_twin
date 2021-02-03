@@ -2,7 +2,7 @@ import {popupCenter} from "@/services/popupService";
 
 export const login = () => {
     return new Promise<void>(resolve => {
-        const loginUrl = `/api/signin`;
+        const loginUrl = `/api/auth/signin`;
         const popup = popupCenter(loginUrl, "Threefold login", 800, 550);
         window.onmessage = async (e: MessageEvent) => {
             if (e.data.message !== "LoginRedirectSuccess") {
