@@ -1,3 +1,4 @@
+import { IdInterface } from './../types/index';
 import {config} from "../config/config"
 import {user} from "../store/user"
 import User from "../models/user"
@@ -11,7 +12,7 @@ export const getChatIds = () => {
     return locations
 }
 
-export const getChat = () => {
+export const getChat = (id:IdInterface)  => {
 
 }
 
@@ -38,4 +39,5 @@ export const persistUserdata = () => {
     const userdata = JSON.stringify(dataToWrite)
     const location = config.baseDir + "user/userinfo.json"
     fs.writeFileSync(location,userdata,{flag: 'w'})
+    return
 }

@@ -1,3 +1,4 @@
+import { sendMessage } from './chatService';
 import {Socket} from "socket.io";
 import Connections from "../models/connections";
 import Message from "../models/message";
@@ -40,7 +41,7 @@ export const startSocketIo = (httpServer: http.Server) => {
                 return "receiver not found";
             }
 
-            chats.sendMessage(receiver.id, newMessage);
+            sendMessage(receiver.id, newMessage);
 
             // @todo refactor this
             const url = `http://${receiver.location}/api/messages`
