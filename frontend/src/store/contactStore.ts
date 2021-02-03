@@ -48,7 +48,6 @@ const addContact = (username:DtId, location, dontCheck = false) => {
     //     throw "Peer is not healthy"
     // }
     const {user} = useAuthState()
-    const id = uuidv4()
     const addMessage:Message<String> = {
         id: uuidv4(),
         body: `Request has been send to ${username}`,
@@ -57,16 +56,16 @@ const addContact = (username:DtId, location, dontCheck = false) => {
         timeStamp: new Date()
     }
     const chatname:String = username
-    axios.post(`${config.baseUrl}api/contacts`, {id,location,message:addMessage}).then( (res) => {
+    axios.post(`${config.baseUrl}api/contacts`, {id:username,location,message:addMessage}).then( (res) => {
         const contact:Contact = {
-            id,
+            id:username,
             location
         } 
 
         state.contacts.push(contact)
         const {addChat} = usechatsActions()
         const chat:PersonChat = {
-            chatId:id,
+            chatId:username,
             messages:[addMessage],
             name: chatname.toString(),
         }

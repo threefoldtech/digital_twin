@@ -7,7 +7,7 @@ import {config} from "../config/config";
 import axios from "axios";
 import {contacts} from "../store/contacts";
 import {contactRequests} from "../store/contactRequests";
-import {sendEventToConnectedSockets, io} from "../service/socketService";
+import {sendEventToConnectedSockets} from "../service/socketService";
 import {connections} from "../store/connections";
 
 const router = Router();
@@ -36,7 +36,7 @@ router.post("/", (req, res) => {
         message: mes
     }
 
-    sendEventToConnectedSockets(io, connections, "message", data)
+    sendEventToConnectedSockets(connections, "message", data)
     console.log("<<<<< new message >>>>")
 
     res.sendStatus(200);

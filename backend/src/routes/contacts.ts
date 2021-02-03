@@ -37,15 +37,15 @@ router.post("/", (req, res) => {
     }
 
     const con = req.body;
-    const contact = new Contact(con.id, con.username, con.location);
+    const contact = new Contact(con.id, con.id, con.location);
 
-    console.log(`Adding contact  ${contact.username}`);
+    console.log(`Adding contact  ${contact.id}`);
     contacts.push(contact);
 
     const message:Message = con.message
     console.log(`creating chat`)
     console.log(message)
-    chats.addChat(contact.id,[contact],false, message ,contact.username, true)
+    chats.addChat(contact.id,[contact],false, message ,contact.id, true)
 
     const url = `http://${contact.location}/api/messageRequest`
     const data = {

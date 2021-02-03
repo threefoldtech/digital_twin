@@ -7,7 +7,6 @@ import {config} from "../config/config";
 import axios from "axios";
 import {contacts} from "../store/contacts";
 import {contactRequests} from "../store/contactRequests";
-import {uuidv4} from "../common";
 import {io, sendEventToConnectedSockets} from "../service/socketService";
 import {connections} from "../store/connections";
 
@@ -19,15 +18,14 @@ router.post("/messageRequest", (req,res)=>{
     const location = req.body.location
 
     if(!contactRequests.find(c=> c.location == location)){
-        const id = uuidv4()
-        const contact = new Contact(id, username, location);
+        const contact = new Contact(username, username, location);
 
         console.log("adding contact to contactrequest", contact )
         contactRequests.push(contact);
 
         console.log(`creating chat`)
         const addMessage:Message = {
-            chatId: id,
+            chatId: username,
             to: config.userid,
             body: `Request to connect received from ${username}`,
             from: username,
@@ -35,7 +33,7 @@ router.post("/messageRequest", (req,res)=>{
         }
         chats.addChat(contact.id, [contact], false, addMessage, contact.username, false)
 
-        sendEventToConnectedSockets(io, connections, "connectionRequest", contact)
+        sendEventToConnectedSockets(connections, "connectionRequest", contact)
     }
     res.sendStatus(200)
 })

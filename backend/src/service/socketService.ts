@@ -12,7 +12,10 @@ const socketio = require("socket.io");
 export let io: Socket;
 
 export const startSocketIo = (httpServer: http.Server) => {
-    const io = socketio(httpServer);
+
+    io = socketio(httpServer, { cors: {
+          origin: '*',
+        }});
 
 
     io.on("connection", (socket: Socket) => {
@@ -69,8 +72,9 @@ export const startSocketIo = (httpServer: http.Server) => {
     });
 }
 
-export const sendEventToConnectedSockets = (io: Socket, connections: Connections, event: string, body: any) => {
+export const sendEventToConnectedSockets = (connections: Connections, event: string, body: any) => {
     connections.getConnections().forEach((connection: string) => {
+        console.log(io)
         io.to(connection).emit(event, body);
         console.log(`send message to ${connection}`);
     });
