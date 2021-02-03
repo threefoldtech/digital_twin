@@ -7,7 +7,7 @@
         </div>
         <div class="flex items-center mb-2">
           <button class="h-10 rounded-full" @click="showDialog = true">
-            <i class="fas fa-plus"></i><span> Add a contact </span>
+            <i class="fas fa-plus"></i><span> New Chat </span>
           </button>
         </div>
         
@@ -108,7 +108,7 @@
     </div>
     <jdialog v-model="showDialog" @close="showDialog = false" noActions>
       <template v-slot:title>
-        <h1>Add a contact</h1>
+        <h1>New chat</h1>
       </template>
       <add-contact @closeDialog="showDialog = false">
         </add-contact>
