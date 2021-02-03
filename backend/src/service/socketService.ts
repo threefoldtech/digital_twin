@@ -3,6 +3,7 @@ import Connections from "../models/connections";
 import Message from "../models/message";
 import {contacts} from "../store/contacts";
 import {chats} from "../store/chats";
+import { user } from "../store/user"
 import axios from "axios";
 import {connections} from "../store/connections";
 import * as http from "http";
