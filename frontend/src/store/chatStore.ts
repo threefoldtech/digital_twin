@@ -13,15 +13,17 @@ const state = reactive<chatstate>({
     chats:[]
 });
 
-const retrievechats = () => {
-    console.log(axios.get(`${config.baseUrl}api/chats`).then(function(response) {
+const retrievechats = async () => {
+    const response = await axios.get(`${config.baseUrl}api/chats`).then((response) => {
         console.log("retreived chats: ", response.data)
-        const incommingchats =  response.data
-        Object.keys(incommingchats).forEach((key)=>{
-            addChat(incommingchats[key])
+        const incommingchats = response.data
+
+        // debugger
+        incommingchats.forEach(chat => {
+            addChat(chat)
         })
         sortChats()
-    }))
+    })
 }
 
 const addChat = (chat:Chat) => {
@@ -32,7 +34,7 @@ const addChat = (chat:Chat) => {
 const addMessage = (chatId, message) => {
     console.log('in addmessage chatid', chatId)
     console.log('in addmessage message', message)
-    
+
     const chat:Chat = state.chats.find(chat=>chat.chatId == chatId)
     chat.messages.push(message)
     console.log("before setLastmessage")
@@ -61,7 +63,7 @@ const setLastMessage= (chatId:string, message:Message<String>) => {
     const chat = state.chats.find(c=> c.chatId == chatId)
     if(!chat) return
 
-    sortChats()    
+    // sortChats()
 }
 
 const sortChats = () => {

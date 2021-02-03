@@ -12,7 +12,7 @@ export const getChatIds = () => {
 }
 
 export const getChat = (id: IdInterface):Chat => {
-  const path = config.baseDir + `chats/${id}`
+  const path = config.baseDir + `chats/${id}/chat.json`
   const chat:Chat = <Chat>JSON.parse(fs.readFileSync(path).toString());
   return chat
 };
@@ -26,7 +26,7 @@ export const persistChat = (chat:Chat) => {
   catch{
     fs.mkdirSync(path)
   }
-  fs.writeFileSync(path+"/chat.json",JSON.stringify(chat),{flag: 'w'})
+  fs.writeFileSync(path+"/chat.json",JSON.stringify(chat, null, 4),{flag: 'w'})
 };
 export const getUserdata = () => {
   const location = config.baseDir + "user/userinfo.json";
@@ -38,7 +38,7 @@ export const getUserdata = () => {
   }
 };
 export const persistUserdata = (userData:Object) => {
-  const userdata = JSON.stringify(userData)
+  const userdata = JSON.stringify(userData, null, 4)
   const location = config.baseDir + "user/userinfo.json"
   fs.writeFileSync(location,userdata,{flag: 'w'})
   return
