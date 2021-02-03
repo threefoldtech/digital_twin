@@ -1,12 +1,24 @@
+import { getUserdata, persistUserdata } from "../service/dataService"
 export default class User {
     status: string;
   
     constructor() {
-      this.status = "I am happy to use chat"
+      try{
+        const userData = getUserdata()
+        this.status = userData.status
+      }
+      catch(error){
+        persistUserdata()
+      }
     }
 
     getStatus(){
         return this.status
+    }
+    getData(){
+      return {
+        status: this.status
+      }
     }
 
     updateStatus(newStatus:string){
