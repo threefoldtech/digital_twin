@@ -1,8 +1,8 @@
-export interface User {
-    name: string,
+export interface User extends AnonymousContact {
     image: string,
     email: string
 }
+
 export interface App {
     id: string,
     name: string,
@@ -17,23 +17,50 @@ export interface Tab {
     icon: string
 }
 
-export interface Message {
-    from: string,
-    body: string,
+export interface Message <T>{
+    id: Id
+    from: DtId,
+    to: Id | DtId,
+    body: T,
     timeStamp: Date,
 }
 
-export interface Chat {
-    chatId: string;
-    contacts: Contact[];
-    isGroup: boolean;
-    messages: Message[];
-    name: string;
-    lastMessage: Message;
+export interface MessageBodyType extends String{
+
 }
 
-export interface Contact {
-    id: string,
-    name:string,
+export interface Chat {
+    chatId: Id,
+    messages: Message<MessageBodyType>[];
+    name: string;
+}
+export interface PersonChat extends Chat{
+    chatId: DtId;
+    messages: Message<MessageBodyType>[];
+}
+
+export interface GroupChat extends Chat{
+    chatId: Id;
+    contacts: (AnonymousContact|Contact)[];
+}
+
+export interface Contact extends AnonymousContact {
     location:string,
+}
+
+export interface AnonymousContact {
+    id: DtId,
+}
+
+export interface DtId extends Id {
+
+}
+
+export interface Id extends String {
+
+}
+const test: Id = ""
+
+export interface Workspace extends GroupChat{
+    subGroups: GroupChat[]
 }

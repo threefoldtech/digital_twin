@@ -7,6 +7,7 @@ import {useSocketActions} from './socketStore'
 import { useAuthState } from "./authStore";
 import {useContactsActions} from './contactStore'
 import config from '../../public/config/config'
+import { uuidv4 } from "@/common";
 
 const state = reactive<chatstate>({
     chats:[]
@@ -24,9 +25,6 @@ const retrievechats = () => {
 }
 
 const addChat = (chat:Chat) => {
-    if(chat.messages.length){
-        chat.lastMessage = chat.messages[chat.messages.length -1]
-    }
     state.chats.push(chat)
     sortChats()
 }
@@ -45,29 +43,30 @@ const addMessage = (chatId, message) => {
 const sendMessage = (chatId, message) => {
     const {sendSocketMessage} = useSocketActions()
     const {user} = useAuthState()
-    const msg:Message = {
+    const msg:Message<String> = {
+        id: uuidv4(),
         body: message,
-        from: user.name,
+        from: user.id,
+        to: chatId,
         timeStamp: new Date()
     }
     addMessage(chatId, msg)
     sendSocketMessage(chatId, msg)
 }
 
-const setLastMessage= (chatId:string, message:Message) => {
+const setLastMessage= (chatId:string, message:Message<String>) => {
     console.log("here", state.chats, chatId)
     if(!state.chats) return
     const chat = state.chats.find(c=> c.chatId == chatId)
     if(!chat) return
 
-    chat.lastMessage = message
     sortChats()    
 }
 
 const sortChats = () => {
     state.chats.sort((a,b)=> {
-        var adate = a.lastMessage? a.lastMessage.timeStamp : new Date(-8640000000000000)
-        var bdate = b.lastMessage? b.lastMessage.timeStamp : new Date(-8640000000000000)
+        var adate = a.messages[a.messages.length-1] ? a.messages[a.messages.length-1].timeStamp : new Date(-8640000000000000)
+        var bdate = b.messages[b.messages.length-1]? b.messages[b.messages.length-1].timeStamp : new Date(-8640000000000000)
         return moment(bdate).unix() - moment(adate).unix()
     })
 }

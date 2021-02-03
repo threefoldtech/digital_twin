@@ -8,7 +8,7 @@ import {uuidv4} from "../../src/common/index"
 import { Chat } from "../types";
 import {usechatsActions} from "./chatStore"
 import { useAuthState } from './authStore';
-import {Message} from "../types/index"
+import { Message, PersonChat, DtId } from "../types/index"
 
 
 const state = reactive<State>({
@@ -43,33 +43,32 @@ const contactIsHealthy = (location) => {
     return isAvailable
 }
 
-const addContact = (username:string, location, dontCheck = false) => { 
+const addContact = (username:DtId, location, dontCheck = false) => { 
     // if(!dontCheck && !contactIsHealthy(username)){ 
     //     throw "Peer is not healthy"
     // }
     const {user} = useAuthState()
     const id = uuidv4()
-    const addMessage:Message = {
+    const addMessage:Message<String> = {
+        id: uuidv4(),
         body: `Request has been send to ${username}`,
-        from: user.name,
+        from: user.id,
+        to: username,
         timeStamp: new Date()
     }
-    axios.post(`${config.baseUrl}api/contacts`, {id, username,location,message:addMessage}).then( (res) => {
+    const chatname:String = username
+    axios.post(`${config.baseUrl}api/contacts`, {id,location,message:addMessage}).then( (res) => {
         const contact:Contact = {
             id,
-            name: username,
             location
         } 
 
         state.contacts.push(contact)
         const {addChat} = usechatsActions()
-        const chat:Chat = {
+        const chat:PersonChat = {
             chatId:id,
-            contacts: [contact],
-            isGroup: false,
             messages:[addMessage],
-            name: username,
-            lastMessage: addMessage
+            name: chatname.toString(),
         }
         addChat(chat)
     })
@@ -84,15 +83,11 @@ const moveConnectionRequestToContacts = (id) => {
     axios.post(`${config.baseUrl}api/contacts?id=${id}`).then( (res) => {
         const index = state.connectionRequests.findIndex(c=>c.id==id)
         console.log(state.connectionRequests[index])
-        const messages:Message[] = res.data
-        const chat:Chat = {
+        const messages:Message<String>[] = res.data
+        const chat:PersonChat = {
             chatId:id,
-            contacts: [state.connectionRequests[index]],
-            isGroup: false,
             messages:messages,
-            //@ts-ignore
-            name: state.connectionRequests[index].username,
-            lastMessage: messages[messages.length - 1]
+            name: id,
         }
         console.log(chat)
         addChat(chat)

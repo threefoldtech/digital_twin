@@ -164,12 +164,12 @@ export default defineComponent({
       );
     });
     onBeforeMount(() => {
-      initializeSocket(user.name);
+      initializeSocket(user.id.toString());
     });
     onBeforeMount(retrievechats);
     onBeforeMount(() => {
       retrieveContacts().then(() => {
-        selectedId.value = chats.value[0].chatId;
+        selectedId.value = <string>chats.value[0].chatId;
       });
     });
 

@@ -27,7 +27,7 @@ const initializeSocket = (username: string) => {
   })
 };
 
-const sendSocketMessage = async (chatId:string, message:Message) => {
+const sendSocketMessage = async (chatId:string, message:Message<String>) => {
   console.log('sending ', message)
   const data = {
     chatId,

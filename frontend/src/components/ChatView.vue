@@ -90,7 +90,7 @@ export default defineComponent({
     console.log("chats in chatview", chats);
 
     const isMine = (message) => {
-      return message.from == user.name;
+      return message.from == user.id;
     };
     const truncate = (value, limit = 20) => {
       if (value.length > limit) {
