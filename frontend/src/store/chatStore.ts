@@ -48,7 +48,8 @@ const sendMessage = (chatId, message) => {
         body: message,
         from: user.id,
         to: chatId,
-        timeStamp: new Date()
+        timeStamp: new Date(),
+        type: "STRING"
     }
     addMessage(chatId, msg)
     sendSocketMessage(chatId, msg)
