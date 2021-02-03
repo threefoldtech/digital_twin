@@ -1,3 +1,5 @@
+import { MessageInterface } from './../types/index';
+import { parseMessage } from './../service/messageService';
 import {Router} from 'express';
 import {appCallback, getAppLoginUrl} from "../service/authService";
 import {chats} from "../store/chats";
@@ -41,7 +43,7 @@ router.post("/", (req, res) => {
     console.log(`Adding contact  ${contact.id}`);
     contacts.push(contact);
 
-    const message:Message<MessageBodyTypeInterface> = con.message
+    const message:MessageInterface<MessageBodyTypeInterface> = parseMessage(con.message)
     console.log(`creating chat`)
     console.log(message)
     addChat(contact.id,[contact],false, message ,contact.id, true)

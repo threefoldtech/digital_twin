@@ -8,7 +8,8 @@ export default class User {
         this.status = userData.status
       }
       catch(error){
-        persistUserdata()
+        this.status = "Exploring the new DigitalTwin"
+        persistUserdata({status:this.status})
       }
     }
 
