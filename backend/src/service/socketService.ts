@@ -7,13 +7,14 @@ import { user } from "../store/user"
 import axios from "axios";
 import {connections} from "../store/connections";
 import * as http from "http";
+import {parseMessage} from "./messageService";
+import {MessageBodyTypeInterface} from "../types";
 
 const socketio = require("socket.io");
 
 export let io: Socket;
 
 export const startSocketIo = (httpServer: http.Server) => {
-
     io = socketio(httpServer, { cors: {
           origin: '*',
         }});
@@ -30,12 +31,10 @@ export const startSocketIo = (httpServer: http.Server) => {
 
         socket.on("message", (messageData) => {
             console.log('new message')
-            const newMessage: Message = messageData.message
-            const chatId: string = messageData.chatId
+            const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData)
 
             console.log(contacts)
-            console.log(chatId)
-            const receiver = contacts.find(c => c.id == chatId);
+            const receiver = contacts.find(c => c.id == newMessage.to);
             if (!receiver) {
                 console.log("receiver not found")
                 return "receiver not found";
@@ -43,6 +42,7 @@ export const startSocketIo = (httpServer: http.Server) => {
 
             chats.sendMessage(receiver.id, newMessage);
 
+            // @todo refactor this
             const url = `http://${receiver.location}/api/messages`
             console.log(`sending message ${newMessage.body} to ${url}`);
 
@@ -51,11 +51,8 @@ export const startSocketIo = (httpServer: http.Server) => {
                     // this is me
                     return
                 }
-                const data = {
-                    chatId: newMessage.chatId,
-                    message: newMessage
-                }
-                io.to(connection).emit("message", data);
+
+                io.to(connection).emit("message", newMessage);
                 console.log(`send message to ${connection}`);
             });
             try {

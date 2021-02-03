@@ -1,11 +1,11 @@
-export default class Contact {
+import {ContactInterface} from "../types";
+
+export default class Contact implements ContactInterface{
   id: string;
-  username: string;
   location: string;
-  
-  constructor(id: string, username: string, location: string) {
+
+  constructor(id: string, location: string) {
     this.id = id;
-    this.username = username;
     this.location = location;
   }
 }

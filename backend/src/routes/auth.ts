@@ -3,6 +3,10 @@ import {appCallback, getAppLoginUrl} from "../service/authService";
 
 const router = Router();
 
+router.get('/', async (request, response) => {
+    response.json({status: true})
+});
+
 router.get('/signin', async (request, response) => {
     const loginUrl = await getAppLoginUrl(request, `/api/auth/callback`);
     response.redirect(loginUrl);

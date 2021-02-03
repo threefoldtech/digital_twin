@@ -7,15 +7,14 @@ import {config} from "../config/config";
 import axios from "axios";
 import {contacts} from "../store/contacts";
 import {contactRequests} from "../store/contactRequests";
+import {MessageBodyTypeInterface} from "../types";
+import {addChat} from "../service/chatService";
 
 const router = Router();
 
 router.get("/", (req, res) => {
     const resp = contacts.map((contact) => {
-        return {
-            id: contact.id,
-            name: contact.username
-        };
+        return contact.id
     });
     res.json(resp);
 });
@@ -37,15 +36,15 @@ router.post("/", (req, res) => {
     }
 
     const con = req.body;
-    const contact = new Contact(con.id, con.id, con.location);
+    const contact = new Contact(con.id, con.location);
 
     console.log(`Adding contact  ${contact.id}`);
     contacts.push(contact);
 
-    const message:Message = con.message
+    const message:Message<MessageBodyTypeInterface> = con.message
     console.log(`creating chat`)
     console.log(message)
-    chats.addChat(contact.id,[contact],false, message ,contact.id, true)
+    addChat(contact.id,[contact],false, message ,contact.id, true)
 
     const url = `http://${contact.location}/api/messageRequest`
     const data = {
