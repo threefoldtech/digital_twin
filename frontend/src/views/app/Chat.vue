@@ -1,9 +1,13 @@
 <template>
-  <div class="grid grid-cols-12">
-    <div class="col-span-3 flex flex-col">
+  <div class="md:grid-cols-12 relative h-full w-full">
+    <div class="fixed h-screen w-screen bg-black bg-opacity-25 top-0 left-0 md:hidden transition-all z-20" :class="{'hidden': !showContacts}" @click="showContacts = false"></div>
+    <div class="fixed md:static md:col-span-3 flex flex-col md:bg-transparent bg-white rounded-r-lg shadow md:shadow-none h-screen md:h-auto top-0 left-0 z-30 transition-all" :class="{'-left-full' : !showContacts}">
       <div>
-        <div class="flex mb-2">
-          <h1 style="font-size: 1.75em">Chats</h1>
+        <div class="flex m-2 mt-5">
+          <button @click="showContacts = false">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <h1>Chats</h1>
         </div>
         <div class="flex items-center mb-2">
           <button class="h-10 rounded-full" @click="showDialog = true">
@@ -59,16 +63,16 @@
             }"
             @click="setSelected(chat.chatId)"
           >
-            <div class="col-span-2 place-items-center grid">
+            <div class="md:col-span-2 col-span-3 place-items-center grid">
               <img
                 :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
                   chat.name
                 )}.svg`"
                 alt="User image"
-                class="h-12 bg-icon rounded-full"
+                class="h-12 w-12 bg-icon rounded-full"
               />
             </div>
-            <div class="col-span-10 pr-4">
+            <div class="md:col-span-10 col-span-9 pl-2">
               <p class="flex place-content-between">
                 <span class="font-bold">
                   {{ chat.name }}
@@ -80,15 +84,15 @@
               <p class="font-thin truncate" v-if="chat.lastMessage">
                 {{ chat.lastMessage.body }}
               </p>
-              <p class="font-thin" v-else>No chats yet</p>
+              <p class="font-thin truncate" v-else>No chats yet</p>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="col-span-6 h-full w-full grid grid-rows-6">
-      <chat-view v-if="selectedId" :selectedId="selectedId"></chat-view>
+    <div class="md:col-span-6 w-full h-full relative">
+      <chat-view v-if="selectedId" :selectedId="selectedId" @showContacts="showContacts=true"></chat-view>
       <div v-else class="text-center">
         It feels lonely over here :( <br />
         Use the top left button <b>Add a contact</b> to add a contact
@@ -96,11 +100,11 @@
     </div>
 
     <div
-      class="col-span-3 relative h-full w-full overflow-y-auto flex flex-col"
+      class="hidden col-span-3 relative h-full w-full overflow-y-auto flex-col"
     >
       <div class="absolute max-w-full w-full px-4 pb-4">
         <div
-          class="bg-white h-52 w-full relative rounded-lg mb-4 mt-0"
+          class="bg-white h-52 w-full relative rounded-lg mb-4 mt-0 hidden md:block"
           v-for="i in 3"
           :key="i"
         ></div>
@@ -145,6 +149,7 @@ export default defineComponent({
     const m = (val) => moment(val);
     const searchValue = ref("");
     let showDialog = ref(false);
+    let showContacts = ref(false);
 
     let selectedId = ref("");
     const setSelected = (id) => {
@@ -152,6 +157,7 @@ export default defineComponent({
       console.log(id);
       console.log(chats.value);
       searchValue.value = "";
+      showContacts.value = false
     };
 
     const filteredChats = computed(() => {
@@ -187,6 +193,7 @@ export default defineComponent({
       searchValue,
       filteredChats,
       showDialog,
+      showContacts,
       m,
     };
   },

@@ -1,76 +1,90 @@
 <template>
-  <div class="grid grid-cols-12 bg-white rounded-lg mx-4">
-    <div class="col-span-2 place-items-center grid">
-      <img
-        :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-          chat.name
-        )}.svg`"
-        alt="User image"
-        class="h-12 bg-icon rounded-full"
-      />
+  <div class="relative h-full w-full flex flex-col">
+    <div class="grid grid-cols-12 bg-white rounded-lg shadow z-10">
+      <button @click="$emit('showContacts')" class="md:hidden">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+      <div class="col-span-2 place-items-center grid">
+        <img
+          :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
+            chat.name
+          )}.svg`"
+          alt="User image"
+          class="h-12 bg-icon rounded-full"
+        />
+      </div>
+      <div class="col-span-9 py-4 pl-2">
+        <p class="font-bold font">{{ chat.name }}</p>
+        <p class="font-thin">Is online</p>
+        <!-- <p class="font-thin">
+          <span v-if=".isOnline">Is online</span>
+          <span v-else> Last seen {{ m(contact.lastSeen).fromNow() }} </span>
+        </p> -->
+      </div>
     </div>
-    <div class="col-span-10 py-8">
-      <p class="font-bold font">{{ chat.name }}</p>
-      <p class="font-thin">
-        <!-- <span v-if=".isOnline">Is online</span>
-        <span v-else>
-          Last seen {{ m(contact.lastSeen).fromNow() }}
-        </span> -->
-      </p>
-    </div>
-  </div>
-  <div class="row-span-4 relative overflow-y-auto" ref="messageBox">
-    <div class="absolute w-full px-4">
-      <div
-        v-for="(message, i) in chat.messages"
-        class="my-2 flex"
-        :class="{
-          'justify-end': isMine(message),
-        }"
-        :key="i"
-      >
-        <div class="bg-white p-4 rounded-lg truncate">
-          {{ message.body }}
-          <p
-            class="font-thin"
-            :class="{
-              'text-right': isMine(message),
-            }"
-          >
-            {{ m(message.timeStamp).fromNow() }}
-          </p>
+    <div class="flex-grow row-span-4 relative overflow-y-auto" ref="messageBox">
+      <div class="absolute w-full px-4">
+        <div
+          v-for="(message, i) in chat.messages"
+          class="my-2 flex"
+          :class="{
+            'justify-end': isMine(message),
+          }"
+          :key="i"
+        >
+          <div class="bg-white p-4 rounded-lg truncate">
+            {{ message.body }}
+            <p
+              class="font-thin"
+              :class="{
+                'text-right': isMine(message),
+              }"
+            >
+              {{ m(message.timeStamp).fromNow() }}
+            </p>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-  <div class="p4 grid grid-rows-3">
-    <p class="mx-6 pt-4 font-thin">
-      <!-- <span v-if="contact.istyping"
-        >{{ contact.name }} is typing ...
-      </span> -->
-    </p>
-    <form
-      @submit.prevent="chatsend"
-      class="row-span-2 rounded-xl grid grid-cols-12 h place-items-center bg-white mx-4"
-    >
-      <span>+</span>
-      <input
-        class="col-span-10 w-full h-full pl-4"
-        type="text"
-        v-model="message"
-      />
-      <button class="px-2 py-8" type="submit" value="Send">Send</button>
-    </form>
+    <div class="p4 flex flex-col">
+      <p class="mx-6 font-thin">
+        <span>{{ chat.name }} is typing ... </span>
+      </p>
+      <form
+        @submit.prevent="chatsend"
+        class="flex rounded-xl h place-items-center bg-white mx-4"
+      >
+        <button class="px-2 py-8" type="submit" value="Send">
+          <i class="fas fa-paperclip text-gray-500 transform" style="--tw-rotate: -225deg;"></i>
+        </button>
+        <input
+          class="col-span-10 w-full h-full pl-4"
+          type="text"
+          v-model="message"
+        />
+        <button class="px-2 py-8" type="submit" value="Send">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import moment from "moment";
-import { defineComponent, onMounted, watch, ref, toRefs, nextTick, computed } from "vue";
+import {
+  defineComponent,
+  onMounted,
+  watch,
+  ref,
+  toRefs,
+  nextTick,
+  computed,
+} from "vue";
 import { usechatsState, usechatsActions } from "../store/chatStore";
 import { useContactsState } from "../store/contactStore";
 import { useAuthState } from "../store/authStore";
-import { Contact } from "../types/index"
+import { Contact } from "../types/index";
 
 export default defineComponent({
   name: "ChatView",
@@ -115,13 +129,13 @@ export default defineComponent({
       });
     };
 
-    const chat = computed(()=>{
-      return chats.value.find(c => c.chatId == props.selectedId)
-    })
+    const chat = computed(() => {
+      return chats.value.find((c) => c.chatId == props.selectedId);
+    });
 
-    onMounted(()=>{
-      scrollToBottom()
-    })
+    onMounted(() => {
+      scrollToBottom();
+    });
 
     return {
       chats,

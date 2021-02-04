@@ -1,9 +1,9 @@
 <template>
   <div class="bg-gray-100 h-screen overflow-hidden relative">
-    <div class="px-4 pl-0 relative h-full w-full flex">
-      <Sidebar ></Sidebar>
+    <div class="pl-0 relative h-full w-full flex">
+      <Sidebar class="hidden md:block"></Sidebar>
       <div class="w-full h-full overflow-y-auto relative flex flex-col p-4">
-        <Topbar class="mb-10" />
+        <Topbar class="mb-5" />
         <div class="relative w-full h-full overflow-y-auto">
           <router-view class="absolute w-full h-full" />
         </div>
