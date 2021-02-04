@@ -35,6 +35,7 @@ const addMessage = (chatId, message) => {
     console.log('in addmessage chatid', chatId)
     console.log('in addmessage message', message)
 
+    debugger
     const chat:Chat = state.chats.find(chat=>chat.chatId == chatId)
     chat.messages.push(message)
     console.log("before setLastmessage")

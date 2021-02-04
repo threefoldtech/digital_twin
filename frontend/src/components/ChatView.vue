@@ -26,11 +26,12 @@
       <div class="absolute w-full px-4">
         <MessageCard v-for="(message, i) in chat.messages"
                      :key="i"
-                     :message="message" />
+                     :message="message"
+        />
       </div>
     </div>
 
-    <ChatInput :chatsend="chatsend" :message="message" v-on:messageSend="scrollToBottom"/>
+    <ChatInput :selectedid="chat.chatId" v-on:messageSend="scrollToBottom"/>
   </div>
 </template>
 

@@ -18,7 +18,6 @@ const initializeSocket = (username: string) => {
         name: username,
     });
     state.socket.on("message", (message) => {
-        debugger
         console.log(message);
         const {addMessage} = usechatsActions()
 

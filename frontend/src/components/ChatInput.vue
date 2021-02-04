@@ -37,8 +37,7 @@ import {usechatsActions} from "@/store/chatStore";
 export default {
   name: 'ChatInput',
   props: {
-    chatsend: {},
-    message: {}
+    selectedid: {},
   },
   setup(props) {
 
@@ -52,12 +51,12 @@ export default {
 
     const chatsend = (e) => {
       if (message.value != "") {
-        sendMessage(props.selectedId, message.value);
+        sendMessage(props.selectedid, message.value);
         message.value = "";
       }
       if (fileinput.value.files.length > 0) {
-        sendFile(props.selectedId, fileinput.value.files[0]);
-        fileinput.value = null;
+        sendFile(props.selectedid, fileinput.value.files[0]);
+        removeFile()
       }
       this.$emit('messageSend')
     };
