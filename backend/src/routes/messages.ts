@@ -1,45 +1,68 @@
 import {Router} from 'express';
-import {appCallback, getAppLoginUrl} from "../service/authService";
-import {chats} from "../store/chats";
-import Contact from "../models/contact";
 import Message from "../models/message";
-import {config} from "../config/config";
-import axios from "axios";
 import {contacts} from "../store/contacts";
 import {contactRequests} from "../store/contactRequests";
-import {sendEventToConnectedSockets} from "../service/socketService";
+import {io, sendEventToConnectedSockets} from "../service/socketService";
 import {connections} from "../store/connections";
+import {ContactRequest, MessageBodyTypeInterface, MessageTypes} from "../types";
+import Contact from "../models/contact";
+import {parseMessage} from "../service/messageService";
+import {sendMessage} from "../service/chatService";
 
 const router = Router();
 
+function handleContactRequest(message: Message<ContactRequest>) {
+    contactRequests.push(<Contact><unknown>message.body)
+}
+
 // Should be externally availble
-router.post("/", (req, res) => {
+router.put("/", (req, res) => {
     // @ TODO check if valid
-    const mes = req.body;
-
-    let contact = contacts.find(c => c.username == mes.from)
-    if(!contact){
-        contact = contactRequests.find(c=> c.username == mes.from)
-
-        if(!contact){
-            res.sendStatus(404)
-            return
-        }
-        return
+    const msg = req.body;
+    let message: Message<MessageBodyTypeInterface>;
+    try {
+        message = parseMessage(msg);
+    } catch (e) {
+        res.status(500).json({status: 'failed', reason: 'validation failed'})
+        return;
     }
-    const message = new Message(mes.from, mes.to, mes.body);
+
+    if (message.type === MessageTypes.CONTACT_REQUEST) {
+        handleContactRequest(message as Message<ContactRequest>);
+
+        res.json({status:"success"})
+        return;
+    }
+
+    let contact = contacts.find(c => c.id == message.from)
+
+    if (!contact && contactRequests.find(c => c.id == message.from)) {
+        //@todo maybe 3 messages should be allowed or something
+        res.status(403).json({status: 'Forbidden', reason: 'contact not yet approved'});
+        return;
+    }
+
+    if (!contact) {
+        res.status(403).json({status: 'Forbidden', reason: 'not in contact'});
+        return;
+    }
+
+    // const message = new Message(msg.from, msg.to, msg.body);
     console.log(`received new message from ${message.from}`);
-
-    chats.sendMessage(contact.id, message);
-    const data = {
-        chatId: contact.id,
-        message: mes
-    }
-
-    sendEventToConnectedSockets(connections, "message", data)
-    console.log("<<<<< new message >>>>")
+    //
+    sendMessage(contact.id, message);
+    //
+    sendEventToConnectedSockets(connections, "message", message)
 
     res.sendStatus(200);
 });
+
+router.put("/file", (req, res) => {
+    if(!req.query.chatId){
+        res.status(403).json({status:'Forbidden',reason:'ChatId is required as a parameter'})
+        return
+    }
+    res.sendStatus(200)
+})
 
 export default router

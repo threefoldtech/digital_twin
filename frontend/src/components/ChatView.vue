@@ -46,23 +46,30 @@
         </div>
       </div>
     </div>
+
     <div class="p4 flex flex-col">
-      <p class="mx-6 font-thin">
-        <span>{{ chat.name }} is typing ... </span>
+      <p class="mx-6 pt-4 font-thin">
+        <!-- <span v-if="contact.istyping"
+        >{{ contact.name }} is typing ...
+      </span> -->
       </p>
       <form
         @submit.prevent="chatsend"
         class="flex rounded-xl h place-items-center bg-white mx-4"
       >
-        <button class="px-2 py-8" type="submit" value="Send">
+        <!-- <button class="px-2 py-8" type="submit" value="Send">
           <i class="fas fa-paperclip text-gray-500 transform" style="--tw-rotate: -225deg;"></i>
-        </button>
+        </button> -->
+        <label class="col-span-4"
+          >File <br />
+          <input type="file" id="file" ref="file" />
+        </label>
         <input
-          class="col-span-10 w-full h-full pl-4"
+          class="col-span-6 w-full h-full pl-4"
           type="text"
           v-model="message"
         />
-        <button class="px-2 py-8" type="submit" value="Send">
+        <button class="px-2 py-8" type="submit">
           <i class="fas fa-paper-plane"></i>
         </button>
       </form>
@@ -93,11 +100,12 @@ export default defineComponent({
   },
   setup(props) {
     const { chats } = usechatsState();
-    const { sendMessage } = usechatsActions();
+    const { sendMessage, sendFile } = usechatsActions();
     const { user } = useAuthState();
     const { contacts } = useContactsState();
     const m = (val) => moment(val);
     const messageBox = ref(null);
+    const file = ref();
 
     const propRefs = toRefs(props);
 
@@ -119,11 +127,13 @@ export default defineComponent({
 
     const message = ref("");
     const chatsend = (e) => {
-      if (message.value == "") {
-        return;
+      if (message.value != "") {
+        sendMessage(props.selectedId, message.value);
+        message.value = "";
       }
-      sendMessage(props.selectedId, message.value);
-      message.value = "";
+      if (file.value.files.length > 0) {
+        sendFile(props.selectedId, file.value.files[0]);
+      }
       nextTick(() => {
         scrollToBottom();
       });
@@ -143,6 +153,7 @@ export default defineComponent({
       truncate,
       chatsend,
       message,
+      file,
       isMine,
       m,
       messageBox,

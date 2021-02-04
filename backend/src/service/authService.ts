@@ -14,9 +14,7 @@ export const getAppLoginUrl = async (request: Request, redirectUrl: string): Pro
     );
     await login.init();
     const loginState = generateRandomString();
-    console.log(request.session)
     request.session.state = loginState;
-    console.log(request.session.state)
     return login.generateLoginUrl(loginState);
 }
 export const appCallback = async (request: Request): Promise<string> => {

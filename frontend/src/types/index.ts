@@ -23,6 +23,7 @@ export interface Message <T>{
     to: Id | DtId,
     body: T,
     timeStamp: Date,
+    type: String,
 }
 
 export interface MessageBodyType extends String{

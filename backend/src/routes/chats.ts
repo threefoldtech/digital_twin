@@ -1,12 +1,11 @@
 import {Router} from 'express';
 import {appCallback, getAppLoginUrl} from "../service/authService";
-import {chats} from "../store/chats";
+import {getAcceptedChats} from "../service/chatService";
 
 const router = Router();
 
 router.get("/", (req, res) => {
-    const returnChats = chats.getAcceptedChats()
-    console.log(returnChats)
+    const returnChats = getAcceptedChats()
     res.json(returnChats);
 });
 

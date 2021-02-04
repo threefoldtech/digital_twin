@@ -38,4 +38,6 @@ RUN npm install pm2 -g
 COPY ./startup.sh /startup.sh
 RUN chmod +x /startup.sh
 
+RUN mkdir /app/data/user /app/data/chats
+
 CMD /startup.sh

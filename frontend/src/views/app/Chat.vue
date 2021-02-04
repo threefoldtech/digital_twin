@@ -14,7 +14,7 @@
             <i class="fas fa-plus"></i><span> New Chat </span>
           </button>
         </div>
-        
+
         <div v-if="connectionRequests.length > 0">
           <h2 style="font-size: 1.5em">
             You have
@@ -66,7 +66,7 @@
             <div class="md:col-span-2 col-span-3 place-items-center grid">
               <img
                 :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-                  chat.name
+                  chat.chatId
                 )}.svg`"
                 alt="User image"
                 class="h-12 w-12 bg-icon rounded-full"
@@ -75,7 +75,7 @@
             <div class="md:col-span-10 col-span-9 pl-2">
               <p class="flex place-content-between">
                 <span class="font-bold">
-                  {{ chat.name }}
+                  {{ chat.chatId }}
                 </span>
                 <span class="font-thin" v-if="chat.lastMessage">
                   {{ m(chat.lastMessage.timeStamp).fromNow() }}
