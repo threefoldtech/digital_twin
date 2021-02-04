@@ -3,7 +3,6 @@ import {Socket} from "socket.io";
 import Connections from "../models/connections";
 import Message from "../models/message";
 import {contacts} from "../store/contacts";
-import {chats} from "../store/chats";
 import { user } from "../store/user"
 import axios from "axios";
 import {connections} from "../store/connections";
@@ -35,10 +34,7 @@ export const startSocketIo = (httpServer: http.Server) => {
             console.log('new message')
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
 
-            console.log(contacts)
-            console.log(newMessage.to)
-            const receiver = getChatById(newMessage.to);
-
+            const receiver = contacts.find(c => c.id == newMessage.to);
             if (!receiver) {
                 console.log("receiver not found")
                 return "receiver not found";
@@ -72,12 +68,12 @@ export const startSocketIo = (httpServer: http.Server) => {
             }
         });
 
-        socket.on('slice upload', (data) => { 
+        socket.on('slice upload', (data) => {
             console.log(data)
             var file:any = {
-                name: data.file.name, 
+                name: data.file.name,
                 type: data.file.type,
-                data: data.file.data, 
+                data: data.file.data,
                 size: data.file.size
             }
             console.log(file)

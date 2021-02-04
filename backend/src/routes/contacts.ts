@@ -2,7 +2,6 @@ import { MessageInterface } from './../types/index';
 import { parseMessage } from './../service/messageService';
 import {Router} from 'express';
 import {appCallback, getAppLoginUrl} from "../service/authService";
-import {chats} from "../store/chats";
 import Contact from "../models/contact";
 import Message from "../models/message";
 import {config} from "../config/config";
@@ -10,7 +9,7 @@ import axios from "axios";
 import {contacts} from "../store/contacts";
 import {contactRequests} from "../store/contactRequests";
 import {MessageBodyTypeInterface} from "../types";
-import {addChat} from "../service/chatService";
+import {addChat, getMessagesFromId} from "../service/chatService";
 
 const router = Router();
 
@@ -25,15 +24,10 @@ router.post("/", (req, res) => {
     if(req.query.id){
         //Flow to add contact request to contacts
         const id = req.query.id
-        console.log("adding from requests to contacts: ", id)
         const index = contactRequests.findIndex(c=>c.id==id)
         contacts.push(contactRequests[index]);
         contactRequests.splice(index,1)
-        //@ts-ignore
-        const messages = chats.getMessagesFromId(id)
-        //@ts-ignore
-        chats.setChatToAccepted(id)
-        res.json(messages)
+        res.json([]);
         return
     }
 
@@ -45,7 +39,6 @@ router.post("/", (req, res) => {
 
     const message:MessageInterface<MessageBodyTypeInterface> = parseMessage(con.message)
     console.log(`creating chat`)
-    console.log(message)
     addChat(contact.id,[contact],false, message ,contact.id, true)
 
     const url = `http://${contact.location}/api/messageRequest`

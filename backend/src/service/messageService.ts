@@ -4,11 +4,7 @@ import { saveFile } from "./dataService"
 
 
 export const parseMessage = (msg: any): MessageInterface<MessageBodyTypeInterface> => {
-    console.log(msg)
-    console.log(msg.type)
     const type: MessageTypes = <MessageTypes>msg.type;
-
-    console.log("message type", type)
 
     switch (type) {
         case MessageTypes.STRING:
@@ -30,9 +26,8 @@ export const parseMessage = (msg: any): MessageInterface<MessageBodyTypeInterfac
                 type
             )
         case MessageTypes.FILE_UPLOAD:
-            console.log("newMessage")
-                
-            saveFile(msg.to, msg.body.name, msg.body.parsedFile);
+
+            const url = saveFile(msg.to, msg.body.name, msg.body.parsedFile);
 
             return new Message<FileMessageType>(
                 msg.from,

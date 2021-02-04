@@ -3,15 +3,12 @@ import Chat from "../models/chat";
 import Message from "../models/message";
 import {IdInterface, MessageBodyTypeInterface} from "../types";
 import Contact from "../models/contact";
-import {chats} from "../store/chats";
 import {getChatIds, persistChat, getChat} from "./dataService";
 
 export const sendMessage = (
     chatId: IdInterface,
     message: MessageInterface<MessageBodyTypeInterface>
 ) => {
-    console.log("insendMessage")
-    console.log(chatId)
     const chat = getChat(chatId);
     chat.messages.push(message);
     console.log(chat)
@@ -27,20 +24,16 @@ export const addChat = (
     name: string,
     acceptedChat: boolean
 ) => {
-    chats.set(
-        chatId,
-        new Chat(chatId, contacts, isGroupchat, [message], name, acceptedChat)
-    );
     persistChat(
         new Chat(chatId, contacts, isGroupchat, [message], name, acceptedChat)
     );
 };
 
 export const getMessagesFromId = (chatId: IdInterface) =>
-    chats.get(chatId).messages;
+    true
 
 export const setChatToAccepted = (chatId: IdInterface) =>
-    (chats.get(chatId).acceptedChat = true);
+    true
 
 export const getAcceptedChats = () => {
     return getChatIds()

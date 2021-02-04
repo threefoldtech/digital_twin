@@ -1,5 +1,4 @@
 import {Router} from 'express';
-import {chats} from "../store/chats";
 import Message from "../models/message";
 import {contacts} from "../store/contacts";
 import {contactRequests} from "../store/contactRequests";
@@ -63,7 +62,6 @@ router.put("/file", (req, res) => {
         res.status(403).json({status:'Forbidden',reason:'ChatId is required as a parameter'})
         return
     }
-    console.log(req.files)
     res.sendStatus(200)
 })
 
