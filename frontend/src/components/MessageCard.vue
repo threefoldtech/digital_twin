@@ -7,6 +7,8 @@
   >
     <div class="bg-white p-4 rounded-lg truncate">
       <span v-if="message.type === 'FILE'">
+        <audio controls v-if="message.body.filename.indexOf('.WebM') !== -1" :src="`http://${message.from.replace('localhost:8080','localhost:3000')}/api/files/${message.to}/${message.body.filename}`"></audio>
+        <br>
         <a class="py-2 px-2 bg-green-200 border-r-2" :href="`http://${message.from.replace('localhost:8080','localhost:3000')}/api/files/${message.to}/${message.body.filename}`" download>{{message.body.filename}}</a>
       </span>
       <span v-else>

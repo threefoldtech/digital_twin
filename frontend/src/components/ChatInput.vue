@@ -1,10 +1,10 @@
 <template>
   <div class="p4 flex flex-col">
-<!--    <p class="mx-6 pt-4 font-thin">-->
-<!--      <span v-if="true"-->
-<!--      >{{ contact.name }} is typing ...-->
-<!--    </span>-->
-<!--    </p>-->
+    <!--    <p class="mx-6 pt-4 font-thin">-->
+    <!--      <span v-if="true"-->
+    <!--      >{{ contact.name }} is typing ...-->
+    <!--    </span>-->
+    <!--    </p>-->
     <div
         class="flex rounded-xl h place-items-center bg-white mx-4"
     >
@@ -12,6 +12,12 @@
         <i class="fas fa-paperclip text-gray-500 transform" style="--tw-rotate: -225deg;"></i>
       </button>
       <input class="hidden" type="file" id="fileinput" ref="fileinput" @change="changeFile"/>
+      <button class="px-2 py-8" @click.stop="startRecording" v-if="!stopRecording">
+        <i class="fas fa-microphone text-gray-500"></i>
+      </button>
+      <button class="px-2 py-8" @click.stop="stopRecording" v-else>
+        <i class="fas fa-circle text-red-600"></i>
+      </button>
       <input
           class="col-span-6 w-full h-full pl-4"
           type="text"
@@ -48,6 +54,8 @@ export default {
     const fileinput = ref();
     const file = ref(null)
 
+    const stopRecording = ref(null)
+
 
     const chatsend = (e) => {
       if (message.value != "") {
@@ -55,7 +63,7 @@ export default {
         message.value = "";
       }
       if (fileinput.value.files.length > 0) {
-        sendFile(props.selectedid, fileinput.value.files[0]);
+        sendFile(props.selectedid, fileinput.value.files[0].name, fileinput.value.files[0].arrayBuffer());
         removeFile()
       }
       this.$emit('messageSend')
@@ -73,6 +81,34 @@ export default {
       file.value = null;
     }
 
+    const startRecording = async () => {
+      const stream = await navigator.mediaDevices.getUserMedia({audio: true});
+
+
+      const mediaRecorder = new MediaRecorder(stream);
+      const audioChunks = [];
+
+      mediaRecorder.addEventListener("dataavailable", event => {
+        audioChunks.push(event.data);
+      });
+
+      mediaRecorder.start()
+
+      stopRecording.value = () => {
+        mediaRecorder.addEventListener("stop", async () => {
+          const audioBlob = new Blob(audioChunks);
+          const arrayBuffer = await audioBlob.arrayBuffer()
+          console.log(props.selectedid)
+          sendFile(props.selectedid, `recording-${Date.now()}.WebM`, arrayBuffer)
+          stopRecording.value = null;
+        });
+
+        mediaRecorder.stop();
+        stream.getAudioTracks().forEach(at => at.stop())
+      }
+
+    }
+
     return {
       sendMessage,
       message,
@@ -82,6 +118,8 @@ export default {
       fileinput,
       file,
       removeFile,
+      startRecording,
+      stopRecording,
     }
   }
 }

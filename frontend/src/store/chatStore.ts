@@ -35,7 +35,7 @@ const addMessage = (chatId, message) => {
     console.log('in addmessage chatid', chatId)
     console.log('in addmessage message', message)
 
-    debugger
+
     const chat:Chat = state.chats.find(chat=>chat.chatId == chatId)
     chat.messages.push(message)
     console.log("before setLastmessage")
@@ -58,17 +58,15 @@ const sendMessage = (chatId, message) => {
     sendSocketMessage(chatId, msg)
 }
 
-const sendFile = async (chatId, file) => {
+const   sendFile = async (chatId,name, parsedFile) => {
     const { sendSocketMessage } = useSocketActions()
     const {user} = useAuthState()
-    console.log("heree ",file, chatId)
-    const parsedFile = await file.arrayBuffer()
 
 
     const msgToSend:Message<Object> = {
         id: uuidv4(),
         body: {
-            name: file.name,
+            name,
             parsedFile
         },
         from: user.id,
@@ -80,7 +78,7 @@ const sendFile = async (chatId, file) => {
     const msgToShow:Message<Object> = {
         id: uuidv4(),
         body: {
-            filename: file.name
+            filename: name
         },
         from: user.id,
         to: chatId,
