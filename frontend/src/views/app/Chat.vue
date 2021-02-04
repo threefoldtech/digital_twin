@@ -53,40 +53,17 @@
       </div>
       <div class="relative overflow-y-auto w-full max-h-full h-full mt-4">
         <div class="absolute w-full px-2">
-          <div
-            v-for="(chat, i) in filteredChats"
-            :key="i"
-            class="grid grid-cols-12 rounded-lg mb-2 py-2"
-            :class="{
+          <ChatCard
+              v-for="(chat, i) in filteredChats"
+              :key="i"
+              class="grid grid-cols-12 rounded-lg mb-2 py-2"
+              :class="{
               'bg-white': chat.chatId !== selectedId,
               'bg-icon': chat.chatId === selectedId,
             }"
-            @click="setSelected(chat.chatId)"
-          >
-            <div class="md:col-span-2 col-span-3 place-items-center grid">
-              <img
-                :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-                  chat.chatId
-                )}.svg`"
-                alt="User image"
-                class="h-12 w-12 bg-icon rounded-full"
-              />
-            </div>
-            <div class="md:col-span-10 col-span-9 pl-2">
-              <p class="flex place-content-between">
-                <span class="font-bold">
-                  {{ chat.chatId }}
-                </span>
-                <span class="font-thin" v-if="chat.lastMessage">
-                  {{ m(chat.lastMessage.timeStamp).fromNow() }}
-                </span>
-              </p>
-              <p class="font-thin truncate" v-if="chat.lastMessage">
-                {{ chat.lastMessage.body }}
-              </p>
-              <p class="font-thin truncate" v-else>No chats yet</p>
-            </div>
-          </div>
+              @click="setSelected(chat.chatId)"
+              :chat="chat"
+          />
         </div>
       </div>
     </div>
@@ -131,10 +108,11 @@ import addContact from "../../components/ContactAdd.vue";
 import chatView from "../../components/ChatView.vue";
 import Dialog from "../../components/Dialog.vue";
 // import contactpopup from "../../components/ContactPopup.vue";
+import ChatCard from "../../components/ChatCard.vue";
 
 export default defineComponent({
   name: "Apps",
-  components: { addContact, chatView, jdialog: Dialog },
+  components: { addContact, chatView, jdialog: Dialog, ChatCard },
   setup(_, context) {
     const { chats } = usechatsState();
     const { connectionRequests } = useContactsState();

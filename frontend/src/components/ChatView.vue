@@ -15,7 +15,7 @@
       </div>
       <div class="col-span-9 py-4 pl-2">
         <p class="font-bold font">{{ chat.name }}</p>
-        <p class="font-thin">Is online</p>
+        <p class="font-thin">{{statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline"}}</p>
         <!-- <p class="font-thin">
           <span v-if=".isOnline">Is online</span>
           <span v-else> Last seen {{ m(contact.lastSeen).fromNow() }} </span>
@@ -46,6 +46,8 @@ import {
   nextTick,
   computed,
 } from "vue";
+
+import {statusList} from "@/store/statusStore"
 import { usechatsState, usechatsActions } from "../store/chatStore";
 import { useContactsState } from "../store/contactStore";
 import { useAuthState } from "../store/authStore";
@@ -111,6 +113,7 @@ export default defineComponent({
       m,
       messageBox,
       scrollToBottom,
+      statusList,
       ...propRefs,
     };
   },
