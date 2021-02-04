@@ -62,17 +62,9 @@ const sendFile = async (chatId, file) => {
     const {user} = useAuthState()
     console.log("heree ",file, chatId)
     const parsedFile = await file.arrayBuffer()
-    // const a = { 
-    //     chatId,
-    //     file: {
-    //     name: file.name, 
-    //     type: file.type, 
-    //     size: file.size, 
-    //     data: parsedFile 
-    //     }
-    // }
 
-    const msg:Message<Object> = {
+
+    const msgToSend:Message<Object> = {
         id: uuidv4(),
         body: {
             name: file.name,
@@ -83,18 +75,18 @@ const sendFile = async (chatId, file) => {
         timeStamp: new Date(),
         type: "FILE_UPLOAD"
     }
-    sendSocketMessage(chatId,msg)
-    
-    // const msg:Message<> = {
-    //     id: uuidv4(),
-    //     body: message,
-    //     from: user.id,
-    //     to: chatId,
-    //     timeStamp: new Date(),
-    //     type: "FILE"
-    // }
-    // addMessage(chatId, msg)
-    // sendSocketMessage(chatId, msg)
+    sendSocketMessage(chatId,msgToSend)
+    const msgToShow:Message<Object> = {
+        id: uuidv4(),
+        body: {
+            filename: file.name
+        },
+        from: user.id,
+        to: chatId,
+        timeStamp: new Date(),
+        type: "FILE"
+    }
+    addMessage(chatId, msgToShow)
 }
 
 const setLastMessage= (chatId:string, message:Message<String>) => {

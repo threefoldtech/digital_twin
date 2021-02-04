@@ -50,7 +50,7 @@ export interface ContactRequest extends MessageBodyTypeInterface, ContactInterfa
 
 }
 export interface FileMessageType extends MessageBodyTypeInterface{
-    url:string
+    filename:string
 }
 
 export interface ChatInterface {

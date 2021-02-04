@@ -19,6 +19,7 @@ export const getChat = (id: IdInterface):Chat => {
 
 export const persistChat = (chat:Chat) => {
   const path = config.baseDir + `chats/${chat.chatId}`
+  console.log("persisting", path)
 
   try{
     fs.statSync(path)

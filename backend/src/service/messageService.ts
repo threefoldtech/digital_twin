@@ -32,12 +32,12 @@ export const parseMessage = (msg: any): MessageInterface<MessageBodyTypeInterfac
         case MessageTypes.FILE_UPLOAD:
             console.log("newMessage")
                 
-            const url = saveFile(msg.to, msg.body.name, msg.body.parsedFile);
+            saveFile(msg.to, msg.body.name, msg.body.parsedFile);
 
             return new Message<FileMessageType>(
                 msg.from,
                 msg.to,
-                <FileMessageType>{url},
+                <FileMessageType>{filename:msg.body.name},
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.FILE

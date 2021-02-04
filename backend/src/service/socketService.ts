@@ -1,4 +1,4 @@
-import { sendMessage } from './chatService';
+import { sendMessage, getChatById } from './chatService';
 import {Socket} from "socket.io";
 import Connections from "../models/connections";
 import Message from "../models/message";
@@ -36,18 +36,20 @@ export const startSocketIo = (httpServer: http.Server) => {
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
 
             console.log(contacts)
-            const receiver = contacts.find(c => c.id == newMessage.to);
+            console.log(newMessage.to)
+            const receiver = getChatById(newMessage.to);
+
             if (!receiver) {
                 console.log("receiver not found")
                 return "receiver not found";
             }
 
-            sendMessage(receiver.id, newMessage);
-
+            sendMessage(receiver.chatId, newMessage);
+            
+            
             // @todo refactor this
             const url = `http://${receiver.location}/api/messages`
             console.log(`sending message ${newMessage.body} to ${url}`);
-
             connections.getConnections().forEach((connection: string) => {
                 if (connection == socket.id) {
                     // this is me

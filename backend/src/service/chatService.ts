@@ -10,9 +10,12 @@ export const sendMessage = (
     chatId: IdInterface,
     message: MessageInterface<MessageBodyTypeInterface>
 ) => {
+    console.log("insendMessage")
     console.log(chatId)
     const chat = getChat(chatId);
     chat.messages.push(message);
+    console.log(chat)
+    console.log(chat.messages)
     persistChat(chat)
 };
 
@@ -44,3 +47,7 @@ export const getAcceptedChats = () => {
         .map((chatid) => getChat(chatid))
         .filter((chat) => chat.acceptedChat);
 };
+
+export const getChatById = (id:IdInterface) => {
+    return getChat(id)
+}
