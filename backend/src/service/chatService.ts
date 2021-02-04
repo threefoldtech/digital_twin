@@ -11,8 +11,6 @@ export const sendMessage = (
 ) => {
     const chat = getChat(chatId);
     chat.messages.push(message);
-    console.log(chat)
-    console.log(chat.messages)
     persistChat(chat)
 };
 
