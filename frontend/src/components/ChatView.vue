@@ -6,20 +6,23 @@
       </button>
       <div class="col-span-2 place-items-center grid">
         <img
-          :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
+            :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
             chat.name
           )}.svg`"
-          alt="User image"
-          class="h-12 bg-icon rounded-full"
+            alt="User image"
+            class="h-12 bg-icon rounded-full"
         />
       </div>
-      <div class="col-span-9 py-4 pl-2">
+      <div class="col-span-6 py-4 pl-2">
         <p class="font-bold font">{{ chat.name }}</p>
-        <p class="font-thin">{{statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline"}}</p>
+        <p class="font-thin">{{ statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline" }}</p>
         <!-- <p class="font-thin">
           <span v-if=".isOnline">Is online</span>
           <span v-else> Last seen {{ m(contact.lastSeen).fromNow() }} </span>
         </p> -->
+      </div>
+      <div class="col-span-3 py-4 pl-2">
+        <button @click="popupMeeting">goto video</button>
       </div>
     </div>
     <div class="flex-grow row-span-4 relative overflow-y-auto" ref="messageBox">
@@ -48,12 +51,15 @@ import {
 } from "vue";
 
 import {statusList} from "@/store/statusStore"
-import { usechatsState, usechatsActions } from "../store/chatStore";
-import { useContactsState } from "../store/contactStore";
-import { useAuthState } from "../store/authStore";
-import { Contact } from "../types/index";
+import {usechatsState, usechatsActions} from "../store/chatStore";
+import {useContactsState} from "../store/contactStore";
+import {useAuthState} from "../store/authStore";
+import {Contact} from "../types/index";
 import MessageCard from "@/components/MessageCard.vue";
 import ChatInput from "@/components/ChatInput.vue";
+import {popupCenter} from "@/services/popupService";
+import * as crypto from "crypto-js";
+
 
 export default defineComponent({
   name: "ChatView",
@@ -62,10 +68,10 @@ export default defineComponent({
     selectedId: String,
   },
   setup(props) {
-    const { chats } = usechatsState();
-    const { sendMessage, sendFile } = usechatsActions();
-    const { user } = useAuthState();
-    const { contacts } = useContactsState();
+    const {chats} = usechatsState();
+    const {sendMessage, sendFile} = usechatsActions();
+    const {user} = useAuthState();
+    const {contacts} = useContactsState();
     const m = (val) => moment(val);
     const messageBox = ref(null);
     const file = ref();
@@ -103,6 +109,15 @@ export default defineComponent({
       scrollToBottom()
     });
 
+    const popupMeeting = () => {
+
+      // @ts-ignore
+      const str = chat?.contacts ? chat.id :[user.id,chat.id].sort().join();
+
+      const ID = crypto.SHA1(str)
+      popupCenter('https://meetings.jimber.org/room/' + ID, "Threefold login", 800, 550)
+    }
+
     return {
       chats,
       chat,
@@ -114,6 +129,7 @@ export default defineComponent({
       messageBox,
       scrollToBottom,
       statusList,
+      popupMeeting,
       ...propRefs,
     };
   },

@@ -5,7 +5,8 @@ import {reactive} from "@vue/reactivity";
 export const statusList = reactive<Object>({})
 
 export const fetchStatus = async digitalTwinId => {
-  const response = await axios.get("https://chatty.jimbertesting.be/api/user/getStatus");
+  let url = "https://chatty.jimbertesting.be/api/user/getStatus";
+  const response = await axios.get(url);
   let status = response.data;
   statusList[digitalTwinId] = status
   return status;
