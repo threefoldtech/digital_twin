@@ -7,15 +7,11 @@
   >
     <div class="bg-white p-4 rounded-lg truncate">
       <span v-if="message.type === 'FILE'">
-        <a :href="`http://${message.from.replace('localhost:8080','localhost:3000')}/api/files/${message.to}/${message.body.filename}`" download>{{message.body.filename}}</a>
-              {{ message.body }}
+        <a class="py-2 px-2 bg-green-200 border-r-2" :href="`http://${message.from.replace('localhost:8080','localhost:3000')}/api/files/${message.to}/${message.body.filename}`" download>{{message.body.filename}}</a>
       </span>
       <span v-else>
               {{ message.body }}
       </span>
-      <pre>
-      {{message}}
-      </pre>
       <p
           class="font-thin"
           :class="{

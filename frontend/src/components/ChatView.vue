@@ -30,33 +30,7 @@
       </div>
     </div>
 
-    <div class="p4 flex flex-col">
-      <p class="mx-6 pt-4 font-thin">
-        <!-- <span v-if="contact.istyping"
-        >{{ contact.name }} is typing ...
-      </span> -->
-      </p>
-      <form
-        @submit.prevent="chatsend"
-        class="flex rounded-xl h place-items-center bg-white mx-4"
-      >
-        <!-- <button class="px-2 py-8" type="submit" value="Send">
-          <i class="fas fa-paperclip text-gray-500 transform" style="--tw-rotate: -225deg;"></i>
-        </button> -->
-        <label class="col-span-4"
-          >File <br />
-          <input type="file" id="file" ref="file" />
-        </label>
-        <input
-          class="col-span-6 w-full h-full pl-4"
-          type="text"
-          v-model="message"
-        />
-        <button class="px-2 py-8" type="submit">
-          <i class="fas fa-paper-plane"></i>
-        </button>
-      </form>
-    </div>
+    <ChatInput :chatsend="chatsend" :message="message" v-on:messageSend="scrollToBottom"/>
   </div>
 </template>
 
@@ -76,10 +50,11 @@ import { useContactsState } from "../store/contactStore";
 import { useAuthState } from "../store/authStore";
 import { Contact } from "../types/index";
 import MessageCard from "@/components/MessageCard.vue";
+import ChatInput from "@/components/ChatInput.vue";
 
 export default defineComponent({
   name: "ChatView",
-  components: {MessageCard},
+  components: {ChatInput, MessageCard},
   props: {
     selectedId: String,
   },
@@ -106,47 +81,38 @@ export default defineComponent({
       return value;
     };
 
+    // @todo: fix so that properly scrools to bottom
     const scrollToBottom = () => {
-      messageBox.value.scrollTop = messageBox.value.scrollHeight;
+      nextTick(
+          () => {
+            messageBox.value.scrollTop = messageBox.value.scrollHeight;
+          }
+      )
     };
 
     const message = ref("");
-    const chatsend = (e) => {
-      if (message.value != "") {
-        sendMessage(props.selectedId, message.value);
-        message.value = "";
-      }
-      if (file.value.files.length > 0) {
-        sendFile(props.selectedId, file.value.files[0]);
-      }
-      nextTick(() => {
-        scrollToBottom();
-      });
-    };
 
     const chat = computed(() => {
       return chats.value.find((c) => c.chatId == props.selectedId);
     });
 
     onMounted(() => {
-      scrollToBottom();
+      scrollToBottom()
     });
 
     return {
       chats,
       chat,
       truncate,
-      chatsend,
       message,
       file,
       isMine,
       m,
       messageBox,
+      scrollToBottom,
       ...propRefs,
     };
   },
 });
 </script>
 
-<style scoped>
-</style>
