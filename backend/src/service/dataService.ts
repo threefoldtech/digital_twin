@@ -20,13 +20,13 @@ export const getChat = (id: IdInterface):Chat => {
 export const persistChat = (chat:Chat) => {
   const path = config.baseDir + `chats/${chat.chatId}`
 
-  try{
-    fs.statSync(path)
-  }
-  catch{
-    fs.mkdirSync(path)
-    fs.mkdirSync(path+"/files")
-  }
+    try{
+      fs.statSync(path)
+    }
+    catch{
+      fs.mkdirSync(path)
+      fs.mkdirSync(path+"/files")
+    }
   fs.writeFileSync(path+"/chat.json",JSON.stringify(chat, null, 4),{flag: 'w'})
 };
 

@@ -24,26 +24,9 @@
     </div>
     <div class="flex-grow row-span-4 relative overflow-y-auto" ref="messageBox">
       <div class="absolute w-full px-4">
-        <div
-          v-for="(message, i) in chat.messages"
-          class="my-2 flex"
-          :class="{
-            'justify-end': isMine(message),
-          }"
-          :key="i"
-        >
-          <div class="bg-white p-4 rounded-lg truncate">
-            {{ message.body }}
-            <p
-              class="font-thin"
-              :class="{
-                'text-right': isMine(message),
-              }"
-            >
-              {{ m(message.timeStamp).fromNow() }}
-            </p>
-          </div>
-        </div>
+        <MessageCard v-for="(message, i) in chat.messages"
+                     :key="i"
+                     :message="message" />
       </div>
     </div>
 
@@ -92,9 +75,11 @@ import { usechatsState, usechatsActions } from "../store/chatStore";
 import { useContactsState } from "../store/contactStore";
 import { useAuthState } from "../store/authStore";
 import { Contact } from "../types/index";
+import MessageCard from "@/components/MessageCard.vue";
 
 export default defineComponent({
   name: "ChatView",
+  components: {MessageCard},
   props: {
     selectedId: String,
   },

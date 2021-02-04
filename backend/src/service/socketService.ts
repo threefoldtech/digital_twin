@@ -40,9 +40,8 @@ export const startSocketIo = (httpServer: http.Server) => {
                 return "receiver not found";
             }
 
-            sendMessage(receiver.chatId, newMessage);
-            
-            
+            sendMessage(receiver.id, newMessage);
+
             // @todo refactor this
             const url = `http://${receiver.location}/api/messages`
             console.log(`sending message ${newMessage.body} to ${url}`);
