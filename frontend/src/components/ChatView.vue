@@ -53,9 +53,11 @@
       @submit.prevent="chatsend"
       class="row-span-2 rounded-xl grid grid-cols-12 h place-items-center bg-white mx-4"
     >
-      <span>+</span>
+      <label class="col-span-4">File <br>
+        <input  type="file" id="file" ref="file" />
+      </label>
       <input
-        class="col-span-10 w-full h-full pl-4"
+        class="col-span-6 w-full h-full pl-4"
         type="text"
         v-model="message"
       />
@@ -79,11 +81,12 @@ export default defineComponent({
   },
   setup(props) {
     const { chats } = usechatsState();
-    const { sendMessage } = usechatsActions();
+    const { sendMessage, sendFile } = usechatsActions();
     const { user } = useAuthState();
     const { contacts } = useContactsState();
     const m = (val) => moment(val);
     const messageBox = ref(null);
+    const file = ref()
 
     const propRefs = toRefs(props);
 
@@ -105,11 +108,13 @@ export default defineComponent({
 
     const message = ref("");
     const chatsend = (e) => {
-      if (message.value == "") {
-        return;
+      if (message.value != "") {
+        sendMessage(props.selectedId, message.value);
+        message.value = "";
       }
-      sendMessage(props.selectedId, message.value);
-      message.value = "";
+      if (file.value.files.length>0){
+        sendFile(props.selectedId, file.value.files[0])
+      }
       nextTick(() => {
         scrollToBottom();
       });
@@ -129,6 +134,7 @@ export default defineComponent({
       truncate,
       chatsend,
       message,
+      file,
       isMine,
       m,
       messageBox,

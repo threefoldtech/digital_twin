@@ -10,6 +10,7 @@ import {connections} from "../store/connections";
 import * as http from "http";
 import {parseMessage} from "./messageService";
 import {MessageBodyTypeInterface} from "../types";
+import { saveFile } from "./dataService"
 
 const socketio = require("socket.io");
 
@@ -32,7 +33,7 @@ export const startSocketIo = (httpServer: http.Server) => {
 
         socket.on("message", (messageData) => {
             console.log('new message')
-            const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData)
+            const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
 
             console.log(contacts)
             const receiver = contacts.find(c => c.id == newMessage.to);
@@ -67,6 +68,18 @@ export const startSocketIo = (httpServer: http.Server) => {
             } catch (e) {
                 console.log(e)
             }
+        });
+
+        socket.on('slice upload', (data) => { 
+            console.log(data)
+            var file:any = {
+                name: data.file.name, 
+                type: data.file.type,
+                data: data.file.data, 
+                size: data.file.size
+            }
+            console.log(file)
+            saveFile(data.chatId, file.name, file.data)
         });
     });
 }

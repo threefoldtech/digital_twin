@@ -1,4 +1,4 @@
-import { IdInterface } from "../types/index";
+import { IdInterface } from './../types/index';
 import { config } from "../config/config";
 import fs from "fs";
 import User from "../models/user";
@@ -25,9 +25,11 @@ export const persistChat = (chat:Chat) => {
   }
   catch{
     fs.mkdirSync(path)
+    fs.mkdirSync(path+"/files")
   }
   fs.writeFileSync(path+"/chat.json",JSON.stringify(chat, null, 4),{flag: 'w'})
 };
+
 export const getUserdata = () => {
   const location = config.baseDir + "user/userinfo.json";
   try {
@@ -37,9 +39,16 @@ export const getUserdata = () => {
     throw new Error("Userinfo file doesn't exitst");
   }
 };
+
 export const persistUserdata = (userData:Object) => {
   const userdata = JSON.stringify(userData, null, 4)
   const location = config.baseDir + "user/userinfo.json"
   fs.writeFileSync(location,userdata,{flag: 'w'})
   return
 };
+
+export const saveFile = (chatId:IdInterface, fileName:string, fileBuffer:Buffer) => {
+  const path = `${config.baseDir}chats/${chatId}/files/${fileName}`
+  fs.writeFileSync(path, fileBuffer)
+  return path
+}

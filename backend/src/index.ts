@@ -1,6 +1,7 @@
 import express, {Application} from "express"
 import http from "http"
 import bodyParser from "body-parser";
+import fileupload  from 'express-fileupload';
 import cors, {CorsOptions} from "cors"
 import session from "express-session";
 import {startSocketIo} from "./service/socketService"
@@ -31,8 +32,12 @@ app.use(session({
     }
 }));
 
+app.use(bodyParser.raw());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(fileupload({
+    limits: { filesize: 50 * 1024 * 1024 }
+}))
 
 app.use('/api/', routes)
 

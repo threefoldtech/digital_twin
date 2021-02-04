@@ -24,11 +24,14 @@ export enum MessageTypes {
     STRING = "STRING",
     MESSAGE = "MESSAGE",
     FILE = "FILE",
+    FILE_UPLOAD = "FILE_UPLOAD",
     EDIT = "EDIT",
     READ = "READ",
     CONTACT_REQUEST = "CONTACT_REQUEST",
 
 }
+
+
 
 export interface MessageInterface <T>{
     id: IdInterface
@@ -45,6 +48,9 @@ export interface MessageBodyTypeInterface extends String{
 }
 export interface ContactRequest extends MessageBodyTypeInterface, ContactInterface{
 
+}
+export interface FileMessageType extends MessageBodyTypeInterface{
+    url:string
 }
 
 export interface ChatInterface {

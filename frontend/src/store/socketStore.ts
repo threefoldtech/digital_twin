@@ -27,7 +27,7 @@ const initializeSocket = (username: string) => {
   })
 };
 
-const sendSocketMessage = async (chatId:string, message:Message<String>) => {
+const sendSocketMessage = async (chatId:string, message:Message<any>) => {
   console.log('sending ', message)
   const data = {
     chatId,
@@ -35,6 +35,15 @@ const sendSocketMessage = async (chatId:string, message:Message<String>) => {
   }
   await state.socket.emit("message", data);
 };
+
+// const sendSocketFile = async (chatId:string, message:Message<ArrayBuffer>) => {
+//   console.log('sending ', message)
+//   const data = {
+//     chatId,
+//     message
+//   }
+//   await state.socket.emit("message", data);
+// };
 
 const getSocket = () => {
   return state.socket;

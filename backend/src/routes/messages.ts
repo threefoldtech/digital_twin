@@ -58,4 +58,13 @@ router.put("/", (req, res) => {
     res.sendStatus(200);
 });
 
+router.put("/file", (req, res) => {
+    if(!req.query.chatId){
+        res.status(403).json({status:'Forbidden',reason:'ChatId is required as a parameter'})
+        return
+    }
+    console.log(req.files)
+    res.sendStatus(200)
+})
+
 export default router
