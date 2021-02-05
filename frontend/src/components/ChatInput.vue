@@ -57,13 +57,14 @@ export default {
     const stopRecording = ref(null)
 
 
-    const chatsend = (e) => {
+    const chatsend = async (e) => {
       if (message.value != "") {
         sendMessage(props.selectedid, message.value);
         message.value = "";
       }
       if (fileinput.value.files.length > 0) {
-        sendFile(props.selectedid, fileinput.value.files[0].name, fileinput.value.files[0].arrayBuffer());
+        const parsedFile = await fileinput.value.files[0].arrayBuffer()
+        sendFile(props.selectedid, fileinput.value.files[0].name, parsedFile);
         removeFile()
       }
       emit('messageSend')
