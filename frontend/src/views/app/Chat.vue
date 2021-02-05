@@ -1,7 +1,10 @@
 <template>
   <div class="md:grid-cols-12 relative h-full w-full">
-    <div class="fixed h-screen w-screen bg-black bg-opacity-25 top-0 left-0 md:hidden transition-all z-20" :class="{'hidden': !showContacts}" @click="showContacts = false"></div>
-    <div class="fixed md:static md:col-span-3 flex flex-col md:bg-transparent bg-white rounded-r-lg shadow md:shadow-none h-screen md:h-auto top-0 left-0 z-30 transition-all" :class="{'-left-full' : !showContacts}">
+    <div class="fixed h-screen w-screen bg-black bg-opacity-25 top-0 left-0 md:hidden transition-all z-20"
+         :class="{'hidden': !showContacts}" @click="showContacts = false"></div>
+    <div
+        class="fixed md:static md:col-span-3 flex flex-col md:bg-transparent bg-white rounded-r-lg shadow md:shadow-none h-screen md:h-auto top-0 left-0 z-30 transition-all"
+        :class="{'-left-full' : !showContacts}">
       <div>
         <div class="flex m-2 mt-5">
           <button @click="showContacts = false">
@@ -20,17 +23,17 @@
             You have
             <span style="color: red"> {{ connectionRequests.length }} </span>
             new connection request<span v-if="connectionRequests.length > 1"
-              >s</span
-            >
+          >s</span
+          >
           </h2>
           <div v-for="(connRequest, i) in connectionRequests" :key="i">
             <div class="grid grid-cols-12 w-full rounded-lg mb-2 py-2">
               <span class="truncate col-span-8">{{
-                connRequest.username
-              }}</span>
+                  connRequest.username
+                }}</span>
               <button
-                class="col-span-4"
-                @click="addConnectionRequestToContacts(connRequest.id)"
+                  class="col-span-4"
+                  @click="addConnectionRequestToContacts(connRequest.id)"
               >
                 Add to contacts
               </button>
@@ -39,15 +42,15 @@
         </div>
         <div class="relative full">
           <div
-            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+              class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
           >
             <i class="text-gray-500 fas fa-search"></i>
           </div>
           <input
-            type="text"
-            placeholder="Search..."
-            class="w-full pl-12 py-3 sm:text-sm rounded-full bg-white"
-            v-model="searchValue"
+              type="text"
+              placeholder="Search..."
+              class="w-full pl-12 py-3 sm:text-sm rounded-full bg-white"
+              v-model="searchValue"
           />
         </div>
       </div>
@@ -71,19 +74,19 @@
     <div class="md:col-span-6 w-full h-full relative">
       <chat-view v-if="selectedId" :selectedId="selectedId" @showContacts="showContacts=true"></chat-view>
       <div v-else class="text-center">
-        It feels lonely over here :( <br />
+        It feels lonely over here :( <br/>
         Use the top left button <b>Add a contact</b> to add a contact
       </div>
     </div>
 
     <div
-      class="hidden col-span-3 relative h-full w-full overflow-y-auto flex-col"
+        class="hidden col-span-3 relative h-full w-full overflow-y-auto flex-col"
     >
       <div class="absolute max-w-full w-full px-4 pb-4">
         <div
-          class="bg-white h-52 w-full relative rounded-lg mb-4 mt-0 hidden md:block"
-          v-for="i in 3"
-          :key="i"
+            class="bg-white h-52 w-full relative rounded-lg mb-4 mt-0 hidden md:block"
+            v-for="i in 3"
+            :key="i"
         ></div>
       </div>
     </div>
@@ -92,18 +95,18 @@
         <h1>New chat</h1>
       </template>
       <add-contact @closeDialog="showDialog = false">
-        </add-contact>
+      </add-contact>
     </jdialog>
   </div>
 </template>
 
 <script lang="ts">
 import moment from "moment";
-import { defineComponent, ref, computed, onBeforeMount } from "vue";
-import { usechatsState, usechatsActions } from "../../store/chatStore";
-import { useContactsState, useContactsActions } from "../../store/contactStore";
-import { useAuthState } from "../../store/authStore";
-import { useSocketActions } from "../../store/socketStore";
+import {defineComponent, ref, computed, onBeforeMount} from "vue";
+import {usechatsState, usechatsActions} from "../../store/chatStore";
+import {useContactsState, useContactsActions} from "../../store/contactStore";
+import {useAuthState} from "../../store/authStore";
+import {useSocketActions} from "../../store/socketStore";
 import addContact from "../../components/ContactAdd.vue";
 import chatView from "../../components/ChatView.vue";
 import Dialog from "../../components/Dialog.vue";
@@ -112,17 +115,17 @@ import ChatCard from "../../components/ChatCard.vue";
 
 export default defineComponent({
   name: "Apps",
-  components: { addContact, chatView, jdialog: Dialog, ChatCard },
+  components: {addContact, chatView, jdialog: Dialog, ChatCard},
   setup(_, context) {
-    const { chats } = usechatsState();
-    const { connectionRequests } = useContactsState();
-    const { retrievechats } = usechatsActions();
+    const {chats} = usechatsState();
+    const {connectionRequests} = useContactsState();
+    const {retrievechats} = usechatsActions();
     const {
       retrieveContacts,
       moveConnectionRequestToContacts,
     } = useContactsActions();
-    const { initializeSocket } = useSocketActions();
-    const { user } = useAuthState();
+    const {initializeSocket} = useSocketActions();
+    const {user} = useAuthState();
 
     const m = (val) => moment(val);
     const searchValue = ref("");
@@ -136,6 +139,7 @@ export default defineComponent({
       console.log(chats.value);
       searchValue.value = "";
       showContacts.value = false
+      chats.value.find((c) => c.chatId === selectedId.value);
     };
 
     const filteredChats = computed(() => {
@@ -144,7 +148,7 @@ export default defineComponent({
       }
       console.log("filtered", chats.value)
       return chats.value.filter((c) =>
-        c.name.toLowerCase().includes(searchValue.value.toLowerCase())
+          c.name.toLowerCase().includes(searchValue.value.toLowerCase())
       );
     });
     onBeforeMount(() => {

@@ -94,7 +94,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue";
+import {defineComponent, nextTick, ref} from "vue";
 import {useAuthState} from "../store/authStore";
 import moment from "moment";
 import {usechatsActions} from "../store/chatStore";
@@ -188,17 +188,14 @@ export default defineComponent({
     };
 
     const read = () => {
-      const newMessage: Message<string> = {
-        id: uuidv4(),
-        from: user.id,
-        to: props.chatId,
-        body: props.message.id,
-        timeStamp: new Date(),
-        type: "READ",
-      };
-      sendMessageObject(props.chatId, newMessage);
-
+      const {readMessage} = usechatsActions()
+      readMessage(props.chatId, props.message.id)
     }
+    nextTick(() => {
+      if (!props.isread){
+        read()
+      }
+    })
 
     return {
       isMine,
