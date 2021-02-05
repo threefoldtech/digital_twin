@@ -73,8 +73,9 @@ const sendFile = async (chatId, name, parsedFile) => {
     const { sendSocketMessage } = useSocketActions()
     const {user} = useAuthState()
 
+    let id = uuidv4();
     const msgToSend:Message<Object> = {
-        id: uuidv4(),
+        id,
         body: {
             name,
             parsedFile
@@ -85,17 +86,17 @@ const sendFile = async (chatId, name, parsedFile) => {
         type: "FILE_UPLOAD"
     }
     sendSocketMessage(chatId,msgToSend)
-    const msgToShow:Message<Object> = {
-        id: uuidv4(),
-        body: {
-            filename: name
-        },
-        from: user.id,
-        to: chatId,
-        timeStamp: new Date(),
-        type: "FILE"
-    }
-    addMessage(chatId, msgToShow)
+    // const msgToShow:Message<Object> = {
+    //     id,
+    //     body: {
+    //         filename: name
+    //     },
+    //     from: user.id,
+    //     to: chatId,
+    //     timeStamp: new Date(),
+    //     type: "FILE"
+    // }
+    // addMessage(chatId, msgToShow)
 }
 
 const setLastMessage= (chatId:string, message:Message<String>) => {
