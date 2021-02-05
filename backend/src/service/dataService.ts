@@ -1,4 +1,4 @@
-import { IdInterface } from './../types/index';
+import { IdInterface, UserInterface } from './../types/index';
 import { config } from "../config/config";
 import fs from "fs";
 import User from "../models/user";
@@ -50,7 +50,7 @@ export const persistChat = (chat:Chat) => {
   fs.writeFileSync(path+"/chat.json",JSON.stringify(sortedChat, null, 4),{flag: 'w'})
 };
 
-export const persistUserdata = (userData:Object) => {
+export const persistUserdata = (userData:UserInterface) => {
   const userdata = JSON.stringify(userData, null, 4)
   const location = config.baseDir + "user/userinfo.json"
   fs.writeFileSync(location,userdata,{flag: 'w'})
@@ -61,4 +61,9 @@ export const saveFile = (chatId:IdInterface, fileName:string, fileBuffer:Buffer)
   const path = `${config.baseDir}chats/${chatId}/files/${fileName}`
   fs.writeFileSync(path, fileBuffer)
   return path
+}
+
+export const saveAvatar = (fileBuffer:Buffer) => {
+  const path = `${config.baseDir}user/avatar`
+  fs.writeFileSync(path, fileBuffer)
 }

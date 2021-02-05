@@ -3,7 +3,7 @@ import Message from "../models/message";
 
 export interface UserInterface extends AnonymousContactInterface {
     image: string,
-    email: string
+    status: string,
 }
 
 export interface AppInterface {

@@ -7,8 +7,10 @@ import {connections} from "../store/connections";
 import * as http from "http";
 import {editMessage, handleRead, parseMessage} from "./messageService";
 import {MessageBodyTypeInterface, MessageOperations, MessageTypes} from "../types";
-import {saveFile} from "./dataService"
+import {saveFile, saveAvatar} from "./dataService"
 import {getLocationForId, sendMessageToApi} from './apiService';
+import {user} from "../store/user"
+
 
 const socketio = require("socket.io");
 
@@ -83,6 +85,13 @@ export const startSocketIo = (httpServer: http.Server) => {
             let location1 = getLocationForId(<string>newMessage.to);
             sendMessageToApi(location1, newMessage, MessageOperations.UPDATE)
         })
+        socket.on('new_avatar', (data) => {
+            console.log(data)
+            const url = data.url
+            const avatar = data.avatar
+            saveAvatar(avatar)
+            user.updateAvatar(url)
+        });
 
     });
 }

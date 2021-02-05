@@ -1,12 +1,12 @@
-import {Message} from "@/types";
-import {reactive} from "@vue/reactivity";
-import {inject} from "vue";
-import {usechatsActions} from "./chatStore";
-import {useContactsActions} from "./contactStore";
-import {useAuthState} from "@/store/authStore";
+import { Message } from "@/types";
+import { reactive } from "@vue/reactivity";
+import { inject } from "vue";
+import { usechatsActions } from "./chatStore";
+import { useContactsActions } from "./contactStore";
+import { useAuthState } from "@/store/authStore";
 
 const state = reactive<State>({
-    socket: "",
+  socket: "",
 });
 
 const initializeSocket = (username: string) => {
@@ -24,23 +24,27 @@ const initializeSocket = (username: string) => {
         }
         const {addMessage} = usechatsActions()
 
-        const {user} = useAuthState()
-        addMessage(message.to === user.id ? message.from : message.to, message)
-    });
-    state.socket.on("connectionRequest", (newContactRequest) => {
-        const {addConnectionRequests} = useContactsActions()
-        addConnectionRequests(newContactRequest)
-    })
+    const { user } = useAuthState();
+    addMessage(message.to === user.id ? message.from : message.to, message);
+  });
+  state.socket.on("connectionRequest", (newContactRequest) => {
+    const { addConnectionRequests } = useContactsActions();
+    addConnectionRequests(newContactRequest);
+  });
 };
 
-const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate=false) => {
-    console.log('sending ', message)
-    const data = {
-        chatId,
-        message
-    }
-    const messageType = isUpdate? "update_message":"message"
-    await state.socket.emit(messageType, data);
+const sendSocketMessage = async (
+  chatId: string,
+  message: Message<any>,
+  isUpdate = false
+) => {
+  console.log("sending ", message);
+  const data = {
+    chatId,
+    message,
+  };
+  const messageType = isUpdate ? "update_message" : "message";
+  await state.socket.emit(messageType, data);
 };
 
 // const sendSocketFile = async (chatId:string, message:Message<ArrayBuffer>) => {
@@ -52,17 +56,27 @@ const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate
 //   await state.socket.emit("message", data);
 // };
 
+const sendSocketAvatar = async (avatar: ArrayBuffer) => {
+  const url = `https://${window.location.origin}/api/user/avatar`.replace("https://localhost:8080","http://localhost:3000")
+  const data = {
+    avatar,
+    url
+  }
+  state.socket.emit("new_avatar", data);
+};
+
 const getSocket = () => {
-    return state.socket;
+  return state.socket;
 };
 
 export const useSocketActions = () => {
-    return {
-        initializeSocket,
-        sendSocketMessage,
-    };
+  return {
+    initializeSocket,
+    sendSocketMessage,
+    sendSocketAvatar,
+  };
 };
 
 interface State {
-    socket: any;
+  socket: any;
 }
