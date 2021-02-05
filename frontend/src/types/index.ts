@@ -43,6 +43,7 @@ export interface PersonChat extends Chat{
 export interface GroupChat extends Chat{
     chatId: Id;
     contacts: (AnonymousContact|Contact)[];
+    adminId: Id;
 }
 
 export interface Contact extends AnonymousContact {

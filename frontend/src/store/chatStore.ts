@@ -1,8 +1,9 @@
+
 import { reactive } from "@vue/reactivity";
 import { toRefs } from "vue";
 import axios from "axios";
 import moment from "moment";
-import { Chat, Message } from "../types";
+import { Chat, Contact, Message, GroupChat } from "../types";
 import {useSocketActions} from './socketStore'
 import { useAuthState } from "./authStore";
 import {useContactsActions} from './contactStore'
@@ -29,6 +30,29 @@ const retrievechats = async () => {
 const addChat = (chat:Chat) => {
     state.chats.push(chat)
     sortChats()
+}
+
+const addGroupchat = (name:string ,contacts:Contact[]) => {
+    const {user} = useAuthState()
+    const newGroupchat:GroupChat = {
+        chatId: uuidv4(),
+        contacts: contacts,
+        messages: [{
+            from: "localhost:8080",
+            to: "testgroup",
+            body: "testing",
+            timeStamp: new Date(),
+            id: "3d11c0cf-0fa9-4177-90c3-1ac08d2313f7",
+            type: "STRING"
+        }],
+        name: name,
+        adminId: user.id
+    }
+    axios.put(`${config.baseUrl}api/group`, newGroupchat).then((res)=>{
+        console.log(res)
+    }).catch((e)=>{
+        console.log("failed to add groupchat",e)
+    })
 }
 
 const addMessage = (chatId, message) => {
@@ -130,6 +154,7 @@ export const usechatsActions = () => {
         addMessage,
         sendFile,
         sendEditMessage,
+        addGroupchat,
     }
 }
 
