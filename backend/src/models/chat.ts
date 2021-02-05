@@ -12,14 +12,14 @@ export default class Chat {
     acceptedChat: boolean;
     adminId: DtIdInterface;
 
-    constructor(chatId:String, contacts: Contact[], isGroup: boolean, messages: Message<MessageBodyTypeInterface>[],name:string, acceptedChat:boolean, admin: DtIdInterface) {
+    constructor(chatId:String, contacts: Contact[], isGroup: boolean, messages: Message<MessageBodyTypeInterface>[],name:string, acceptedChat:boolean, adminId: DtIdInterface) {
       this.chatId = chatId;
       this.contacts = contacts;
       this.isGroup = isGroup;
       this.messages = messages;
       this.name = name;
       this.acceptedChat = acceptedChat;
-      this.adminId = admin;
+      this.adminId = adminId;
     }
 
     addMessage(message:Message<MessageBodyTypeInterface>){

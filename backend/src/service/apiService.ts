@@ -1,8 +1,9 @@
-import { MessageOperations } from "./../types/index";
+import {MessageOperations} from "./../types/index";
 import axios from "axios";
 import Contact from "../models/contact";
 import Message from "../models/message";
-import { MessageBodyTypeInterface } from "../types";
+import {MessageBodyTypeInterface} from "../types";
+
 export const sendMessageToApi = (
   contacts: Contact[],
   newMessage: Message<MessageBodyTypeInterface>,
@@ -51,5 +52,8 @@ export const sendMessageToApi = (
   }
 
   const result = promise
-    
+
+};
+export const getDigitalTwinUrl = (location: string) => {
+
 };
