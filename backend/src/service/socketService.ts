@@ -56,6 +56,7 @@ export const startSocketIo = (httpServer: http.Server) => {
                 console.log(`send message to socket ${connection}`);
             });
             let location = getLocationForId(<string>chat.adminId);
+            sendMessage(chat.chatId, newMessage);
             sendMessageToApi(location, newMessage, MessageOperations.NEW)
         });
 

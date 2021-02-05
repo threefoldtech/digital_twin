@@ -1,71 +1,75 @@
 <template>
   <div
-    class="my-2 flex"
-    :class="{
+      class=" flex "
+      :class="{
       'justify-end': isMine(message),
+      'my-2': !disabled
     }"
   >
-    <div class="bg-white p-4 rounded-lg truncate">
+    <div class="bg-white  rounded-lg truncate"
+         :class="{
+      'bg-gray-100': disabled,
+      'p-4': !disabled
+    }">
       <pre v-if="config.showdebug">{{ message }}</pre>
-      <button
-        v-if="message.type == 'EDIT' || message.type == 'STRING'"
-        @click="setEditMessage"
-      >
-        <i class="fas fa-pen text-gray-500"></i>
-      </button>
-      <button @click="setQuoteMessage">
-        <i class="fas fa-reply-all text-gray-500"></i>
-      </button>
-      <button v-if="message.type !== 'DELETE'" @click="sendUpdateMessage(true)">
-        <i class="fas fa-minus-circle text-gray-500"></i>
-      </button>
-
-      <br />
+      <div class="btn-group">
+        <button
+            v-if="(message.type == 'EDIT' || message.type == 'STRING') && !disabled"
+            @click="setEditMessage"
+        >
+          <i class="fas fa-pen text-gray-500"></i>
+        </button>
+        <button @click="setQuoteMessage" v-if="!disabled">
+          <i class="fas fa-reply-all text-gray-500"></i>
+        </button>
+        <button v-if="message.type !== 'DELETE' && !disabled" @click="sendUpdateMessage(true)">
+          <i class="fas fa-minus-circle text-gray-500"></i>
+        </button>
+      </div>
+      <br/>
       <span v-if="message.type === 'FILE'">
         <audio
-          controls
-          v-if="message.body.filename.indexOf('.WebM') !== -1"
-          :src="`http://${message.from.replace(
+            controls
+            v-if="message.body.filename.indexOf('.WebM') !== -1"
+            :src="`http://${message.from.replace(
             'localhost:8080',
             'localhost:3000'
           )}/api/files/${message.to}/${message.body.filename}`"
         ></audio>
-        <br />
+        <br/>
         <a
-          class="py-2 px-2 bg-green-200 border-r-2"
-          :href="`http://${message.from.replace(
+            class="py-2 px-2 bg-green-200 border-r-2"
+            :href="`http://${message.from.replace(
             'localhost:8080',
             'localhost:3000'
           )}/api/files/${message.to}/${message.body.filename}`"
-          download
-          >{{ message.body.filename }}</a
+            download
+        >{{ message.body.filename }}</a
         >
       </span>
       <div v-else-if="message.type === 'QUOTE'">
-        <div class="px-2 py-2 bg-accent">
-          <b> {{ message.body.quotedMessage.from }} said: </b> <br />
-          <i>{{ message.body.quotedMessage.body }}</i>
-        </div>
+        <b> {{ message.body.quotedMessage.from }} said: </b> <br/>
+        <MessageCard :message="message.body.quotedMessage" :chat-id="chatId" disabled/>
         {{ message.body.message }}
       </div>
       <div v-else>
         {{ message.body }}
       </div>
       <div v-if="quoteMessage" class="flex">
-        <input class="col-span-6" stype="text" v-model="quoteMessageValue" />
+        <input class="col-span-6" stype="text" v-model="quoteMessageValue"/>
         <button class="px-2 py-8" @click="sendQuoteMessage(false)">
           <i class="fas fa-paper-plane"></i>
         </button>
       </div>
       <div v-if="editMessage" class="flex">
-        <input class="col-span-6" stype="text" v-model="editMessageValue" />
+        <input class="col-span-6" stype="text" v-model="editMessageValue"/>
         <button class="px-2 py-8" @click="sendUpdateMessage(false)">
           <i class="fas fa-paper-plane"></i>
         </button>
       </div>
       <p
-        class="font-thin"
-        :class="{
+          class="font-thin"
+          :class="{
           'text-right': isMine(message),
         }"
       >
@@ -78,12 +82,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
-import { useAuthState } from "../store/authStore";
+import {defineComponent, ref} from "vue";
+import {useAuthState} from "../store/authStore";
 import moment from "moment";
-import { usechatsActions } from "../store/chatStore";
-import { Message, MessageBodyType, QuoteBodyType } from "../types/index";
-import { uuidv4 } from "@/common";
+import {usechatsActions} from "../store/chatStore";
+import {Message, MessageBodyType, QuoteBodyType} from "../types/index";
+import {uuidv4} from "@/common";
 import config from "../../public/config/config";
 
 export default defineComponent({
@@ -91,9 +95,13 @@ export default defineComponent({
   props: {
     message: Object,
     chatId: String,
+    disabled: {
+      type: Boolean,
+      default: false
+    },
   },
   setup(props) {
-    const { user } = useAuthState();
+    const {user} = useAuthState();
 
     const isMine = (message) => {
       return message.from == user.id;
@@ -114,7 +122,7 @@ export default defineComponent({
     const sendUpdateMessage = (isDelete: Boolean) => {
       editMessage.value = false;
       if (props.message.value != editMessageValue.value) {
-        const { sendMessageObject } = usechatsActions();
+        const {sendMessageObject} = usechatsActions();
         const oldmessage = props.message;
         console.log(props.message);
         const updatedMessage: Message<String> = {
@@ -138,8 +146,8 @@ export default defineComponent({
       console.log("quote");
       if (quoteMessageValue.value !== "") {
         quoteMessage.value = false;
-        const { sendMessageObject } = usechatsActions();
-        const { user } = useAuthState();
+        const {sendMessageObject} = usechatsActions();
+        const {user} = useAuthState();
         const messageToQuote = props.message;
         // from: user.id,
         // to: chatId,
@@ -179,5 +187,3 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-</style>
