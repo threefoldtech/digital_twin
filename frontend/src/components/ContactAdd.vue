@@ -120,6 +120,7 @@
 import { usechatsActions } from "@/store/chatStore";
 import { defineComponent, ref, computed } from "vue";
 import { useContactsActions, useContactsState } from "../store/contactStore";
+import { useAuthState } from "../store/authStore";
 import { Contact } from "../types/index"
 
 export default defineComponent({
@@ -161,16 +162,18 @@ export default defineComponent({
 
     const groupAdd = () => {
       const { addGroupchat } = usechatsActions();
-      
+      const { user } = useAuthState();
+      usersInGroup.value.push(user.id)
       const contacts:Contact[] = usersInGroup.value.map((id) =>{
         const contact:Contact  = {
           id,
-          location: `${usernameAdd.value}-chat`
+          location: `${id}-chat`
         }
         return contact
       })
+
       addGroupchat(groupnameAdd.value,contacts)
-      console.log("ADDING GROUP TO CHATS");
+      usersInGroup.value = []
     };
 
     const userIsInGroup = (username) => {
