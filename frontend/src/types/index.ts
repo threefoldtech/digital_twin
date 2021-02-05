@@ -30,6 +30,11 @@ export interface MessageBodyType extends String{
 
 }
 
+export interface QuoteBodyType extends MessageBodyType{
+    message: string
+    quotedMessage: Message<MessageBodyType>
+}
+
 export interface Chat {
     chatId: Id,
     messages: Message<MessageBodyType>[];

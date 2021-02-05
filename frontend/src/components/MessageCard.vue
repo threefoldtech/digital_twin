@@ -6,28 +6,63 @@
     }"
   >
     <div class="bg-white p-4 rounded-lg truncate">
-      <pre>{{ message }}</pre>
-      <button v-if="message.type=='EDIT'|| message.type=='STRING'" @click="setEditMessage">
+      <pre v-if="config.showdebug">{{ message }}</pre>
+      <button
+        v-if="message.type == 'EDIT' || message.type == 'STRING'"
+        @click="setEditMessage"
+      >
         <i class="fas fa-pen text-gray-500"></i>
       </button>
-      <i class="fas fa-minus-circle text-gray-500"></i>
+      <button @click="setQuoteMessage">
+        <i class="fas fa-reply-all text-gray-500"></i>
+      </button>
+      <button v-if="message.type !== 'DELETE'" @click="sendUpdateMessage(true)">
+        <i class="fas fa-minus-circle text-gray-500"></i>
+      </button>
+
       <br />
       <span v-if="message.type === 'FILE'">
-        <audio controls v-if="message.body.filename.indexOf('.WebM') !== -1" :src="`http://${message.from.replace('localhost:8080','localhost:3000')}/api/files/${message.to}/${message.body.filename}`"></audio>
-        <br>
-        <a class="py-2 px-2 bg-green-200 border-r-2" :href="`http://${message.from.replace('localhost:8080','localhost:3000')}/api/files/${message.to}/${message.body.filename}`" download>{{message.body.filename}}</a>
+        <audio
+          controls
+          v-if="message.body.filename.indexOf('.WebM') !== -1"
+          :src="`http://${message.from.replace(
+            'localhost:8080',
+            'localhost:3000'
+          )}/api/files/${message.to}/${message.body.filename}`"
+        ></audio>
+        <br />
+        <a
+          class="py-2 px-2 bg-green-200 border-r-2"
+          :href="`http://${message.from.replace(
+            'localhost:8080',
+            'localhost:3000'
+          )}/api/files/${message.to}/${message.body.filename}`"
+          download
+          >{{ message.body.filename }}</a
+        >
       </span>
-      <span v-else>
-        <div v-if="editMessage" class="flex">
-          <input class="col-span-6" stype="text" v-model="editMessageValue" />
-          <button class="px-2 py-8" @click="sendUpdateMessage">
-            <i class="fas fa-paper-plane"></i>
-          </button>
+      <div v-else-if="message.type === 'QUOTE'">
+        <div class="px-2 py-2 bg-accent">
+          <b> {{ message.body.quotedMessage.from }} said: </b> <br />
+          <i>{{ message.body.quotedMessage.body }}</i>
         </div>
-        <div v-else>
-          {{ message.body }}
-        </div>
-      </span>
+        {{ message.body.message }}
+      </div>
+      <div v-else>
+        {{ message.body }}
+      </div>
+      <div v-if="quoteMessage" class="flex">
+        <input class="col-span-6" stype="text" v-model="quoteMessageValue" />
+        <button class="px-2 py-8" @click="sendQuoteMessage(false)">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
+      <div v-if="editMessage" class="flex">
+        <input class="col-span-6" stype="text" v-model="editMessageValue" />
+        <button class="px-2 py-8" @click="sendUpdateMessage(false)">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
       <p
         class="font-thin"
         :class="{
@@ -35,6 +70,7 @@
         }"
       >
         <span v-if="message.type == 'EDIT'"> edited - </span>
+        <span v-if="message.type == 'DELETE'"> deleted - </span>
         {{ m(message.timeStamp).fromNow() }}
       </p>
     </div>
@@ -45,8 +81,10 @@
 import { defineComponent, ref } from "vue";
 import { useAuthState } from "../store/authStore";
 import moment from "moment";
-import { usechatsActions } from "../store/chatStore"
-import { Message } from "../types/index"
+import { usechatsActions } from "../store/chatStore";
+import { Message, MessageBodyType, QuoteBodyType } from "../types/index";
+import { uuidv4 } from "@/common";
+import config from "../../public/config/config";
 
 export default defineComponent({
   name: "MessageCard",
@@ -65,30 +103,61 @@ export default defineComponent({
 
     const editMessage = ref(false);
     const editMessageValue = ref("");
+
+    const quoteMessage = ref(false);
+    const quoteMessageValue = ref("");
+
     const setEditMessage = () => {
-      console.log("inseteditmessage");
       editMessage.value = true;
       editMessageValue.value = props.message.body;
     };
-    const sendUpdateMessage = () => { 
+    const sendUpdateMessage = (isDelete: Boolean) => {
       editMessage.value = false;
-      console.log("heerreeeeeeeeeeeeeeee")
       if (props.message.value != editMessageValue.value) {
-        const { sendEditMessage } = usechatsActions()
-        const oldmessage = props.message
-        console.log(props.message)
-        console.log("hlllasdfasdf")
-        const updatedMessage:Message<String> = {
+        const { sendMessageObject } = usechatsActions();
+        const oldmessage = props.message;
+        console.log(props.message);
+        const updatedMessage: Message<String> = {
           id: oldmessage.id,
           from: oldmessage.from,
           to: oldmessage.to,
-          body: editMessageValue.value,
+          body: isDelete ? "Message has been deleted" : editMessageValue.value,
           timeStamp: oldmessage.timeStamp,
-          type:"EDIT"
-        } 
-        sendEditMessage(props.chatId, updatedMessage)
+          type: isDelete ? "DELETE" : "EDIT",
+        };
+        sendMessageObject(props.chatId, updatedMessage);
         console.log(props.chatId);
         console.log(props.message);
+      }
+      props.message.value = editMessageValue.value;
+    };
+    const setQuoteMessage = () => {
+      quoteMessage.value = true;
+    };
+    const sendQuoteMessage = () => {
+      console.log("quote");
+      if (quoteMessageValue.value !== "") {
+        quoteMessage.value = false;
+        const { sendMessageObject } = usechatsActions();
+        const { user } = useAuthState();
+        const messageToQuote = props.message;
+        // from: user.id,
+        // to: chatId,
+        // timeStamp: new Date(),
+        // type: "STRING"
+
+        const newMessage: Message<QuoteBodyType> = {
+          id: uuidv4(),
+          from: user.id,
+          to: props.chatId,
+          body: <QuoteBodyType>{
+            message: quoteMessageValue.value,
+            quotedMessage: <Message<MessageBodyType>>messageToQuote,
+          },
+          timeStamp: new Date(),
+          type: "QUOTE",
+        };
+        sendMessageObject(props.chatId, newMessage);
       }
       props.message.value = editMessageValue.value;
     };
@@ -97,9 +166,14 @@ export default defineComponent({
       isMine,
       m,
       setEditMessage,
+      setQuoteMessage,
       editMessage,
       editMessageValue,
       sendUpdateMessage,
+      quoteMessage,
+      quoteMessageValue,
+      sendQuoteMessage,
+      config
     };
   },
 });

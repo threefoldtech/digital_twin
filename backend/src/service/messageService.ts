@@ -54,14 +54,33 @@ export const parseMessage = (
         type
       );
     case MessageTypes.EDIT:
-        return new Message<String>(
-            msg.from,
-            msg.to,
-            <String>msg.body,
-            new Date(msg.timeStamp),
-            msg.id,
-            MessageTypes.EDIT
-          );
+      return new Message<String>(
+        msg.from,
+        msg.to,
+        <String>msg.body,
+        new Date(msg.timeStamp),
+        msg.id,
+        MessageTypes.EDIT
+      );
+    case MessageTypes.DELETE:
+      return new Message<String>(
+        msg.from,
+        msg.to,
+        <String>msg.body,
+        new Date(msg.timeStamp),
+        msg.id,
+        MessageTypes.DELETE
+      );
+    case MessageTypes.QUOTE:
+      return new Message<String>(
+        msg.from,
+        msg.to,
+        <String>msg.body,
+        new Date(msg.timeStamp),
+        msg.id,
+        MessageTypes.QUOTE
+      );
+
     default:
       throw new Error("validation failed");
   }

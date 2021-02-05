@@ -3,41 +3,48 @@
     <ul class="nav nav-tabs nav-justified">
       <li class="nav-item">
         <a
-          class="nav-link active"
-          @click.prevent="setActive('user')"
-          :class="{ active: isActive('user') }"
-          href="#"
-          >Add an user</a
+            class="nav-link active"
+            @click.prevent="setActive('user')"
+            :class="{ active: isActive('user') }"
+            href="#"
+        >Add an user</a
         >
       </li>
       <li class="nav-item">
         <a
-          class="nav-link"
-          @click.prevent="setActive('group')"
-          :class="{ active: isActive('group') }"
-          href="#"
-          >Create a group</a
+            class="nav-link"
+            @click.prevent="setActive('group')"
+            :class="{ active: isActive('group') }"
+            href="#"
+        >Create a group</a
         >
       </li>
     </ul>
+    <div>
+      <h2>possible users</h2>
+      <ul v-if="possibleUsers.length > 0">
+        <li v-for="possibleUser in possibleUsers">{{possibleUser}}</li>
+      </ul>
+      <span v-else  > ...</span>
+    </div>
 
     <form @submit.prevent="contactAdd" class="w-full" v-if="isActive('user')">
       <div class="flex place-items-center">
         <label class="mr-2" for="username">Username: </label>
         <input
-          v-model="usernameAdd"
-          id="username"
-          class="mb-2"
-          placeholder="Username"
+            v-model="usernameAdd"
+            id="username"
+            class="mb-2"
+            placeholder="Username"
         />
       </div>
       <div class="flex place-items-center">
         <label class="mr-2" for="location">Location: </label>
         <input
-          id="location"
-          disabled="true"
-          class="mb-2"
-          :placeholder="location"
+            id="location"
+            disabled="true"
+            class="mb-2"
+            :placeholder="location"
         />
       </div>
 
@@ -50,40 +57,40 @@
       <div class="flex place-items-center">
         <label class="mr-2" for="username">Group name: </label>
         <input
-          v-model="groupnameAdd"
-          id="username"
-          class="mb-2"
-          placeholder="Group name"
+            v-model="groupnameAdd"
+            id="username"
+            class="mb-2"
+            placeholder="Group name"
         />
       </div>
       <div class="flex place-items-center">
         <label class="mr-2" for="location">Location: </label>
         <input
-          id="location"
-          disabled="true"
-          class="mb-2"
-          :placeholder="location"
+            id="location"
+            disabled="true"
+            class="mb-2"
+            :placeholder="location"
         />
       </div>
       <div
-        class="flex flex-col max-h-52 relative overflow-auto my-2 bg-gray-100 px-4 py-2 rounded-xl"
+          class="flex flex-col max-h-52 relative overflow-auto my-2 bg-gray-100 px-4 py-2 rounded-xl"
       >
         <div class="h-full">
           <div v-if="!contacts.length">
             <p class="text-gray-300 text-center py-4">No users in group yet</p>
           </div>
           <div
-            v-for="(contact, i) in contacts"
-            :key="i"
-            class="grid grid-cols-12 rounded-lg mb-2 py-2"
+              v-for="(contact, i) in contacts"
+              :key="i"
+              class="grid grid-cols-12 rounded-lg mb-2 py-2"
           >
             <div class="col-span-2 place-items-center grid">
               <img
-                :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
+                  :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
                   contact
                 )}.svg`"
-                alt="contact image"
-                class="h-12 bg-icon rounded-full"
+                  alt="contact image"
+                  class="h-12 bg-icon rounded-full"
               />
             </div>
             <div class="col-span-8 pl-4 flex flex-col justify-center">
@@ -91,16 +98,16 @@
             </div>
             <div class="col-span-2 place-items-center grid">
               <button
-                class="h-12 rounded-full"
-                @click="removeUserFromGroup(contact)"
-                v-if="userIsInGroup(contact)"
+                  class="h-12 rounded-full"
+                  @click="removeUserFromGroup(contact)"
+                  v-if="userIsInGroup(contact)"
               >
                 <i class="fas fa-times"></i>
               </button>
               <button
-                class="h-12 rounded-full"
-                @click="usersInGroup.push(contact)"
-                v-if="!userIsInGroup(contact)"
+                  class="h-12 rounded-full"
+                  @click="usersInGroup.push(contact)"
+                  v-if="!userIsInGroup(contact)"
               >
                 <i class="fas fa-plus"></i>
               </button>
@@ -117,21 +124,25 @@
 </template>
 
 <script lang="ts">
-import { usechatsActions } from "@/store/chatStore";
-import { defineComponent, ref, computed } from "vue";
-import { useContactsActions, useContactsState } from "../store/contactStore";
-import { Contact } from "../types/index"
+import {usechatsActions} from "@/store/chatStore";
+import {defineComponent, ref, computed} from "vue";
+import {useContactsActions, useContactsState} from "../store/contactStore";
+import {useAuthState} from "../store/authStore";
+import {Contact} from "../types/index"
+import axios from "axios";
+import config from "../../public/config/config";
 
 export default defineComponent({
   name: "ContactAdd",
-  setup(props, { emit }) {
-    const { addContact } = useContactsActions();
-    const { contacts } = useContactsState();
+  setup(props, {emit}) {
+    const {addContact} = useContactsActions();
+    const {contacts} = useContactsState();
     let addGroup = ref(false);
     let usernameAdd = ref("");
     let groupnameAdd = ref("")
     let usernameInGroupAdd = ref("");
     let usersInGroup = ref([]);
+    let possibleUsers = ref([]);
     let contactAddError = ref("");
 
     const contactAdd = () => {
@@ -160,17 +171,20 @@ export default defineComponent({
     };
 
     const groupAdd = () => {
-      const { addGroupchat } = usechatsActions();
-      
-      const contacts:Contact[] = usersInGroup.value.map((id) =>{
-        const contact:Contact  = {
+      const {addGroupchat} = usechatsActions();
+      const {user} = useAuthState();
+      usersInGroup.value.push(user.id)
+      const contacts: Contact[] = usersInGroup.value.map((id) => {
+        const contact: Contact = {
           id,
-          location: `${usernameAdd.value}-chat`
+          location: `${id}-chat`
         }
         return contact
       })
-      addGroupchat(groupnameAdd.value,contacts)
-      console.log("ADDING GROUP TO CHATS");
+
+      addGroupchat(groupnameAdd.value, contacts)
+      usersInGroup.value = []
+      emit('closeDialog')
     };
 
     const userIsInGroup = (username) => {
@@ -185,9 +199,15 @@ export default defineComponent({
       console.log("inremoveuserfromgroup")
       const index = usersInGroup.value.findIndex(u => u == username)
       console.log(index)
-      usersInGroup.value.splice(index,1)
-      
+      usersInGroup.value.splice(index, 1)
+
     }
+
+    // @todo: config
+    axios.get(`${config.spawnerUrl}api/v1/list`, {}).then(r => {
+      console.log(r.data)
+      possibleUsers.value = r.data
+    })
 
     return {
       addGroup,
@@ -202,7 +222,8 @@ export default defineComponent({
       groupAdd,
       contacts,
       userIsInGroup,
-      removeUserFromGroup
+      removeUserFromGroup,
+      possibleUsers,
     };
   },
 });
