@@ -3,7 +3,7 @@ import { reactive } from "@vue/reactivity";
 import { toRefs } from "vue";
 import axios from "axios";
 import moment from "moment";
-import { Chat, Contact, Message, GroupChat } from "../types";
+import { Chat, Contact, Message, GroupChat, MessageBodyType } from "../types";
 import {useSocketActions} from './socketStore'
 import { useAuthState } from "./authStore";
 import {useContactsActions} from './contactStore'
@@ -86,11 +86,16 @@ const sendMessage = (chatId, message) => {
     sendSocketMessage(chatId, msg)
 }
 
-const sendMessageObject = (chatId,message)=> {
+const sendMessageObject = (chatId, message:Message<MessageBodyType>)=> {
     const {sendSocketMessage} = useSocketActions()
     console.log(chatId,message)
     addMessage(chatId,message)
-    sendSocketMessage(chatId, message, true)
+    let isEdit = false
+    if(message.type === "UPDATE" ){
+        isEdit = true
+    }
+
+    sendSocketMessage(chatId, message, isEdit)
 }
 
 const sendFile = async (chatId, name, parsedFile) => {
