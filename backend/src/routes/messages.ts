@@ -9,6 +9,8 @@ import {ContactRequest, MessageBodyTypeInterface, MessageTypes} from "../types";
 import Contact from "../models/contact";
 import {parseMessage, editMessage} from "../service/messageService";
 import {sendMessage} from "../service/chatService";
+import {getChat} from "../service/dataService";
+import {config} from "../config/config";
 
 const router = Router();
 
@@ -37,13 +39,23 @@ router.put("/", (req, res) => {
 
     let contact = contacts.find(c => c.id == message.from)
 
-    if (!contact && contactRequests.find(c => c.id == message.from)) {
+    let chat = getChat(message.from)
+
+    if (chat.isGroup && chat.adminId === config.userid ){
+        chat.contacts.forEach(c => {
+            sendMessage(c.id, message);
+        })
+        sendEventToConnectedSockets(connections, "message", message)
+        return;
+    }
+
+    if (!chat && contactRequests.find(c => c.id == message.from)) {
         //@todo maybe 3 messages should be allowed or something
         res.status(403).json({status: 'Forbidden', reason: 'contact not yet approved'});
         return;
     }
 
-    if (!contact) {
+    if (!chat) {
         res.status(403).json({status: 'Forbidden', reason: 'not in contact'});
         return;
     }
@@ -51,7 +63,7 @@ router.put("/", (req, res) => {
     // const message = new Message(msg.from, msg.to, msg.body);
     console.log(`received new message from ${message.from}`);
     //
-    sendMessage(contact.id, message);
+    sendMessage(chat.adminId, message);
     //
     sendEventToConnectedSockets(connections, "message", message)
 
@@ -70,7 +82,7 @@ router.patch("/", (req,res) => {
     if(!req.query.chatId){
         return res.status(500).json("Please provide chatId and messageId")
     }
-    const chatId:IdInterface = <IdInterface>req.query.chatId 
+    const chatId:IdInterface = <IdInterface>req.query.chatId
     const msg = req.body;
     const message: Message<MessageBodyTypeInterface> = parseMessage(msg);
     editMessage(chatId,message)

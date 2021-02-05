@@ -39,7 +39,7 @@ router.post("/", (req, res) => {
 
     const message:MessageInterface<MessageBodyTypeInterface> = parseMessage(con.message)
     console.log(`creating chat`)
-    addChat(contact.id,[contact],false, message ,contact.id, true)
+    addChat(contact.id,[contact],false, message ,contact.id, true, contact.id)
 
     const url = `http://${contact.location}/api/messageRequest`
     const data = {
