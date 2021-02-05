@@ -6,7 +6,7 @@ import Contact from "../models/contact";
 import {getChatIds, persistChat, getChat} from "./dataService";
 import messages from "../routes/messages";
 
-export const    persistMessage = (
+export const persistMessage = (
     chatId: IdInterface,
     message: MessageInterface<MessageBodyTypeInterface>
 ) => {
@@ -41,10 +41,10 @@ export const getAcceptedChats = () => {
         .filter((chat) => chat.acceptedChat);
 };
 
-export const getChatById = (id:IdInterface) => {
+export const getChatById = (id: IdInterface) => {
     return getChat(id)
 }
 
 export const parseChat = (chat: any) => {
-    return new Chat(chat.chatId,chat.contacts, chat.isGroup,chat.messages, chat.name,chat.acceptedChat,chat.adminId)
+    return new Chat(chat.chatId, chat.contacts, chat.isGroup, chat.messages, chat.name, chat.acceptedChat, chat.adminId)
 }
