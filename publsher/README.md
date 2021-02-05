@@ -45,7 +45,11 @@
 
 using `pkg` tool 
 
-- First find all the native modules in your application
+- `npm install -g pkg`
+- `./build.sh`
+
+
+- PS : to find modules in your application with native prebuilds
     ```
     hamdy@myth:~/work/digitaltwin$ find . -name prebuilds
     ./node_modules/leveldown/prebuilds
@@ -53,16 +57,3 @@ using `pkg` tool
     ./node_modules/sodium-native/prebuilds
     ./node_modules/fd-lock/prebuilds
     ```
-
-- For all these modules you need to add in your `package.json` in the `pkg` section as assets
-    ```
-    "pkg": {
-        "assets": [
-        "node_modules/sodium-native/prebuilds/**/*",
-        "node_modules/leveldown/prebuilds/**/*",
-        "node_modules/utp-native/prebuilds/**/*",
-        "node_modules/fd-lock/prebuilds/**/*"
-        ]
-    ```
- - for each package of these native packages we gonna do
-    
