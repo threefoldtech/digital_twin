@@ -10,7 +10,9 @@
       <button v-if="message.type=='EDIT'|| message.type=='STRING'" @click="setEditMessage">
         <i class="fas fa-pen text-gray-500"></i>
       </button>
-      <i class="fas fa-minus-circle text-gray-500"></i>
+      <button v-if="message.type!=='DELETE'" @click="sendUpdateMessage(true)">
+        <i class="fas fa-minus-circle text-gray-500" ></i>
+      </button>
       <br />
       <span v-if="message.type === 'FILE'">
         <audio controls v-if="message.body.filename.indexOf('.WebM') !== -1" :src="`http://${message.from.replace('localhost:8080','localhost:3000')}/api/files/${message.to}/${message.body.filename}`"></audio>
@@ -20,7 +22,7 @@
       <span v-else>
         <div v-if="editMessage" class="flex">
           <input class="col-span-6" stype="text" v-model="editMessageValue" />
-          <button class="px-2 py-8" @click="sendUpdateMessage">
+          <button class="px-2 py-8" @click="sendUpdateMessage(false)">
             <i class="fas fa-paper-plane"></i>
           </button>
         </div>
@@ -35,6 +37,7 @@
         }"
       >
         <span v-if="message.type == 'EDIT'"> edited - </span>
+        <span v-if="message.type == 'DELETE'"> deleted - </span>
         {{ m(message.timeStamp).fromNow() }}
       </p>
     </div>
@@ -70,21 +73,19 @@ export default defineComponent({
       editMessage.value = true;
       editMessageValue.value = props.message.body;
     };
-    const sendUpdateMessage = () => { 
+    const sendUpdateMessage = (isDelete:Boolean) => { 
       editMessage.value = false;
-      console.log("heerreeeeeeeeeeeeeeee")
       if (props.message.value != editMessageValue.value) {
         const { sendEditMessage } = usechatsActions()
         const oldmessage = props.message
         console.log(props.message)
-        console.log("hlllasdfasdf")
         const updatedMessage:Message<String> = {
           id: oldmessage.id,
           from: oldmessage.from,
           to: oldmessage.to,
-          body: editMessageValue.value,
+          body: isDelete? "Message has been deleted" :editMessageValue.value,
           timeStamp: oldmessage.timeStamp,
-          type:"EDIT"
+          type:isDelete? "DELETE": "EDIT"
         } 
         sendEditMessage(props.chatId, updatedMessage)
         console.log(props.chatId);
