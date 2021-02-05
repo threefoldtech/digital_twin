@@ -1,13 +1,13 @@
-import {MessageOperations} from "./../types/index";
+import {ChatInterface, IdInterface, MessageOperations} from "./../types/index";
 import axios from "axios";
 import Contact from "../models/contact";
 import Message from "../models/message";
 import {MessageBodyTypeInterface} from "../types";
 
-export const sendMessageToApi = (
-  contacts: Contact[],
-  newMessage: Message<MessageBodyTypeInterface>,
-  type: MessageOperations
+export const sendMessageToApi = async (
+    location: IdInterface,
+    newMessage: Message<MessageBodyTypeInterface>,
+    type: MessageOperations
 ) => {
     // console.log(contacts)
     // console.log(newMessage)
@@ -17,43 +17,45 @@ export const sendMessageToApi = (
 //     return "receiver not found";
 //   }
 
-  let url;
-  let promise;
-  switch (type) {
-    case MessageOperations.NEW:
-      url = `http://${newMessage.to}-chat/api/messages`;
-      console.log(url)
-      try {
-        axios.put(url, newMessage).then((resp) => {
-            console.log(resp.data);
-          })
-          .catch((error) => {
-            console.log("couldn't send message");
-          });
-      } catch (e) {
-        console.log(e);
-      }
-    case MessageOperations.UPDATE:
-      url = `http://${newMessage.to}-chat/api/messages?chatId=${newMessage.id}`;
-      try {
-        axios.patch(url, newMessage).then((resp) => {
-            console.log(resp.data);
-          })
-          .catch((error) => {
-            console.log("couldn't send message");
-          });
-      } catch (e) {
-        console.log(e);
-      }
-    // case MessageOperations.DELETE:
-    // url =
-    // default:
-    //     throw new Error("validation failed");
-  }
+    let url: string;
+    let promise;
+    switch (type) {
+        case MessageOperations.NEW:
+            url = `${getDigitalTwinUrl(location)}/api/messages`;
+            console.log(url)
+            try {
+                await axios.put(url, newMessage).then((resp) => {
+                    console.log(resp.data);
+                })
+            } catch (e) {
+                console.error(`couldn't send message ${url}`)
+            }
+            break;
+        case MessageOperations.UPDATE:
+            url = `${getDigitalTwinUrl(location)}/api/messages?chatId=${newMessage.id}`;
+            try {
+                await axios.patch(url, newMessage).then((resp) => {
+                    console.log(resp.data);
+                })
+            } catch (e) {
+                console.log(e);
+            }
+            break;
+        // case MessageOperations.DELETE:
+        // url =
+        // default:
+        //     throw new Error("validation failed");
+    }
 
-  const result = promise
+    const result = promise
 
 };
-export const getDigitalTwinUrl = (location: string) => {
+export const getDigitalTwinUrl = (location: IdInterface) => {
+    //@todo
 
+    if (location === "localhost:3000-chat"){
+        return 'http://localhost:3000'
+    }
+
+    return `http://${location}`
 };

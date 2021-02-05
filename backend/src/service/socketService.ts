@@ -12,6 +12,7 @@ import {MessageBodyTypeInterface, MessageOperations} from "../types";
 import { saveFile } from "./dataService"
 import { editMessage } from "./messageService"
 import { sendMessageToApi } from './apiService';
+import {config} from "../config/config";
 
 const socketio = require("socket.io");
 
@@ -34,8 +35,13 @@ export const startSocketIo = (httpServer: http.Server) => {
 
         socket.on("message", (messageData) => {
             console.log('new message')
+
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
-            sendMessage(newMessage.to, newMessage);
+
+            const chat = getChatById(newMessage.to)
+
+            console.log(`internal send message to  ${chat.adminId}`)
+            // sendMessage(chat.adminId, newMessage);
 
             // @todo refactor this
             connections.getConnections().forEach((connection: string) => {
@@ -45,9 +51,9 @@ export const startSocketIo = (httpServer: http.Server) => {
                 // }
 
                 io.to(connection).emit("message", newMessage);
-                console.log(`send message to ${connection}`);
+                console.log(`send message to socket ${connection}`);
             });
-            sendMessageToApi(contacts,newMessage,MessageOperations.NEW)
+            sendMessageToApi(chat.adminId,newMessage,MessageOperations.NEW)
         });
 
         socket.on('slice upload', (data) => {
@@ -67,7 +73,7 @@ export const startSocketIo = (httpServer: http.Server) => {
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
             editMessage(messageData.chatId,newMessage)
             console.log(contacts)
-            sendMessageToApi(contacts,newMessage,MessageOperations.UPDATE)
+            sendMessageToApi(newMessage.to,newMessage,MessageOperations.UPDATE)
         })
 
     });
@@ -75,7 +81,6 @@ export const startSocketIo = (httpServer: http.Server) => {
 
 export const sendEventToConnectedSockets = (connections: Connections, event: string, body: any) => {
     connections.getConnections().forEach((connection: string) => {
-        console.log(io)
         io.to(connection).emit(event, body);
         console.log(`send message to ${connection}`);
     });

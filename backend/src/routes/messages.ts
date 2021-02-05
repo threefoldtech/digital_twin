@@ -1,4 +1,4 @@
-import { IdInterface } from './../types/index';
+import {IdInterface, MessageOperations} from './../types/index';
 import {Router} from 'express';
 import Message from "../models/message";
 import {contacts} from "../store/contacts";
@@ -11,6 +11,7 @@ import {parseMessage, editMessage} from "../service/messageService";
 import {sendMessage} from "../service/chatService";
 import {getChat} from "../service/dataService";
 import {config} from "../config/config";
+import {sendMessageToApi} from "../service/apiService";
 
 const router = Router();
 
@@ -37,17 +38,29 @@ router.put("/", (req, res) => {
         return;
     }
 
-    let contact = contacts.find(c => c.id == message.from)
+    let chat = getChat(message.from === config.userid ? message.to : message.from)
 
-    let chat = getChat(message.from)
-
-    if (chat.isGroup && chat.adminId === config.userid ){
-        chat.contacts.forEach(c => {
-            sendMessage(c.id, message);
+    console.log(`chat.isGroup ${chat.isGroup}`)
+    console.log(`chat.chatId ${chat.chatId}`)
+    console.log(`chat.adminId ${chat.adminId}`)
+    console.log(`config.userid ${config.userid}`)
+    console.log(`works? ${chat.isGroup && chat.adminId === config.userid}`)
+    if (chat.isGroup && chat.adminId == config.userid ){
+        chat.contacts.filter(c => c.id !== config.userid).forEach(c => {
+            console.log(`group sendMessage to ${c.id}`)
+            sendMessageToApi(c.id, message,MessageOperations.NEW);
         })
+
+
+        console.log(`received new group message from ${message.from}`);
+        sendEventToConnectedSockets(connections, "message", message)
+
+        sendMessage(chat.chatId, message);
+
         sendEventToConnectedSockets(connections, "message", message)
         return;
     }
+
 
     if (!chat && contactRequests.find(c => c.id == message.from)) {
         //@todo maybe 3 messages should be allowed or something

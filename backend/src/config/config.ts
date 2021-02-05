@@ -1,4 +1,4 @@
-let userid = process.env.USER_ID || 'jonasw';
+let userid = process.env.USER_ID || 'localhost:3000';
 export const config = {
     appBackend: 'https://login.threefold.me',
     kycBackend: 'https://openkyc.live',
