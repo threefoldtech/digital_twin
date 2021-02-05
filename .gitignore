@@ -20,3 +20,9 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw*
+*.so.*
+*.node
+digitaltwin
+build
+*.lock
+package-lock.json
