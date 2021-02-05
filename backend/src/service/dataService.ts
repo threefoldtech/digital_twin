@@ -17,6 +17,16 @@ export const getChat = (id: IdInterface):Chat => {
   return chat
 };
 
+export const getUserdata = () => {
+  const location = config.baseDir + "user/userinfo.json";
+  try {
+    const data = JSON.parse(fs.readFileSync(location).toString());
+    return data;
+  } catch {
+    throw new Error("Userinfo file doesn't exitst");
+  }
+};
+
 export const persistChat = (chat:Chat) => {
   const path = config.baseDir + `chats/${chat.chatId}`
 
@@ -28,16 +38,6 @@ export const persistChat = (chat:Chat) => {
       fs.mkdirSync(path+"/files")
     }
   fs.writeFileSync(path+"/chat.json",JSON.stringify(chat, null, 4),{flag: 'w'})
-};
-
-export const getUserdata = () => {
-  const location = config.baseDir + "user/userinfo.json";
-  try {
-    const data = JSON.parse(fs.readFileSync(location).toString());
-    return data;
-  } catch {
-    throw new Error("Userinfo file doesn't exitst");
-  }
 };
 
 export const persistUserdata = (userData:Object) => {

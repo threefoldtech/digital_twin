@@ -35,12 +35,16 @@ const addMessage = (chatId, message) => {
     console.log('in addmessage chatid', chatId)
     console.log('in addmessage message', message)
 
-
     const chat:Chat = state.chats.find(chat=>chat.chatId == chatId)
+    const index = chat.messages.findIndex(mes=> mes.id == message.id)
+    if(index){
+        console.log("edit chat")
+        chat.messages[index] = message
+        return
+    }
     chat.messages.push(message)
     console.log("before setLastmessage")
     setLastMessage(chatId, message)
-    console.log(state.chats)
 }
 
 const sendMessage = (chatId, message) => {
@@ -58,11 +62,17 @@ const sendMessage = (chatId, message) => {
     sendSocketMessage(chatId, msg)
 }
 
-const   sendFile = async (chatId,name, parsedFile) => {
+const sendEditMessage = (chatId,message)=> {
+    const {sendSocketMessage} = useSocketActions()
+    console.log(chatId,message)
+    addMessage(chatId,message)
+    sendSocketMessage(chatId, message, true)
+}
+
+const sendFile = async (chatId, name, parsedFile) => {
     const { sendSocketMessage } = useSocketActions()
     const {user} = useAuthState()
-
-
+    
     const msgToSend:Message<Object> = {
         id: uuidv4(),
         body: {
@@ -117,7 +127,8 @@ export const usechatsActions = () => {
         retrievechats,
         sendMessage,
         addMessage,
-        sendFile
+        sendFile,
+        sendEditMessage,
     }
 }
 

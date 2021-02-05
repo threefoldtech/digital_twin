@@ -45,7 +45,7 @@ export default {
   props: {
     selectedid: {},
   },
-  setup(props) {
+  setup(props, {emit}) {
 
     const {sendMessage, sendFile} = usechatsActions();
 
@@ -66,7 +66,7 @@ export default {
         sendFile(props.selectedid, fileinput.value.files[0].name, fileinput.value.files[0].arrayBuffer());
         removeFile()
       }
-      this.$emit('messageSend')
+      emit('messageSend')
     };
 
     const selectFile = () => {

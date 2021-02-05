@@ -8,8 +8,10 @@ import axios from "axios";
 import {connections} from "../store/connections";
 import * as http from "http";
 import {parseMessage} from "./messageService";
-import {MessageBodyTypeInterface} from "../types";
+import {MessageBodyTypeInterface, MessageOperations} from "../types";
 import { saveFile } from "./dataService"
+import { editMessage } from "./messageService"
+import { sendMessageToApi } from './apiService';
 
 const socketio = require("socket.io");
 
@@ -33,18 +35,9 @@ export const startSocketIo = (httpServer: http.Server) => {
         socket.on("message", (messageData) => {
             console.log('new message')
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
-
-            const receiver = contacts.find(c => c.id == newMessage.to);
-            if (!receiver) {
-                console.log("receiver not found")
-                return "receiver not found";
-            }
-
-            sendMessage(receiver.id, newMessage);
+            sendMessage(newMessage.to, newMessage);
 
             // @todo refactor this
-            const url = `http://${receiver.location}/api/messages`
-            console.log(`sending message ${newMessage.body} to ${url}`);
             connections.getConnections().forEach((connection: string) => {
                 if (connection == socket.id) {
                     // this is me
@@ -54,17 +47,7 @@ export const startSocketIo = (httpServer: http.Server) => {
                 io.to(connection).emit("message", newMessage);
                 console.log(`send message to ${connection}`);
             });
-            try {
-                axios.post(url, newMessage)
-                    .then(response => {
-                        console.log(response.data)
-                    })
-                    .catch(error => {
-                        console.log("couldn't send message")
-                    });
-            } catch (e) {
-                console.log(e)
-            }
+            sendMessageToApi(contacts,newMessage,MessageOperations.NEW)
         });
 
         socket.on('slice upload', (data) => {
@@ -78,6 +61,15 @@ export const startSocketIo = (httpServer: http.Server) => {
             console.log(file)
             saveFile(data.chatId, file.name, file.data)
         });
+
+        socket.on("update_message", (messageData) => {
+            console.log("updatemsgdata",messageData)
+            const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
+            editMessage(messageData.chatId,newMessage)
+            console.log(contacts)
+            sendMessageToApi(contacts,newMessage,MessageOperations.UPDATE)
+        })
+
     });
 }
 

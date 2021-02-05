@@ -30,13 +30,14 @@ const initializeSocket = (username: string) => {
     })
 };
 
-const sendSocketMessage = async (chatId: string, message: Message<any>) => {
+const sendSocketMessage = async (chatId: string, message: Message<any>, isUpdate=false) => {
     console.log('sending ', message)
     const data = {
         chatId,
         message
     }
-    await state.socket.emit("message", data);
+    const messageType = isUpdate? "update_message":"message"
+    await state.socket.emit(messageType, data);
 };
 
 // const sendSocketFile = async (chatId:string, message:Message<ArrayBuffer>) => {

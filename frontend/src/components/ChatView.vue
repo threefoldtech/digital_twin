@@ -30,6 +30,7 @@
         <MessageCard v-for="(message, i) in chat.messages"
                      :key="i"
                      :message="message"
+                     :chatId="chat.chatId"
         />
       </div>
     </div>

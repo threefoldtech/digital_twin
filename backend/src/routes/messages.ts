@@ -1,3 +1,4 @@
+import { IdInterface } from './../types/index';
 import {Router} from 'express';
 import Message from "../models/message";
 import {contacts} from "../store/contacts";
@@ -6,7 +7,7 @@ import {io, sendEventToConnectedSockets} from "../service/socketService";
 import {connections} from "../store/connections";
 import {ContactRequest, MessageBodyTypeInterface, MessageTypes} from "../types";
 import Contact from "../models/contact";
-import {parseMessage} from "../service/messageService";
+import {parseMessage, editMessage} from "../service/messageService";
 import {sendMessage} from "../service/chatService";
 
 const router = Router();
@@ -57,11 +58,23 @@ router.put("/", (req, res) => {
     res.sendStatus(200);
 });
 
-router.put("/file", (req, res) => {
+// router.put("/file", (req, res) => {
+//     if(!req.query.chatId){
+//         res.status(403).json({status:'Forbidden',reason:'ChatId is required as a parameter'})
+//         return
+//     }
+//     res.sendStatus(200)
+// })
+
+router.patch("/", (req,res) => {
     if(!req.query.chatId){
-        res.status(403).json({status:'Forbidden',reason:'ChatId is required as a parameter'})
-        return
+        return res.status(500).json("Please provide chatId and messageId")
     }
+    const chatId:IdInterface = <IdInterface>req.query.chatId 
+    const msg = req.body;
+    const message: Message<MessageBodyTypeInterface> = parseMessage(msg);
+    editMessage(chatId,message)
+    sendEventToConnectedSockets(connections, "message", message)
     res.sendStatus(200)
 })
 

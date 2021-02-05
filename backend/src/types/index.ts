@@ -31,6 +31,11 @@ export enum MessageTypes {
 
 }
 
+export enum MessageOperations {
+    NEW = "NEW",
+    UPDATE = "UPDATE",
+    DELETE = "DELETE"
+}
 
 
 export interface MessageInterface <T>{
