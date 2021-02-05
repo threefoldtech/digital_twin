@@ -13,9 +13,6 @@
     }">
       <pre v-if="config.showdebug">{{ message }}</pre>
       <div class="btn-group">
-        <button class="bg-gray-200" v-if="!disabled && !isread" @click="read">
-          read
-        </button>
         <button
             v-if="(message.type == 'EDIT' || message.type == 'STRING') && !disabled"
             @click="setEditMessage"
@@ -87,6 +84,8 @@
       >
         <span v-if="message.type == 'EDIT'"> edited - </span>
         <span v-if="message.type == 'DELETE'"> deleted - </span>
+
+        <small class="font-thin text-right " v-if="isread">is read</small>
         {{ m(message.timeStamp).fromNow() }}
       </p>
     </div>
