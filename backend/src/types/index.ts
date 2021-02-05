@@ -63,6 +63,9 @@ export interface FileMessageType extends MessageBodyTypeInterface{
 export interface ChatInterface {
     chatId: IdInterface,
     messages: MessageInterface<MessageBodyTypeInterface>[];
+    read: {
+        [key: string]: string
+    }
     name: string;
 }
 export interface PersonChatInterface extends ChatInterface{

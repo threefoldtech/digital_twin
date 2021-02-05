@@ -1,18 +1,14 @@
-import {persistMessage, getChatById} from './chatService';
+import {getChatById, persistMessage} from './chatService';
 import {Socket} from "socket.io";
 import Connections from "../models/connections";
 import Message from "../models/message";
 import {contacts} from "../store/contacts";
-import {user} from "../store/user"
-import axios from "axios";
 import {connections} from "../store/connections";
 import * as http from "http";
-import {parseMessage} from "./messageService";
-import {MessageBodyTypeInterface, MessageOperations} from "../types";
+import {editMessage, handleRead, parseMessage} from "./messageService";
+import {MessageBodyTypeInterface, MessageOperations, MessageTypes} from "../types";
 import {saveFile} from "./dataService"
-import {editMessage} from "./messageService"
 import {getLocationForId, sendMessageToApi} from './apiService';
-import {config} from "../config/config";
 
 const socketio = require("socket.io");
 
@@ -56,6 +52,13 @@ export const startSocketIo = (httpServer: http.Server) => {
                 console.log(`send message to socket ${connection}`);
             });
             let location = getLocationForId(<string>chat.adminId);
+
+            if (newMessage.type === MessageTypes.READ){
+                handleRead(<Message<string>>newMessage);
+                sendMessageToApi(location, newMessage, MessageOperations.NEW)
+                return;
+            }
+
             persistMessage(chat.chatId, newMessage);
             sendMessageToApi(location, newMessage, MessageOperations.NEW)
         });

@@ -1,13 +1,12 @@
 import {IdInterface, MessageOperations} from './../types/index';
 import {Router} from 'express';
 import Message from "../models/message";
-import {contacts} from "../store/contacts";
 import {contactRequests} from "../store/contactRequests";
-import {io, sendEventToConnectedSockets} from "../service/socketService";
+import {sendEventToConnectedSockets} from "../service/socketService";
 import {connections} from "../store/connections";
 import {ContactRequest, MessageBodyTypeInterface, MessageTypes} from "../types";
 import Contact from "../models/contact";
-import {parseMessage, editMessage} from "../service/messageService";
+import {editMessage, handleRead, parseMessage} from "../service/messageService";
 import {persistMessage} from "../service/chatService";
 import {getChat} from "../service/dataService";
 import {config} from "../config/config";
@@ -70,6 +69,14 @@ router.put("/", (req, res) => {
 
     if (!chat) {
         res.status(403).json({status: 'Forbidden', reason: 'not in contact'});
+        return;
+    }
+
+
+    if (message.type === MessageTypes.READ) {
+        handleRead(message as Message<string>);
+
+        res.json({status:"success"})
         return;
     }
 

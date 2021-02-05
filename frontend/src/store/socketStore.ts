@@ -19,6 +19,9 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on("message", (message) => {
         console.log(message);
+        if (message.type === 'READ'){
+            return;
+        }
         const {addMessage} = usechatsActions()
 
         const {user} = useAuthState()

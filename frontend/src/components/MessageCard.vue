@@ -13,6 +13,9 @@
     }">
       <pre v-if="config.showdebug">{{ message }}</pre>
       <div class="btn-group">
+        <button class="bg-gray-200" v-if="!disabled" @click="read">
+          read
+        </button>
         <button
             v-if="(message.type == 'EDIT' || message.type == 'STRING') && !disabled"
             @click="setEditMessage"
@@ -36,6 +39,15 @@
             'localhost:3000'
           )}/api/files/${message.to}/${message.body.filename}`"
         ></audio>
+
+        <img
+
+            v-if="message.body.filename.indexOf('.gif') !== -1"
+            :src="`http://${message.from.replace(
+            'localhost:8080',
+            'localhost:3000'
+          )}/api/files/${message.to}/${message.body.filename}`"
+        />
         <br/>
         <a
             class="py-2 px-2 bg-green-200 border-r-2"
@@ -114,6 +126,8 @@ export default defineComponent({
 
     const quoteMessage = ref(false);
     const quoteMessageValue = ref("");
+    const {sendMessageObject} = usechatsActions();
+
 
     const setEditMessage = () => {
       editMessage.value = true;
@@ -146,7 +160,6 @@ export default defineComponent({
       console.log("quote");
       if (quoteMessageValue.value !== "") {
         quoteMessage.value = false;
-        const {sendMessageObject} = usechatsActions();
         const {user} = useAuthState();
         const messageToQuote = props.message;
         // from: user.id,
@@ -170,6 +183,18 @@ export default defineComponent({
       props.message.value = editMessageValue.value;
     };
 
+    const read = () => {
+      const newMessage: Message<string> = {
+        id: uuidv4(),
+        from: user.id,
+        to: props.chatId,
+        body: props.message.id,
+        timeStamp: new Date(),
+        type: "READ",
+      };
+      sendMessageObject(props.chatId, newMessage);
+    }
+
     return {
       isMine,
       m,
@@ -181,7 +206,8 @@ export default defineComponent({
       quoteMessage,
       quoteMessageValue,
       sendQuoteMessage,
-      config
+      config,
+      read
     };
   },
 });

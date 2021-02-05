@@ -3,6 +3,7 @@ import { config } from "../config/config";
 import fs from "fs";
 import User from "../models/user";
 import Chat from "../models/chat";
+import {parseChat} from "./chatService";
 
 export const getChatIds = () => {
     const location = config.baseDir + "chats"
@@ -14,7 +15,7 @@ export const getChatIds = () => {
 export const getChat = (id: IdInterface):Chat => {
   const path = config.baseDir + `chats/${id}/chat.json`
   const chat:Chat = <Chat>JSON.parse(fs.readFileSync(path).toString());
-  return chat
+  return parseChat(chat)
 };
 
 export const getUserdata = () => {
@@ -27,8 +28,17 @@ export const getUserdata = () => {
   }
 };
 
+const sortChat = (chat: Chat) => {
+
+  chat.messages.sort((a,b) => a.timeStamp.getTime() - b.timeStamp.getTime())
+  return chat
+};
+
 export const persistChat = (chat:Chat) => {
-  const path = config.baseDir + `chats/${chat.chatId}`
+
+  const sortedChat = sortChat(chat)
+
+  const path = config.baseDir + `chats/${sortedChat.chatId}`
 
     try{
       fs.statSync(path)
@@ -37,7 +47,7 @@ export const persistChat = (chat:Chat) => {
       fs.mkdirSync(path)
       fs.mkdirSync(path+"/files")
     }
-  fs.writeFileSync(path+"/chat.json",JSON.stringify(chat, null, 4),{flag: 'w'})
+  fs.writeFileSync(path+"/chat.json",JSON.stringify(sortedChat, null, 4),{flag: 'w'})
 };
 
 export const persistUserdata = (userData:Object) => {

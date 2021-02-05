@@ -5,6 +5,7 @@ import {IdInterface, MessageBodyTypeInterface} from "../types";
 import Contact from "../models/contact";
 import {getChatIds, persistChat, getChat} from "./dataService";
 import messages from "../routes/messages";
+import {parseMessage} from "./messageService";
 
 export const persistMessage = (
     chatId: IdInterface,
@@ -25,7 +26,7 @@ export const addChat = (
     adminId: DtIdInterface
 ) => {
     persistChat(
-        new Chat(chatId, contacts, isGroupchat, [message], name, acceptedChat, adminId)
+        new Chat(chatId, contacts, isGroupchat, [message], name, acceptedChat, adminId, {})
     );
 };
 
@@ -46,5 +47,6 @@ export const getChatById = (id: IdInterface) => {
 }
 
 export const parseChat = (chat: any) => {
-    return new Chat(chat.chatId, chat.contacts, chat.isGroup, chat.messages, chat.name, chat.acceptedChat, chat.adminId)
+    const messages = chat.messages.map((m: any) => parseMessage(m))
+    return new Chat(chat.chatId, chat.contacts, chat.isGroup, messages, chat.name, chat.acceptedChat, chat.adminId, chat.read)
 }

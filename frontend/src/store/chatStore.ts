@@ -56,6 +56,11 @@ const addGroupchat = (name:string ,contacts:Contact[]) => {
 }
 
 const addMessage = (chatId, message) => {
+
+    if (message.type === 'READ'){
+        return;
+    }
+
     console.log('in addmessage chatid', chatId)
     console.log('in addmessage message', message)
 
