@@ -86,7 +86,7 @@ const sendMessage = (chatId, message) => {
     sendSocketMessage(chatId, msg)
 }
 
-const sendEditMessage = (chatId,message)=> {
+const sendMessageObject = (chatId,message)=> {
     const {sendSocketMessage} = useSocketActions()
     console.log(chatId,message)
     addMessage(chatId,message)
@@ -153,7 +153,7 @@ export const usechatsActions = () => {
         sendMessage,
         addMessage,
         sendFile,
-        sendEditMessage,
+        sendMessageObject,
         addGroupchat,
     }
 }

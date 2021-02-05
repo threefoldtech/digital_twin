@@ -184,6 +184,7 @@ export default defineComponent({
 
       addGroupchat(groupnameAdd.value, contacts)
       usersInGroup.value = []
+      emit('closeDialog')
     };
 
     const userIsInGroup = (username) => {

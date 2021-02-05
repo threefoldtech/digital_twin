@@ -28,7 +28,8 @@ export enum MessageTypes {
     EDIT = "EDIT",
     READ = "READ",
     CONTACT_REQUEST = "CONTACT_REQUEST",
-    DELETE = "DELETE"
+    DELETE = "DELETE",
+    QUOTE = "QUOTE"
 
 }
 
