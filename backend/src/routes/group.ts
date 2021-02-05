@@ -16,14 +16,15 @@ router.put('/invite', async (req, res) => {
 
 router.put('/', async (req, res) => {
 
-    const chat = parseChat(req.body)
+    let preParsedChat = {...req.body, acceptedChat:true, isGroup:true};
+    const chat = parseChat(preParsedChat)
     console.log(chat)
     persistChat(chat);
 
     chat.contacts.forEach(c => {
         const dtUrl = getDigitalTwinUrl(c.location)
         const path = `${dtUrl}/group/invite`;
-        axios.put(path, chat)
+        // axios.put(path, chat)
     })
 
     res.json({success: true})

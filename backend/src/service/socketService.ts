@@ -1,17 +1,17 @@
-import { sendMessage, getChatById } from './chatService';
+import {sendMessage, getChatById} from './chatService';
 import {Socket} from "socket.io";
 import Connections from "../models/connections";
 import Message from "../models/message";
 import {contacts} from "../store/contacts";
-import { user } from "../store/user"
+import {user} from "../store/user"
 import axios from "axios";
 import {connections} from "../store/connections";
 import * as http from "http";
 import {parseMessage} from "./messageService";
 import {MessageBodyTypeInterface, MessageOperations} from "../types";
-import { saveFile } from "./dataService"
-import { editMessage } from "./messageService"
-import { sendMessageToApi } from './apiService';
+import {saveFile} from "./dataService"
+import {editMessage} from "./messageService"
+import {getLocationForId, sendMessageToApi} from './apiService';
 import {config} from "../config/config";
 
 const socketio = require("socket.io");
@@ -19,9 +19,11 @@ const socketio = require("socket.io");
 export let io: Socket;
 
 export const startSocketIo = (httpServer: http.Server) => {
-    io = socketio(httpServer, { cors: {
-          origin: '*',
-        }});
+    io = socketio(httpServer, {
+        cors: {
+            origin: '*',
+        }
+    });
 
 
     io.on("connection", (socket: Socket) => {
@@ -53,12 +55,13 @@ export const startSocketIo = (httpServer: http.Server) => {
                 io.to(connection).emit("message", newMessage);
                 console.log(`send message to socket ${connection}`);
             });
-            sendMessageToApi(chat.adminId,newMessage,MessageOperations.NEW)
+            let location = getLocationForId(<string>chat.adminId);
+            sendMessageToApi(location, newMessage, MessageOperations.NEW)
         });
 
         socket.on('slice upload', (data) => {
             console.log(data)
-            var file:any = {
+            var file: any = {
                 name: data.file.name,
                 type: data.file.type,
                 data: data.file.data,
@@ -69,11 +72,12 @@ export const startSocketIo = (httpServer: http.Server) => {
         });
 
         socket.on("update_message", (messageData) => {
-            console.log("updatemsgdata",messageData)
+            console.log("updatemsgdata", messageData)
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
-            editMessage(messageData.chatId,newMessage)
+            editMessage(messageData.chatId, newMessage)
             console.log(contacts)
-            sendMessageToApi(newMessage.to,newMessage,MessageOperations.UPDATE)
+            let location1 = getLocationForId(<string>newMessage.to);
+            sendMessageToApi(location1, newMessage, MessageOperations.UPDATE)
         })
 
     });

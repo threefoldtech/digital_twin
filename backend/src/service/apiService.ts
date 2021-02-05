@@ -57,5 +57,9 @@ export const getDigitalTwinUrl = (location: IdInterface) => {
         return 'http://localhost:3000'
     }
 
-    return `http://${location}`
+    return `https://${location}`
 };
+
+export const getLocationForId= (id:string) => {
+    return `${(id.replace('-chat', ''))}-chat`
+}
