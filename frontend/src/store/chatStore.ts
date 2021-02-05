@@ -46,7 +46,8 @@ const addGroupchat = (name:string ,contacts:Contact[]) => {
             type: "STRING"
         }],
         name: name,
-        adminId: user.id
+        adminId: user.id,
+        read: {},
     }
     axios.put(`${config.baseUrl}api/group`, newGroupchat).then((res)=>{
         console.log(res)
@@ -58,6 +59,19 @@ const addGroupchat = (name:string ,contacts:Contact[]) => {
 const addMessage = (chatId, message) => {
 
     if (message.type === 'READ'){
+        const chat:Chat = state.chats.find(chat=>chat.chatId == chatId)
+
+        const newRead = chat.messages.find(m => m.id === message.body)
+        const oldRead = chat.messages.find(m => m.id === chat.read[<string>message.from])
+
+
+        if (oldRead && (new Date(newRead.timeStamp)).getTime() < (new Date(oldRead.timeStamp)).getTime()){
+            return;
+        }
+
+
+        chat.read[<string>message.from] = message.body
+
         return;
     }
 

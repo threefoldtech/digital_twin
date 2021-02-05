@@ -13,7 +13,7 @@
     }">
       <pre v-if="config.showdebug">{{ message }}</pre>
       <div class="btn-group">
-        <button class="bg-gray-200" v-if="!disabled" @click="read">
+        <button class="bg-gray-200" v-if="!disabled && !isread" @click="read">
           read
         </button>
         <button
@@ -111,6 +111,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    isread: {
+      type: Boolean,
+      default: false
+    },
   },
   setup(props) {
     const {user} = useAuthState();
@@ -193,6 +197,7 @@ export default defineComponent({
         type: "READ",
       };
       sendMessageObject(props.chatId, newMessage);
+
     }
 
     return {

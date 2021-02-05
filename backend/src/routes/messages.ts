@@ -54,9 +54,13 @@ router.put("/", (req, res) => {
         console.log(`received new group message from ${message.from}`);
         sendEventToConnectedSockets(connections, "message", message)
 
-        persistMessage(chat.chatId, message);
+        if (message.type === MessageTypes.READ) {
+            handleRead(message as Message<string>);
 
-        sendEventToConnectedSockets(connections, "message", message)
+            res.json({status:"success"})
+            return;
+        }
+        persistMessage(chat.chatId, message);
         return;
     }
 

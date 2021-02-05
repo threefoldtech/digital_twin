@@ -38,6 +38,9 @@ export interface QuoteBodyType extends MessageBodyType{
 export interface Chat {
     chatId: Id,
     messages: Message<MessageBodyType>[];
+    read: {
+        [key: string]: string
+    };
     name: string;
 }
 export interface PersonChat extends Chat{

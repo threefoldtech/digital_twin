@@ -29,7 +29,7 @@ const retrieveContacts = async () => {
         console.log(`here are the contacts`, contacts)
         state.contacts = contacts;
     })
-    
+
 }
 
 const contactIsHealthy = (location) => {
@@ -43,8 +43,8 @@ const contactIsHealthy = (location) => {
     return isAvailable
 }
 
-const addContact = (username:DtId, location, dontCheck = false) => { 
-    // if(!dontCheck && !contactIsHealthy(username)){ 
+const addContact = (username:DtId, location, dontCheck = false) => {
+    // if(!dontCheck && !contactIsHealthy(username)){
     //     throw "Peer is not healthy"
     // }
     const {user} = useAuthState()
@@ -61,14 +61,15 @@ const addContact = (username:DtId, location, dontCheck = false) => {
         const contact:Contact = {
             id:username,
             location
-        } 
+        }
 
         state.contacts.push(contact)
         const {addChat} = usechatsActions()
         const chat:PersonChat = {
+            read: {},
             chatId:username,
             messages:[addMessage],
-            name: chatname.toString(),
+            name: chatname.toString()
         }
         addChat(chat)
     })
@@ -85,9 +86,10 @@ const moveConnectionRequestToContacts = (id) => {
         console.log(state.connectionRequests[index])
         const messages:Message<String>[] = res.data
         const chat:PersonChat = {
+            read: {},
             chatId:id,
             messages:messages,
-            name: id,
+            name: id
         }
         console.log(chat)
         addChat(chat)

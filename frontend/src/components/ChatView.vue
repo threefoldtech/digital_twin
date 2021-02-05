@@ -29,6 +29,7 @@
       <div class="absolute w-full px-4">
         <MessageCard v-for="(message, i) in chat.messages"
                      :key="i"
+                     :isread="i <= lastRead"
                      :message="message"
                      :chatId="chat.chatId"
         />
@@ -50,6 +51,7 @@ import {
   nextTick,
   computed,
 } from "vue";
+import {findLastIndex} from 'lodash'
 
 import {statusList} from "@/store/statusStore"
 import {usechatsState, usechatsActions} from "../store/chatStore";
@@ -78,6 +80,12 @@ export default defineComponent({
     const file = ref();
 
     const propRefs = toRefs(props);
+
+    const lastRead = computed(() => {
+      console.log(chat.value)
+      const reads = Object.values(<any>(chat.value).read);
+      return findLastIndex(chat.value.messages, (message) => reads.includes(message.id))
+    })
 
     console.log("chats in chatview", chats);
 
@@ -113,7 +121,7 @@ export default defineComponent({
     const popupMeeting = () => {
 
       // @ts-ignore
-      const str = chat?.contacts ? chat.id :[user.id,chat.id].sort().join();
+      const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
 
       const ID = crypto.SHA1(str)
       popupCenter('https://meetings.jimber.org/room/' + ID, "Threefold login", 800, 550)
@@ -131,6 +139,7 @@ export default defineComponent({
       scrollToBottom,
       statusList,
       popupMeeting,
+      lastRead,
       ...propRefs,
     };
   },
