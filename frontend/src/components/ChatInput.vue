@@ -5,6 +5,7 @@
     <!--      >{{ contact.name }} is typing ...-->
     <!--    </span>-->
     <!--    </p>-->
+
     <div
         class="flex rounded-xl h place-items-center bg-white mx-4"
     >
@@ -18,12 +19,17 @@
       <button class="px-2 py-8" @click.stop="stopRecording" v-else>
         <i class="fas fa-circle text-red-600"></i>
       </button>
-      <input
-          class="col-span-6 w-full h-full pl-4"
-          type="text"
-          v-model="message"
+
+      <form
           v-if="!file"
-      />
+          class="col-span-6 w-full h-full  pb-4" @submit.prevent="chatsend">
+        <input
+            class="w-full h-full pl-4"
+            type="text"
+            v-model="message"
+        />
+
+      </form>
       <div class="file-message col-span-6 w-full h-full pl-4 bg-blue-100" v-if="file">
         <span> {{ file.name }}</span>
         <button class="px-2 py-8" @click.stop="removeFile">

@@ -39,10 +39,10 @@ export const startSocketIo = (httpServer: http.Server) => {
 
             // @todo refactor this
             connections.getConnections().forEach((connection: string) => {
-                if (connection == socket.id) {
-                    // this is me
-                    return
-                }
+                // if (connection == socket.id) {
+                //     // this is me
+                //     return
+                // }
 
                 io.to(connection).emit("message", newMessage);
                 console.log(`send message to ${connection}`);
