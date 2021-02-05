@@ -1,4 +1,4 @@
-import {MessageInterface} from "./../types/index";
+import {DtIdInterface, MessageInterface} from "./../types/index";
 import Chat from "../models/chat";
 import Message from "../models/message";
 import {IdInterface, MessageBodyTypeInterface} from "../types";
@@ -20,10 +20,11 @@ export const addChat = (
     isGroupchat: boolean,
     message: MessageInterface<MessageBodyTypeInterface>,
     name: string,
-    acceptedChat: boolean
+    acceptedChat: boolean,
+    adminId: DtIdInterface
 ) => {
     persistChat(
-        new Chat(chatId, contacts, isGroupchat, [message], name, acceptedChat)
+        new Chat(chatId, contacts, isGroupchat, [message], name, acceptedChat, adminId)
     );
 };
 
