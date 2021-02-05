@@ -1,12 +1,15 @@
 <template>
   <div class="flex flex-col place-items-start">
-    <button @click="addGroup = !addGroup">
-      <i class="fas fa-plus"></i>
-      Add
-      <span v-if="!addGroup">group</span>
-      <span v-else>User</span>
-    </button>
-    <form @submit.prevent="contactAdd" class="w-full" v-if="!addGroup">
+    <ul class="nav nav-tabs nav-justified">
+      <li class="nav-item">
+        <a class="nav-link active" @click.prevent="setActive('user')" :class="{ active: isActive('user') }" href="#">Add an user</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" @click.prevent="setActive('group')" :class="{ active: isActive('group') }" href="#">Create a group</a>
+      </li>
+    </ul>
+    
+    <form @submit.prevent="contactAdd" class="w-full" v-if="isActive('user')">
       <div class="flex place-items-center">
         <label class="mr-2" for="username">Username: </label>
         <input
@@ -31,7 +34,7 @@
         <button>Add contact</button>
       </div>
     </form>
-    <form @submit.prevent="groupAdd" class="w-full" v-else>
+    <form @submit.prevent="groupAdd" class="w-full" v-if="isActive('group')">
       <div class="flex place-items-center">
         <label class="mr-2" for="username">Group name: </label>
         <input
@@ -52,7 +55,7 @@
       </div>
 
       <div class="flex place-items-center">
-        <label class="mr-2" for="location">User: </label>
+        <label class="mr-2" for="location">Users: </label>
         <input
           id="location"
           class="mb-2"
@@ -69,7 +72,9 @@
           <i class="fas fa-plus"></i>
         </button>
       </div>
-      <div class="flex flex-col max-h-52 relative overflow-auto my-2 bg-gray-100 px-4 py-2 rounded-xl">
+      <div
+        class="flex flex-col max-h-52 relative overflow-auto my-2 bg-gray-100 px-4 py-2 rounded-xl"
+      >
         <div class="h-full">
           <div v-if="!usersInGroup.length">
             <p class="text-gray-300 text-center py-4">No users in group yet</p>
@@ -78,7 +83,6 @@
             v-for="(user, i) in usersInGroup"
             :key="i"
             class="grid grid-cols-12 rounded-lg mb-2 py-2"
-           
           >
             <div class="col-span-2 place-items-center grid">
               <img
@@ -93,7 +97,10 @@
               {{ user }}
             </div>
             <div class="col-span-2 place-items-center grid">
-              <button class="h-12 rounded-full" @click="usersInGroup = usersInGroup.filter(u => u != user)">
+              <button
+                class="h-12 rounded-full"
+                @click="usersInGroup = usersInGroup.filter((u) => u != user)"
+              >
                 <i class="fas fa-times"></i>
               </button>
             </div>
@@ -105,13 +112,6 @@
         <button>Add Group</button>
       </div>
     </form>
-    <div v-if="contactAddError">
-      <span class="red"
-        >Failed to reach digitaltwin of the contact. Do you still want to add
-        the contact?</span
-      >
-      <button @click="forceAddContact">Add</button>
-    </div>
   </div>
 </template>
 
@@ -151,6 +151,15 @@ export default defineComponent({
       return `${usernameAdd.value}-chat`;
     });
 
+    let activeItem = ref("user")
+    const isActive =  (menuItem) => {
+      return activeItem.value === menuItem
+    } 
+
+    const setActive =  (menuItem) => {
+      activeItem.value = menuItem
+    }
+
     return {
       addGroup,
       usernameAdd,
@@ -160,6 +169,8 @@ export default defineComponent({
       forceAddContact,
       contactAddError,
       usersInGroup,
+      isActive,
+      setActive
     };
   },
 });
