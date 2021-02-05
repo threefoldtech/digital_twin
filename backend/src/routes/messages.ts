@@ -8,7 +8,7 @@ import {connections} from "../store/connections";
 import {ContactRequest, MessageBodyTypeInterface, MessageTypes} from "../types";
 import Contact from "../models/contact";
 import {parseMessage, editMessage} from "../service/messageService";
-import {sendMessage} from "../service/chatService";
+import {persistMessage} from "../service/chatService";
 import {getChat} from "../service/dataService";
 import {config} from "../config/config";
 import {sendMessageToApi} from "../service/apiService";
@@ -55,7 +55,7 @@ router.put("/", (req, res) => {
         console.log(`received new group message from ${message.from}`);
         sendEventToConnectedSockets(connections, "message", message)
 
-        sendMessage(chat.chatId, message);
+        persistMessage(chat.chatId, message);
 
         sendEventToConnectedSockets(connections, "message", message)
         return;
@@ -76,7 +76,7 @@ router.put("/", (req, res) => {
     // const message = new Message(msg.from, msg.to, msg.body);
     console.log(`received new message from ${message.from}`);
     //
-    sendMessage(chat.adminId, message);
+    persistMessage(chat.adminId, message);
     //
     sendEventToConnectedSockets(connections, "message", message)
 

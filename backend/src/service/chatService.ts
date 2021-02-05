@@ -6,7 +6,7 @@ import Contact from "../models/contact";
 import {getChatIds, persistChat, getChat} from "./dataService";
 import messages from "../routes/messages";
 
-export const sendMessage = (
+export const    persistMessage = (
     chatId: IdInterface,
     message: MessageInterface<MessageBodyTypeInterface>
 ) => {

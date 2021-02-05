@@ -1,4 +1,4 @@
-import {sendMessage, getChatById} from './chatService';
+import {persistMessage, getChatById} from './chatService';
 import {Socket} from "socket.io";
 import Connections from "../models/connections";
 import Message from "../models/message";
@@ -56,7 +56,7 @@ export const startSocketIo = (httpServer: http.Server) => {
                 console.log(`send message to socket ${connection}`);
             });
             let location = getLocationForId(<string>chat.adminId);
-            sendMessage(chat.chatId, newMessage);
+            persistMessage(chat.chatId, newMessage);
             sendMessageToApi(location, newMessage, MessageOperations.NEW)
         });
 
