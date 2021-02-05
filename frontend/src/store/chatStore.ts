@@ -37,7 +37,7 @@ const addMessage = (chatId, message) => {
 
     const chat:Chat = state.chats.find(chat=>chat.chatId == chatId)
     const index = chat.messages.findIndex(mes=> mes.id == message.id)
-    if(index){
+    if(index !== -1){
         console.log("edit chat")
         chat.messages[index] = message
         return
@@ -72,7 +72,7 @@ const sendEditMessage = (chatId,message)=> {
 const sendFile = async (chatId, name, parsedFile) => {
     const { sendSocketMessage } = useSocketActions()
     const {user} = useAuthState()
-    
+
     const msgToSend:Message<Object> = {
         id: uuidv4(),
         body: {
