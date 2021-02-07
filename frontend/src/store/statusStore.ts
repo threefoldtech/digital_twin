@@ -7,7 +7,7 @@ export const watchingUsers = []
 
 
 export const fetchStatus = async digitalTwinId => {
-  if(watchingUsers.find(digitalTwinId)){
+  if(watchingUsers.find(wu => wu === digitalTwinId)){
     return
   }
   watchingUsers.push(digitalTwinId)
