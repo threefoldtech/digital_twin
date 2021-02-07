@@ -29,8 +29,8 @@
       <div class="absolute w-full px-4">
         <MessageCard v-for="(message, i) in chat.messages"
                      :key="i"
-                     :isread="i+1 <= lastRead"
-                     :isreadbyme="i+1 <= lastReadByMe"
+                     :isread="i <= lastRead"
+                     :isreadbyme="i <= lastReadByMe"
                      :message="message"
                      :chatId="chat.chatId"
         />

@@ -5,6 +5,8 @@ import {getChat, persistChat, saveFile} from "./dataService";
 import get = Reflect.get;
 import Chat from "../models/chat";
 import {config} from "../config/config";
+import {sendEventToConnectedSockets} from "./socketService";
+import {connections} from "../store/connections";
 
 export const parseMessage = (
     msg: any
@@ -119,4 +121,5 @@ export const handleRead = (message: Message<string>) => {
 
     chat.read[<string>message.from] = message.body
     persistChat(chat);
+    sendEventToConnectedSockets(connections, "message", message)
 };

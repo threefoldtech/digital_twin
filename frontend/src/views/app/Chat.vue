@@ -102,20 +102,12 @@
 
 <script lang="ts">
 import moment from "moment";
-<<<<<<< Updated upstream
-import {defineComponent, ref, computed, onBeforeMount} from "vue";
-import {usechatsState, usechatsActions} from "../../store/chatStore";
-import {useContactsState, useContactsActions} from "../../store/contactStore";
-import {useAuthState} from "../../store/authStore";
 import {useSocketActions} from "../../store/socketStore";
-=======
 import { defineComponent, ref, computed, onBeforeMount } from "vue";
 import { usechatsState, usechatsActions } from "../../store/chatStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
 import { useAuthState, useAuthActions } from "../../store/authStore";
-import { useSocketActions } from "../../store/socketStore";
 import {fetchStatus} from "../../store/statusStore"
->>>>>>> Stashed changes
 import addContact from "../../components/ContactAdd.vue";
 import chatView from "../../components/ChatView.vue";
 import Dialog from "../../components/Dialog.vue";
@@ -126,16 +118,10 @@ export default defineComponent({
   name: "Apps",
   components: {addContact, chatView, jdialog: Dialog, ChatCard},
   setup(_, context) {
-<<<<<<< Updated upstream
-    const {chats} = usechatsState();
-    const {connectionRequests} = useContactsState();
-    const {retrievechats} = usechatsActions();
-=======
     const { chats } = usechatsState();
     const { updateUserInfo } = useAuthActions();
     const { connectionRequests } = useContactsState();
     const { retrievechats } = usechatsActions();
->>>>>>> Stashed changes
     const {
       retrieveContacts,
       moveConnectionRequestToContacts,
