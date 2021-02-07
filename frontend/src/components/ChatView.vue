@@ -29,7 +29,8 @@
       <div class="absolute w-full px-4">
         <MessageCard v-for="(message, i) in chat.messages"
                      :key="i"
-                     :isread="i <= lastRead"
+                     :isread="i+1 <= lastRead"
+                     :isreadbyme="i+1 <= lastReadByMe"
                      :message="message"
                      :chatId="chat.chatId"
         />
@@ -83,8 +84,20 @@ export default defineComponent({
 
     const lastRead = computed(() => {
       console.log(chat.value)
-      const reads = Object.values(<any>(chat.value).read);
-      return findLastIndex(chat.value.messages, (message) => reads.includes(message.id))
+      let id = <string>user.id;
+      //@ts-ignore
+      const { [id]: _, ...read } = chat.value.read;
+
+      const reads = Object.values(read)
+
+      console.log(reads)
+
+      return findLastIndex(chat.value.messages, (message) => reads.includes(<string>message.id))
+    })
+
+    const lastReadByMe = computed(() => {
+      console.log(chat.value)
+      return findLastIndex(chat.value.messages, (message) => chat.value.read[<string>user.id] === message.id)
     })
 
     console.log("chats in chatview", chats);
@@ -140,6 +153,7 @@ export default defineComponent({
       statusList,
       popupMeeting,
       lastRead,
+      lastReadByMe,
       ...propRefs,
     };
   },
