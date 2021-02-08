@@ -114,7 +114,7 @@ export const handleRead = (message: Message<string>) => {
     const oldRead = chat.messages.find(m => m.id === chat.read[<string>message.from])
 
 
-    if (oldRead && newRead.timeStamp.getTime() > oldRead.timeStamp.getTime()) {
+    if (oldRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) {
         return;
     }
 

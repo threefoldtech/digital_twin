@@ -99,6 +99,15 @@ router.put("/", (req, res) => {
             res.json({status:"success"})
             return;
         }
+
+        if (message.type === MessageTypes.EDIT || message.type === MessageTypes.DELETE) {
+            editMessage(chatId,message)
+            sendEventToConnectedSockets("message", message)
+            res.json({status:"success"})
+            return;
+        }
+
+
         persistMessage(chat.chatId, message);
         return;
     }
