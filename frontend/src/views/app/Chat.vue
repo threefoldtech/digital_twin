@@ -119,6 +119,7 @@ import Dialog from "../../components/Dialog.vue";
 import ChatCard from "../../components/ChatCard.vue";
 import config from "../../../public/config/config"
 import axios from "axios"
+import {startFetchStatusLoop} from "@/store/statusStore";
 
 export default defineComponent({
   name: "Apps",
@@ -167,6 +168,8 @@ export default defineComponent({
         selectedId.value = <string>chats.value[0].chatId;
       });
     });
+
+    startFetchStatusLoop(user.id)
 
     const acceptChatRequest = (id) => {
       const {acceptChat} = usechatsActions()

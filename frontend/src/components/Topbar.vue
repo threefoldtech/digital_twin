@@ -4,11 +4,7 @@
     <div
       class="col-end-13 text-right text-gray-500 flex items-center justify-end"
     >
-      <img
-        :src="user.image"
-        alt="User image"
-        class="h-10 mr-4 bg-icon rounded-full"
-      />
+      <AvatarImg :id="user.id"/>
       <span class="mr-2">{{ user.id }}</span>
       <button @click="showDialog = true">
         <i class="fas fa-cog text-gray-500"></i>
@@ -68,10 +64,11 @@ import { defineComponent, ref } from "vue";
 import { useAuthState } from "../store/authStore";
 import { useSocketActions } from "../store/socketStore"
 import Dialog from "./Dialog.vue";
+import AvatarImg from "@/components/AvatarImg.vue";
 
 export default defineComponent({
   name: "Topbar",
-  components: { jdialog: Dialog },
+  components: {AvatarImg, jdialog: Dialog },
   setup() {
     const { user } = useAuthState();
     const showDialog = ref(false);

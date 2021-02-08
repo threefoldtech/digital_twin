@@ -15,7 +15,6 @@ const fetchStatus = async digitalTwinId => {
   const response = await axios.get(url);
   let status = response.data;
   statusList[digitalTwinId] = status;
-
   const {user} = useAuthState()
 
   if (user.id === digitalTwinId){
@@ -31,6 +30,7 @@ export const startFetchStatusLoop = digitalTwinId => {
     return;
   }
   watchingUsers.push(digitalTwinId);
+  fetchStatus(digitalTwinId);
 
   setInterval(() => {
     try {

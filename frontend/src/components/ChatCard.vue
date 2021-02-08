@@ -4,13 +4,7 @@
       {{ newMessages }}
     </div>
     <div class="md:col-span-2 col-span-3 place-items-center grid relative">
-        <img
-          :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-            chat.chatId
-          )}.svg`"
-          alt="User image"
-          class="h-12 w-12 bg-icon rounded-full"
-        />
+      <AvatarImg :id="chat.chatId"/>
         <div class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-2 transition-all" :class="{'bg-red-500': status && !status.isOnline, 'bg-green-500': status && status.isOnline}"></div>
     </div>
     <div class="md:col-span-10 col-span-9 pl-2">
@@ -34,9 +28,11 @@ import { useAuthState } from "@/store/authStore";
 import { Message, MessageBodyType } from "@/types";
 import moment from 'moment'
 import {statusList} from "@/store/statusStore";
+import AvatarImg from "@/components/AvatarImg.vue";
 
 export default defineComponent({
   name: "ChatCard",
+  components: {AvatarImg},
   props: {
     chat: Object,
   },
@@ -73,5 +69,3 @@ export default defineComponent({
 });
 </script>
 
-<style scoped>
-</style>

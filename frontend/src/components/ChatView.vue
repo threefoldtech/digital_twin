@@ -5,13 +5,7 @@
         <i class="fas fa-chevron-left"></i>
       </button>
       <div class="col-span-2 place-items-center grid">
-        <img
-            :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-            chat.name
-          )}.svg`"
-            alt="User image"
-            class="h-12 bg-icon rounded-full"
-        />
+        <AvatarImg :id="chat.chatId"></AvatarImg>
       </div>
       <div class="col-span-6 py-4 pl-2">
         <p class="font-bold font">{{ chat.name }}</p>
@@ -22,7 +16,7 @@
         </p> -->
       </div>
       <div class="col-end-13 pr-2 flex justify-end">
-        
+
           <button @click="popupMeeting" class="flex flex-col items-center justify-center">
             <i class="fas fa-video"></i>
           </button>
@@ -66,11 +60,12 @@ import MessageCard from "@/components/MessageCard.vue";
 import ChatInput from "@/components/ChatInput.vue";
 import {popupCenter} from "@/services/popupService";
 import * as crypto from "crypto-js";
+import AvatarImg from "@/components/AvatarImg.vue";
 
 
 export default defineComponent({
   name: "ChatView",
-  components: {ChatInput, MessageCard},
+  components: {AvatarImg, ChatInput, MessageCard},
   props: {
     selectedId: String,
   },
