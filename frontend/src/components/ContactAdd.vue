@@ -7,7 +7,7 @@
             @click.prevent="setActive('user')"
             :class="{ active: isActive('user') }"
             href="#"
-        >Add an user</a
+        >Add a user</a
         >
       </li>
       <li class="nav-item">
@@ -20,7 +20,7 @@
         >
       </li>
     </ul>
-    
+
 
     <form @submit.prevent="contactAdd" class="w-full" v-if="isActive('user')">
       <div class="flex place-items-center">
