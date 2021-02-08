@@ -1,4 +1,4 @@
-import { persistChat } from './../service/dataService';
+import {getBlocklist, persistChat} from './../service/dataService';
 import {IdInterface, MessageOperations, PersonChatInterface} from './../types/index';
 import {Router} from 'express';
 import Message from "../models/message";
@@ -55,14 +55,30 @@ router.put("/", (req, res) => {
         return;
     }
 
+    const blockList =  getBlocklist();
+
     if (message.type === MessageTypes.CONTACT_REQUEST) {
+        if (blockList.includes(<string>message.from) ){
+            //@todo what should i return whenblocked
+            res.json({status:"blocked"})
+            return;
+        }
+
         handleContactRequest(message as Message<ContactRequest>);
 
         res.json({status:"success"})
         return;
     }
 
-    let chat = getChat(message.from === config.userid ? message.to : message.from)
+    const chatId = message.from === config.userid ? message.to : message.from;
+
+    if (blockList.includes(<string>chatId) ){
+        //@todo what should i return whenblocked
+        res.json({status:"blocked"})
+        return;
+    }
+
+    let chat = getChat(chatId)
 
     console.log(`chat.isGroup ${chat.isGroup}`)
     console.log(`chat.chatId ${chat.chatId}`)
