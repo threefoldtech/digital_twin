@@ -1,6 +1,6 @@
 <template>
   <div class="relative h-full w-full flex flex-col">
-    <div class="grid grid-cols-12 bg-white rounded-lg shadow z-10">
+    <div class="grid bg-white grid-cols-12 rounded-lg shadow z-10">
       <button @click="$emit('showContacts')" class="md:hidden">
         <i class="fas fa-chevron-left"></i>
       </button>
@@ -21,8 +21,11 @@
           <span v-else> Last seen {{ m(contact.lastSeen).fromNow() }} </span>
         </p> -->
       </div>
-      <div class="col-span-3 py-4 pl-2">
-        <button @click="popupMeeting">goto video</button>
+      <div class="col-end-13 pr-2 flex justify-end">
+        
+          <button @click="popupMeeting" class="flex flex-col items-center justify-center">
+            <i class="fas fa-video"></i>
+          </button>
       </div>
     </div>
     <div class="flex-grow row-span-4 relative overflow-y-auto" ref="messageBox">
