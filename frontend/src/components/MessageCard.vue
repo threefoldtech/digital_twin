@@ -31,10 +31,14 @@
         <audio
             controls
             v-if="message.body.filename.indexOf('.WebM') !== -1"
-            :src="`http://${message.from.replace(
+            :src="`https://${message.from.replace(
             'localhost:8080',
             'localhost:3000'
-          )}/api/files/${message.to}/${message.body.filename}`"
+          )}.digitaltwin.jimbertesting.be/api/files/${message.to}/${message.body.filename}`
+          .replace(
+            'https://localhost:3000.digitaltwin.jimbertesting.be/',
+            'http://localhost:3000/'
+          )"
         ></audio>
 
         <img
