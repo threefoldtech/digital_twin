@@ -19,7 +19,7 @@ const retrieveContacts = async () => {
     return axios.get(`${config.baseUrl}api/contacts`).then(function(response) {
         const contacts = response.data
         console.log(`here are the contacts`, contacts)
-        
+
         state.contacts = contacts;
     })
 
@@ -59,6 +59,7 @@ const addContact = (username:DtId, location, dontCheck = false) => {
         state.contacts.push(contact)
         const {addChat} = usechatsActions()
         const chat:PersonChat = {
+            isGroup: false,
             read: {},
             chatId:username,
             messages:[addMessage],

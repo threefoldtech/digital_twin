@@ -44,6 +44,7 @@ export interface Chat {
     };
     acceptedChat: boolean;
     name: string;
+    isGroup:boolean
 }
 export interface PersonChat extends Chat{
     chatId: DtId;

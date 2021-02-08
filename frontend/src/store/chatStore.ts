@@ -2,12 +2,20 @@ import { reactive } from "@vue/reactivity";
 import { toRefs } from "vue";
 import axios from "axios";
 import moment from "moment";
-import { Chat, Contact, Message, GroupChat, MessageBodyType, PersonChat } from "../types";
+import {
+  Chat,
+  Contact,
+  Message,
+  GroupChat,
+  MessageBodyType,
+  PersonChat
+} from "../types";
 import { useSocketActions } from "./socketStore";
 import { useAuthState } from "./authStore";
 import { useContactsActions } from "./contactStore";
 import config from "../../public/config/config";
 import { uuidv4 } from "@/common";
+import {startFetchStatusLoop} from "@/store/statusStore";
 
 const state = reactive<chatstate>({
   chats: [],
@@ -30,10 +38,15 @@ const retrievechats = async () => {
 };
 
 const addChat = (chat: Chat) => {
-  if(chat.acceptedChat){
+
+  if (!chat.isGroup){
+    startFetchStatusLoop(chat.chatId)
+  }
+
+  if (chat.acceptedChat) {
     state.chats.push(chat);
-  }else{
-    state.chatRequests.push(chat)
+  } else {
+    state.chatRequests.push(chat);
   }
   sortChats();
 };
@@ -41,6 +54,7 @@ const addChat = (chat: Chat) => {
 const addGroupchat = (name: string, contacts: Contact[]) => {
   const { user } = useAuthState();
   const newGroupchat: GroupChat = {
+    isGroup: true,
     chatId: uuidv4(),
     contacts: contacts,
     messages: [
@@ -61,7 +75,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
   axios
     .put(`${config.baseUrl}api/group`, newGroupchat)
     .then(res => {
-      addChat(newGroupchat)
+      addChat(newGroupchat);
       console.log(res);
     })
     .catch(e => {
@@ -69,14 +83,14 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
     });
 };
 
-const acceptChat = (id) => {
-  axios.post(`${config.baseUrl}api/chats?id=${id}`).then( (res) => {
-      const index = state.chatRequests.findIndex(c=>c.chatId==id)
-      console.log(state.chatRequests[index])
-      state.chats.push(state.chatRequests[index])
-      state.chatRequests.splice(index,1)
-  })
-}
+const acceptChat = id => {
+  axios.post(`${config.baseUrl}api/chats?id=${id}`).then(res => {
+    const index = state.chatRequests.findIndex(c => c.chatId == id);
+    console.log(state.chatRequests[index]);
+    addChat(state.chatRequests[index]);
+    state.chatRequests.splice(index, 1);
+  });
+};
 
 const addMessage = (chatId, message) => {
   if (message.type === "READ") {

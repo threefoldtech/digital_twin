@@ -32,7 +32,7 @@
                 {{chat.admin}} invited you to {{ chat.name }}
               </span>
               <span v-else class="truncate col-span-8">
-                <b>{{ chat.name }}</b> wants to have a chat  
+                <b>{{ chat.name }}</b> wants to have a chat
               </span>
               <button
                   class="col-span-4"
@@ -112,7 +112,6 @@ import { defineComponent, ref, computed, onBeforeMount } from "vue";
 import { usechatsState, usechatsActions } from "../../store/chatStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
 import { useAuthState, useAuthActions } from "../../store/authStore";
-import {fetchStatus} from "../../store/statusStore"
 import addContact from "../../components/ContactAdd.vue";
 import chatView from "../../components/ChatView.vue";
 import Dialog from "../../components/Dialog.vue";
@@ -175,22 +174,11 @@ export default defineComponent({
       console.log("TODO here",id);
     };
 
-    onBeforeMount(()=>{
-      const { updateUserInfo } = useAuthActions()
-      const { user } = useAuthState()
-      axios.get(`${config.baseUrl}api/user/getStatus`).then((resp)=>{
-        const status = resp.data
-        user.status = <string>status.status
-        updateUserInfo(status.avatar)
-      })
-    }
-    )
-
     return {
       selectedId,
       setSelected,
       chats,
-      chatRequests,      
+      chatRequests,
       searchValue,
       filteredChats,
       showDialog,

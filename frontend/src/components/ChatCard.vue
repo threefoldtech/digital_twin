@@ -29,11 +29,11 @@
 
 <script lang="ts">
 import { computed, defineComponent, ref } from "vue";
-import { fetchStatus } from "@/store/statusStore";
 import { findLastIndex } from "lodash";
 import { useAuthState } from "@/store/authStore";
 import { Message, MessageBodyType } from "@/types";
 import moment from 'moment'
+import {statusList} from "@/store/statusStore";
 
 export default defineComponent({
   name: "ChatCard",
@@ -41,12 +41,6 @@ export default defineComponent({
     chat: Object,
   },
   setup(props) {
-    const status = ref({});
-
-    setInterval(async () => {
-      status.value = await fetchStatus(props.chat.chatId);
-    }, 5000);
-
     const { user } = useAuthState();
 
     // TODO: this doesn;t work
@@ -59,7 +53,7 @@ export default defineComponent({
     });
     const lastMessage = computed(() => {
       console.log(props.chat.messages[props.chat.messages.length-1])
-      return props.chat && props.chat.messages && props.chat.messages.length? props.chat.messages[props.chat.messages.length-1] : "No messages yet" 
+      return props.chat && props.chat.messages && props.chat.messages.length? props.chat.messages[props.chat.messages.length-1] : "No messages yet"
     });
     const newMessages = computed(() => {
       return props.chat.messages.length - lastReadByMe.value - 1;
@@ -69,6 +63,10 @@ export default defineComponent({
       return moment(time).fromNow()
       return props.chat.messages.length - lastReadByMe.value - 1;
     };
+
+    const status = computed( () => {
+      return statusList[props.chat.chatId]
+    })
 
     return { status, newMessages, lastReadByMe, lastMessage, timeAgo };
   },
