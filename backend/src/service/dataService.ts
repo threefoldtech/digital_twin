@@ -3,6 +3,7 @@ import {config} from "../config/config";
 import fs from "fs";
 import Chat from "../models/chat";
 import {parseChat} from "./chatService";
+import { uniqBy } from "lodash";
 
 export const getChatIds = (): IdInterface[] => {
     const location = config.baseDir + "chats"
@@ -28,9 +29,13 @@ export const getUserdata = () => {
 };
 
 const sortChat = (chat: Chat) => {
+    const messages = uniqBy(chat.messages, m => m.id)
 
-    chat.messages.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime())
-    return chat
+    messages.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime())
+
+    chat.messages = messages;
+
+    return chat;
 };
 
 export const persistChat = (chat: Chat) => {
