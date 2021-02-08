@@ -19,8 +19,8 @@
                   {{ m(chat.lastMessage.timeStamp).fromNow() }}
                 </span>
       </p>
-      <p class="font-thin truncate">{{status?.isOnline ? "Is online" : "Is offline"}}</p>
-      <p class="font-thin truncate" v-if="status.status">{{ status.status }}</p>
+      <p class="font-thin truncate" v-if="status">{{status.isOnline ? "Is online" : "Is offline"}}</p>
+      <p class="font-thin truncate" v-if="status && status.status">{{ status.status }}</p>
       <p class="font-thin truncate" v-if="chat.lastMessage">
         {{ chat.lastMessage.body }}
       </p>
