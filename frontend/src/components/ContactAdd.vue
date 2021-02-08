@@ -20,27 +20,22 @@
         >
       </li>
     </ul>
-    <div>
-      <h2>possible users</h2>
-      <ul v-if="possibleUsers.length > 0">
-        <li v-for="possibleUser in possibleUsers">{{possibleUser}}</li>
-      </ul>
-      <span v-else  > ...</span>
-    </div>
+    
 
     <form @submit.prevent="contactAdd" class="w-full" v-if="isActive('user')">
       <div class="flex place-items-center">
-        <label class="mr-2" for="username">Username: </label>
-        <input
-            v-model="usernameAdd"
-            id="username"
-            class="mb-2"
-            placeholder="Username"
-        />
+        <label class="mr-2" for="username">Username:</label>
+        <auto-complete
+          :data="possibleUsers"
+          v-model="usernameAdd"
+          placeholder="Search for user..."
+        ></auto-complete>
+
       </div>
       <div class="flex place-items-center">
-        <label class="mr-2" for="location">Location: </label>
+        <label class="mr-2" for="location">Location: {{isActive('user')}}</label>
         <input
+            v-if="!isActive('group')"
             id="location"
             disabled="true"
             class="mb-2"
@@ -131,9 +126,11 @@ import {useAuthState} from "../store/authStore";
 import {Contact} from "../types/index"
 import axios from "axios";
 import config from "../../public/config/config";
+import autoComplete from './AutoComplete.vue';
 
 export default defineComponent({
   name: "ContactAdd",
+  components: {autoComplete},
   setup(props, {emit}) {
     const {addContact} = useContactsActions();
     const {contacts} = useContactsState();

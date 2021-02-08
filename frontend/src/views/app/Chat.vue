@@ -74,8 +74,10 @@
     <div class="md:col-span-6 w-full h-full relative">
       <chat-view v-if="selectedId" :selectedId="selectedId" @showContacts="showContacts=true"></chat-view>
       <div v-else class="text-center">
-        It feels lonely over here :( <br/>
-        Use the top left button <b>Add a contact</b> to add a contact
+        <p>
+          It feels lonely over here :(
+        </p>
+        <button  @click="showDialog = true" class="mt-2 border rounded-full px-4">Add a contact</button>
       </div>
     </div>
 
