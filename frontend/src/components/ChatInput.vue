@@ -19,10 +19,20 @@
       <button class="px-2 py-8" @click.stop="stopRecording" v-else>
         <i class="fas fa-circle text-red-600"></i>
       </button>
+      <div class="overlay" :class="{hidden: !showEmoji}" @click="hideEmoji"
+           style="position: fixed; width: 100vw; height: 100vh; background:transparent; top: 0; left: 0; z-index: 9999">
 
+      </div>
+      <emoji-picker
+          ref="emojipicker"
+          :class="{hidden: !showEmoji}" style="position: absolute; bottom: 140px; z-index: 10000"></emoji-picker>
+      <button class="px-2 py-8" @click.stop="toggleEmoji" v-if="!file">
+        😃
+      </button>
       <form
           v-if="!file"
           class="col-span-6 w-full h-full  pb-4" @submit.prevent="chatsend">
+
         <input
             class="w-full h-full pl-4"
             type="text"
@@ -59,8 +69,10 @@ export default {
     const messageBox = ref(null);
     const fileinput = ref();
     const file = ref(null)
+    const emojipicker = ref()
 
     const stopRecording = ref(null)
+    const showEmoji = ref(false)
 
 
     const chatsend = async (e) => {
@@ -115,6 +127,25 @@ export default {
       }
 
     }
+    const selectEmoji = (emoji) => {
+      console.log(emoji)
+      // message.value = emo
+    }
+    const toggleEmoji = () => {
+      showEmoji.value = !showEmoji.value
+    }
+    const hideEmoji = () => {
+      if (!showEmoji) {
+        return
+      }
+      showEmoji.value = false
+    }
+
+    nextTick(() => {
+      emojipicker.value.addEventListener('emoji-click', event => {
+        message.value = `${message.value}${event.detail.unicode}`;
+      });
+    })
 
     return {
       sendMessage,
@@ -127,6 +158,11 @@ export default {
       removeFile,
       startRecording,
       stopRecording,
+      selectEmoji,
+      showEmoji,
+      toggleEmoji,
+      hideEmoji,
+      emojipicker
     }
   }
 }
