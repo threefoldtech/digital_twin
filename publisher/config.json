@@ -5,7 +5,11 @@
         "protocol": "http"
     },
 
-    "filesystem" : {
+    "hyperdrive" : {
         "path" : "~/.digitaltwin"
+    },
+
+    "filesystem" : {
+        "path" : "~/.publisher/pubish"
     }
 }

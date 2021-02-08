@@ -3,6 +3,7 @@ var router = express.Router();
 const asyncHandler = require('express-async-handler')
 
 var drive = require('../../drive.js')
+const cache = require('../../cache.js')
 
 router.get('/', (req, res) => {
     res.json({"one": 1})    
@@ -10,8 +11,20 @@ router.get('/', (req, res) => {
 
 // create new
 router.post('/drive', asyncHandler(async (req, res) => {
-    const key = await drive.create()
-    return res.json({"key": key})    
+    try{
+        var body = req.body
+        if(!body.name){
+            return res.status(400).json('');
+        }
+        if(cache[body.name]){
+            return res.status(419).json('duplicated');
+        }
+        const key = await drive.create(body.name)
+        return res.json({"key": key})    
+    }catch(e){
+        console.log(e)
+        return res.status(400).json('wrong body payload');
+    }
 }))
 
 

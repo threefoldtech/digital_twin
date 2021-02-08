@@ -11,40 +11,43 @@ const cache = require('./cache.js')
 let client
 let server
 
-async function create(){
+async function create(name){
     let drive = new HyperDrive(client.corestore(), null)
     await drive.promises.ready()
 
     const key = drive.key.toString('hex')
     console.log(chalk.green('✓ (HyperSpace Drive) created'))
-    console.log(chalk.blue(`\t✓ ${key}`))
+    console.log(chalk.blue(`\t✓ ${name} (${key})`))
 
     await client.replicate(drive)
     await new Promise(r => setTimeout(r, 3e3)) // just a few seconds
     await client.network.configure(drive, {announce: false, lookup: false})
-    db.keys.push(key)
+    db.hyperdrives.push({"name": name, "key": key})
     fs.writeFile('db/drives.json', JSON.stringify(db), function(err) {
         if (err) {
             console.log(chalk.red('Error saving key to db'));
         }
     });
     cache.drives[key] = drive
+    cache.drives[name] = drive
     return key
 }
 
-async function get(id){
-    return cache.drives[id]
+async function get(id_or_name){
+    return cache.drives[id_or_name]
 }
 
 async function load(){
-    db.keys.map( async function(item) {
+    db.hyperdrives.map( async function(item) {
         let drive = new HyperDrive(client.corestore(), item)
         await drive.promises.ready()
         await client.replicate(drive)
         await new Promise(r => setTimeout(r, 3e3)) // just a few seconds
         await client.network.configure(drive, {announce: false, lookup: false})
-        console.log(chalk.blue(`✓ (HyperSpace Drive) loaded ${item}`))
-        cache.drives[item] = drive
+        console.log(chalk.blue(`✓ (HyperSpace Drive) loaded ${item.name} (${item.key})`))
+        cache.drives[item.name] = drive
+        cache.drives[item.id] = drive
+
     })
 }
 
@@ -57,7 +60,7 @@ async function ensureHyperSpace () {
         await client.ready()
     } catch (e) {
         // no daemon, start it in-process
-        server = new HyperspaceServer({storage: config.storage})
+        server = new HyperspaceServer({storage: config.filesystem.path})
         await server.ready()
         client = new HyperspaceClient()
         await client.ready()
