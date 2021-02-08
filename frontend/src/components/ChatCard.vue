@@ -19,21 +19,25 @@
                   {{ m(chat.lastMessage.timeStamp).fromNow() }}
                 </span>
       </p>
-      <p class="font-thin truncate" v-if="status">{{status.isOnline ? "Is online" : "Is offline"}}</p>
+      <p class="font-thin truncate" v-if="status">{{ status.isOnline ? "Is online" : "Is offline" }}</p>
       <p class="font-thin truncate" v-if="status && status.status">{{ status.status }}</p>
-      <p class="font-thin truncate" v-if="chat.lastMessage">
-        {{ chat.lastMessage.body }}
+      <p class="font-thin truncate" v-if="newMessages >= 1">
+        new messages: {{ newMessages }}
       </p>
-      <p class="font-thin truncate" v-else>No chats yet</p>
+      <p class="font-thin truncate" v-else>No new chats yet</p>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import {
+  computed,
   defineComponent, ref,
 } from "vue";
 import {fetchStatus} from "@/store/statusStore";
+import {findLastIndex} from "lodash";
+import {useAuthState} from "@/store/authStore";
+import {Message, MessageBodyType} from "@/types";
 
 
 export default defineComponent({
@@ -48,7 +52,19 @@ export default defineComponent({
       status.value = await fetchStatus(props.chat.chatId);
     }, 5000)
 
-    return {status}
+
+    const {user} = useAuthState();
+
+    const lastReadByMe = computed(() => {
+      let lastReadMessage = props.chat.read[<string>user.id];
+      return findLastIndex(props.chat.messages, (message: Message<MessageBodyType>) => lastReadMessage === message.id)
+    })
+
+    const newMessages = computed(() => {
+      return props.chat.messages.length - lastReadByMe.value - 1
+    })
+
+    return {status, newMessages, lastReadByMe}
   },
 });
 </script>

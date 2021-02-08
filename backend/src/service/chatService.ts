@@ -36,10 +36,18 @@ export const getMessagesFromId = (chatId: IdInterface) =>
 export const setChatToAccepted = (chatId: IdInterface) =>
     true
 
+    //@TODO filter for acceptedchatss
 export const getAcceptedChats = () => {
     return getChatIds()
         .map((chatid) => getChat(chatid))
-        .filter((chat) => chat.acceptedChat);
+        // .filter((chat) => chat.acceptedChat);
+};
+
+// @TODO will need to use this later
+export const getChatRequests = () => {
+    return getChatIds()
+        .map((chatid) => getChat(chatid))
+        .filter((chat) => !chat.acceptedChat);
 };
 
 export const getChatById = (id: IdInterface) => {

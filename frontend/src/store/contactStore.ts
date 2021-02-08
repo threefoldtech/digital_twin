@@ -12,18 +12,10 @@ import { Message, PersonChat, DtId } from "../types/index"
 
 
 const state = reactive<State>({
-    contacts:[],
-    connectionRequests: []
+    contacts:[]
 });
 
 const retrieveContacts = async () => {
-    axios.get(`${config.baseUrl}api/contactRequests`).then(function(response) {
-        console.log("connectionrequests",response.data)
-        response.data.forEach( (contact:Contact) => {
-            addConnectionRequests(contact)
-        });
-    })
-
     return axios.get(`${config.baseUrl}api/contacts`).then(function(response) {
         const contacts = response.data
         console.log(`here are the contacts`, contacts)
@@ -69,35 +61,13 @@ const addContact = (username:DtId, location, dontCheck = false) => {
             read: {},
             chatId:username,
             messages:[addMessage],
-            name: chatname.toString()
+            name: chatname.toString(),
+            acceptedChat: true
         }
         addChat(chat)
     })
 }
 
-const addConnectionRequests = (contact:Contact) => {
-    state.connectionRequests.push(contact)
-}
-
-const moveConnectionRequestToContacts = (id) => {
-    const {addChat} = usechatsActions()
-    axios.post(`${config.baseUrl}api/contacts?id=${id}`).then( (res) => {
-        const index = state.connectionRequests.findIndex(c=>c.id==id)
-        console.log(state.connectionRequests[index])
-        const messages:Message<String>[] = res.data
-        const chat:PersonChat = {
-            read: {},
-            chatId:id,
-            messages:messages,
-            name: id
-        }
-        console.log(chat)
-        addChat(chat)
-        // @ts-ignore
-        state.contacts.push({id: state.connectionRequests[index].id, name: state.connectionRequests[index].username})
-        state.connectionRequests.splice(index,1)
-    })
-}
 
 export const useContactsState = () => {
     return {
@@ -109,13 +79,10 @@ export const useContactsActions = () => {
     return {
         retrieveContacts,
         // setLastMessage,
-        addContact,
-        addConnectionRequests,
-        moveConnectionRequestToContacts
+        addContact
     }
 }
 
 interface State {
-    contacts: Contact[],
-    connectionRequests: Contact[]
+    contacts: Contact[]
 }

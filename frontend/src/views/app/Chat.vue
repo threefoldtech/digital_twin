@@ -18,24 +18,27 @@
           </button>
         </div>
 
-        <div v-if="connectionRequests.length > 0">
+        <div v-if="chatRequests.length > 0">
           <h2 style="font-size: 1.5em">
             You have
-            <span style="color: red"> {{ connectionRequests.length }} </span>
-            new connection request<span v-if="connectionRequests.length > 1"
+            <span style="color: red"> {{ chatRequests.length }} </span>
+            new connection request<span v-if="chatRequests.length > 1"
           >s</span
           >
           </h2>
-          <div v-for="(connRequest, i) in connectionRequests" :key="i">
+          <div v-for="(chat, i) in chatRequests" :key="i">
             <div class="grid grid-cols-12 w-full rounded-lg mb-2 py-2">
-              <span class="truncate col-span-8">{{
-                  connRequest.username
-                }}</span>
+              <span v-if="chat.isGroup" class="truncate col-span-8">
+                {{chat.admin}} invited you to {{ chat.name }}
+              </span>
+              <span v-else class="truncate col-span-8">
+                <b>{{ chat.name }}</b> wants to have a chat  
+              </span>
               <button
                   class="col-span-4"
-                  @click="addConnectionRequestToContacts(connRequest.id)"
+                  @click="acceptChatRequest(chat.chatId)"
               >
-                Add to contacts
+                Accept Chat
               </button>
             </div>
           </div>
@@ -58,7 +61,7 @@
         <div class="absolute w-full px-2">
           <ChatCard
               v-for="(chat, i) in filteredChats"
-              :key="i"
+              :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
               class="grid grid-cols-12 rounded-lg mb-2 py-2"
               :class="{
               'bg-white': chat.chatId !== selectedId,
@@ -120,13 +123,12 @@ export default defineComponent({
   name: "Apps",
   components: {addContact, chatView, jdialog: Dialog, ChatCard},
   setup(_, context) {
-    const { chats } = usechatsState();
+    const { chats, chatRequests } = usechatsState();
     const { updateUserInfo } = useAuthActions();
-    const { connectionRequests } = useContactsState();
     const { retrievechats } = usechatsActions();
     const {
       retrieveContacts,
-      moveConnectionRequestToContacts,
+      // moveConnectionRequestToContacts,
     } = useContactsActions();
     const {initializeSocket} = useSocketActions();
     const {user} = useAuthState();
@@ -165,9 +167,10 @@ export default defineComponent({
       });
     });
 
-    const addConnectionRequestToContacts = (id) => {
-      moveConnectionRequestToContacts(id);
-      console.log(id);
+    const acceptChatRequest = (id) => {
+      const {acceptChat} = usechatsActions()
+      acceptChat(id);
+      console.log("TODO here",id);
     };
 
     onBeforeMount(()=>{
@@ -184,13 +187,13 @@ export default defineComponent({
       selectedId,
       setSelected,
       chats,
-      // contacts,
-      connectionRequests,
-      addConnectionRequestToContacts,
+      chatRequests,      
       searchValue,
       filteredChats,
       showDialog,
       showContacts,
+      user,
+      acceptChatRequest,
       m,
     };
   },
