@@ -1,7 +1,7 @@
-import { Message } from "@/types";
+import {DtId, Id, Message} from "@/types";
 import { reactive } from "@vue/reactivity";
 import { inject } from "vue";
-import {handleRead, usechatsActions} from "./chatStore";
+import {handleRead, removeChat, usechatsActions} from "./chatStore";
 import { useContactsActions } from "./contactStore";
 import { useAuthState } from "@/store/authStore";
 
@@ -16,6 +16,10 @@ const initializeSocket = (username: string) => {
     });
     state.socket.emit("identify", {
         name: username,
+    });
+    state.socket.on("chat_removed", (chatId) => {
+        console.log('chat_removed')
+        removeChat(chatId)
     });
     state.socket.on("message", (message) => {
         console.log(message);
@@ -59,12 +63,16 @@ const sendSocketMessage = async (
 // };
 
 const sendSocketAvatar = async (avatar: ArrayBuffer) => {
-  const url = `${window.location.origin}/api/user/avatar`.replace("http://localhost:8080","http://localhost:3000")
-  const data = {
-    avatar,
-    url
-  }
-  state.socket.emit("new_avatar", data);
+    const url = `${window.location.origin}/api/user/avatar`.replace("http://localhost:8080","http://localhost:3000")
+    const data = {
+        avatar,
+        url
+    }
+    state.socket.emit("new_avatar", data);
+};
+
+export const sendRemoveChat = async (id: Id) => {
+    state.socket.emit("remove_chat", id);
 };
 
 const sendSocketUserStatus = async (status: string) => {

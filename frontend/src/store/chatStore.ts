@@ -8,7 +8,7 @@ import {
   Message,
   GroupChat,
   MessageBodyType,
-  PersonChat
+  PersonChat, DtId
 } from "../types";
 import { useSocketActions } from "./socketStore";
 import { useAuthState } from "./authStore";
@@ -49,6 +49,14 @@ const addChat = (chat: Chat) => {
     state.chatRequests.push(chat);
   }
   sortChats();
+};
+
+export const removeChat = (chatId) => {
+  console.log('remove')
+  state.chats = state.chats.filter(c => c.chatId !== chatId)
+  console.log(state.chats)
+  sortChats();
+
 };
 
 const addGroupchat = (name: string, contacts: Contact[]) => {
@@ -267,6 +275,7 @@ export const handleRead = (message: Message<string>) => {
   ) {
     return;
   }
+
 
   chat.read[<string>message.from] = message.body;
 };

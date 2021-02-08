@@ -19,7 +19,7 @@
         </p> -->
       </div>
       <div class="col-end-13 pr-2 flex justify-end">
-        <button class="text-red-600">Delete</button>
+        <button @click="deleteChat" class="text-red-600">Delete</button>
 
         <button @click="popupMeeting" class="flex flex-col items-center justify-center">
           <i class="fas fa-video"></i>
@@ -65,6 +65,7 @@ import ChatInput from "@/components/ChatInput.vue";
 import {popupCenter} from "@/services/popupService";
 import * as crypto from "crypto-js";
 import AvatarImg from "@/components/AvatarImg.vue";
+import {sendRemoveChat} from "@/store/socketStore";
 
 
 export default defineComponent({
@@ -142,6 +143,10 @@ export default defineComponent({
       popupCenter('https://meetings.jimber.org/room/' + ID, "Threefold login", 800, 550)
     }
 
+    const deleteChat = () => {
+      sendRemoveChat(chat.value.chatId)
+    }
+
     return {
       chats,
       chat,
@@ -156,6 +161,7 @@ export default defineComponent({
       popupMeeting,
       lastRead,
       lastReadByMe,
+      deleteChat,
       ...propRefs,
     };
   },
