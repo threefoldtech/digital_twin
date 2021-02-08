@@ -23,16 +23,6 @@ router.get("/", (req, res) => {
 });
 
 router.post("/", (req, res) => {
-    if(req.query.id){
-        //Flow to add contact request to contacts
-        const id = req.query.id
-        const index = contactRequests.findIndex(c=>c.id==id)
-        contacts.push(contactRequests[index]);
-        contactRequests.splice(index,1)
-        res.json([]);
-        return
-    }
-
     const con = req.body;
     const contact = new Contact(con.id, con.location);
 

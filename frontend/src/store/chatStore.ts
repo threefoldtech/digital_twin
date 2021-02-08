@@ -2,7 +2,7 @@ import { reactive } from "@vue/reactivity";
 import { toRefs } from "vue";
 import axios from "axios";
 import moment from "moment";
-import { Chat, Contact, Message, GroupChat, MessageBodyType } from "../types";
+import { Chat, Contact, Message, GroupChat, MessageBodyType, PersonChat } from "../types";
 import { useSocketActions } from "./socketStore";
 import { useAuthState } from "./authStore";
 import { useContactsActions } from "./contactStore";
@@ -10,7 +10,8 @@ import config from "../../public/config/config";
 import { uuidv4 } from "@/common";
 
 const state = reactive<chatstate>({
-  chats: []
+  chats: [],
+  chatRequests: []
 });
 
 const retrievechats = async () => {
@@ -29,7 +30,11 @@ const retrievechats = async () => {
 };
 
 const addChat = (chat: Chat) => {
-  state.chats.push(chat);
+  if(chat.acceptedChat){
+    state.chats.push(chat);
+  }else{
+    state.chatRequests.push(chat)
+  }
   sortChats();
 };
 
@@ -50,7 +55,8 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
     ],
     name: name,
     adminId: user.id,
-    read: {}
+    read: {},
+    acceptedChat: true
   };
   axios
     .put(`${config.baseUrl}api/group`, newGroupchat)
@@ -61,6 +67,15 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
       console.log("failed to add groupchat", e);
     });
 };
+
+const acceptChat = (id) => {
+  axios.post(`${config.baseUrl}api/chats?id=${id}`).then( (res) => {
+      const index = state.chatRequests.findIndex(c=>c.chatId==id)
+      console.log(state.chatRequests[index])
+      state.chats.push(state.chatRequests[index])
+      state.chatRequests.splice(index,1)
+  })
+}
 
 const addMessage = (chatId, message) => {
   if (message.type === "READ") {
@@ -205,12 +220,14 @@ export const usechatsActions = () => {
     sendFile,
     sendMessageObject,
     addGroupchat,
-    readMessage
+    readMessage,
+    acceptChat
   };
 };
 
 interface chatstate {
   chats: Chat[];
+  chatRequests: Chat[];
 }
 
 export const handleRead = (message: Message<string>) => {

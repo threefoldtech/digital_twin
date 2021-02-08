@@ -30,8 +30,8 @@ const initializeSocket = (username: string) => {
     addMessage(message.to === user.id ? message.from : message.to, message);
   });
   state.socket.on("connectionRequest", (newContactRequest) => {
-    const { addConnectionRequests } = useContactsActions();
-    addConnectionRequests(newContactRequest);
+    const { addChat } = usechatsActions();
+    addChat(newContactRequest);
   });
 };
 

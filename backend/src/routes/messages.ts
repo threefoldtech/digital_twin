@@ -1,4 +1,5 @@
-import {IdInterface, MessageOperations} from './../types/index';
+import { persistChat } from './../service/dataService';
+import {IdInterface, MessageOperations, PersonChatInterface} from './../types/index';
 import {Router} from 'express';
 import Message from "../models/message";
 import {contactRequests} from "../store/contactRequests";
@@ -11,11 +12,34 @@ import {persistMessage} from "../service/chatService";
 import {getChat} from "../service/dataService";
 import {config} from "../config/config";
 import {sendMessageToApi} from "../service/apiService";
+import Chat from '../models/chat';
+import { uuidv4 } from '../common';
 
 const router = Router();
 
 function handleContactRequest(message: Message<ContactRequest>) {
     contactRequests.push(<Contact><unknown>message.body)
+    const otherContact = new Contact(<string>message.body.id,message.body.location)
+    //@TODO fix this location with config
+    const myself = new Contact(<string>config.userid,`${config.userid}-chat`)
+    const requestMsg:Message<String> = {
+        from:message.from,
+        to: message.to,
+        body: `You've received a new message request from ${message.from}`,
+        id:uuidv4(),
+        type: MessageTypes.STRING,
+        timeStamp: new Date()
+    }
+    const newchat =  new Chat(
+        message.from,
+        [myself,otherContact],
+        false,
+        [requestMsg],
+        <string>message.from,
+        false,
+        message.from
+    )
+    persistChat(newchat)
 }
 
 // Should be externally availble
