@@ -39,6 +39,7 @@ function handleContactRequest(message: Message<ContactRequest>) {
         false,
         message.from
     )
+    sendEventToConnectedSockets(connections,"connectionRequest",newchat)
     persistChat(newchat)
 }
 

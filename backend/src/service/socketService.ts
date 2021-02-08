@@ -81,7 +81,6 @@ export const startSocketIo = (httpServer: http.Server) => {
             console.log("updatemsgdata", messageData)
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
             editMessage(messageData.chatId, newMessage)
-            console.log(contacts)
             let location1 = getLocationForId(<string>newMessage.to);
             sendMessageToApi(location1, newMessage, MessageOperations.UPDATE)
         })
