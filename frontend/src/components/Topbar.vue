@@ -5,7 +5,7 @@
       class="col-end-13 text-right text-gray-500 flex items-center justify-end"
     >
       <AvatarImg :id="user.id"/>
-      <span class="mr-2">{{ user.id }}</span>
+      <span class="ml-2">{{ user.id }}</span>
       <button @click="showDialog = true">
         <i class="fas fa-cog text-gray-500"></i>
       </button>

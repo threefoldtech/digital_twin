@@ -44,7 +44,6 @@ export default defineComponent({
   setup(props) {
     const { user } = useAuthState();
 
-    // TODO: this doesn;t work
     const lastReadByMe = computed(() => {
       let lastReadMessage = props.chat.read[<string>user.id];
       return findLastIndex(
@@ -60,9 +59,7 @@ export default defineComponent({
       return props.chat.messages.length - lastReadByMe.value - 1;
     });
     const timeAgo = (time) => {
-      console.log({time})
       return moment(time).fromNow()
-      return props.chat.messages.length - lastReadByMe.value - 1;
     };
 
     const status = computed( () => {
