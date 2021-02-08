@@ -134,6 +134,7 @@ export default defineComponent({
 
     const contactAdd = () => {
       try {
+        console.log(usernameAdd.value)
         addContact(usernameAdd.value, location.value, false);
         usernameAdd.value = "";
         contactAddError.value = "";

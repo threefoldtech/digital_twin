@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full">
+  <div class="relative w-full" @keydown.esc="showOptions = false" @focusout="showOptions = false">
     <input
       v-model="searchTerm"
       @input="handleInput"
@@ -76,6 +76,7 @@ export default defineComponent({
     };
 
     const handleInput = (evt) => {
+      emit("update:modelValue", evt.target.value);
       showOptions.value = true;
     };
 
