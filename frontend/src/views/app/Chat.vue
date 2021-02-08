@@ -80,6 +80,9 @@
 
     <div class="md:col-span-6 w-full h-full relative">
       <chat-view v-if="selectedId && chats.find((c) => c.chatId === selectedId)" :selectedId="selectedId" :key="selectedId" @showContacts="showContacts=true"></chat-view>
+      <div class="text-center" v-else-if="chats.length >= 1">
+        select a chat on the left
+      </div>
       <div v-else class="text-center">
         <p>It feels lonely over here :(</p>
         <button
