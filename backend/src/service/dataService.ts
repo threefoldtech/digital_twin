@@ -1,7 +1,6 @@
 import {IdInterface, UserInterface} from './../types/index';
 import {config} from "../config/config";
 import fs from "fs";
-import User from "../models/user";
 import Chat from "../models/chat";
 import {parseChat} from "./chatService";
 
@@ -77,3 +76,19 @@ export const saveAvatar = (fileBuffer: Buffer) => {
     const path = `${config.baseDir}user/avatar`
     fs.writeFileSync(path, fileBuffer)
 }
+
+export const persistBlocklist = (blockList: string[]) => {
+    const location = config.baseDir + "user/blockList.json"
+    fs.writeFileSync(location, JSON.stringify(blockList, null, 4), {flag: 'w'})
+    return
+};
+
+
+export const getBlocklist = ():string[] => {
+    const location = config.baseDir + "user/blockList.json";
+    try {
+        return JSON.parse(fs.readFileSync(location).toString());
+    } catch {
+        return []
+    }
+};

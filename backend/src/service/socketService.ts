@@ -91,12 +91,10 @@ export const startSocketIo = (httpServer: http.Server) => {
             saveAvatar(avatar)
             user.updateAvatar(url)
         });
-<<<<<<< HEAD
         socket.on('status_update', (data) => {
             const status = data.status
             user.updateStatus(status)
         })
-=======
         socket.on('remove_chat', (id) => {
             const success = deleteChat(id);
             if (!success) {
@@ -105,7 +103,6 @@ export const startSocketIo = (httpServer: http.Server) => {
             sendEventToConnectedSockets('chat_removed', id)
 
         });
->>>>>>> 66f83f3f89a870e68c8eb8285d3894297611805c
 
     });
 }
