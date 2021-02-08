@@ -60,7 +60,7 @@ router.put("/", (req, res) => {
     if (message.type === MessageTypes.CONTACT_REQUEST) {
         if (blockList.includes(<string>message.from) ){
             //@todo what should i return whenblocked
-            res.json({status:"success"})
+            res.json({status:"blocked"})
             return;
         }
 
@@ -74,7 +74,7 @@ router.put("/", (req, res) => {
 
     if (blockList.includes(<string>chatId) ){
         //@todo what should i return whenblocked
-        res.json({status:"success"})
+        res.json({status:"blocked"})
         return;
     }
 
