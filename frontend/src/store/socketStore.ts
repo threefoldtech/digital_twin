@@ -67,6 +67,13 @@ const sendSocketAvatar = async (avatar: ArrayBuffer) => {
   state.socket.emit("new_avatar", data);
 };
 
+const sendSocketUserStatus = async (status: string) => {
+  const data = {
+    status
+  }
+  state.socket.emit("status_update",data)
+}
+
 const getSocket = () => {
   return state.socket;
 };
@@ -76,6 +83,7 @@ export const useSocketActions = () => {
     initializeSocket,
     sendSocketMessage,
     sendSocketAvatar,
+    sendSocketUserStatus
   };
 };
 

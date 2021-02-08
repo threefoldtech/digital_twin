@@ -4,7 +4,7 @@
     <div
       class="col-end-13 text-right text-gray-500 flex items-center justify-end"
     >
-      <AvatarImg :id="user.id"/>
+      <AvatarImg :id="user.id" />
       <span class="mr-2">{{ user.id }}</span>
       <button @click="showDialog = true">
         <i class="fas fa-cog text-gray-500"></i>
@@ -17,41 +17,47 @@
 
       <div>Username: {{ user.id }}</div>
       <div>
-        Status: {{user.status}}
-        <input v-model="userStatus" />
+        Status: {{ user.status }}
+        <button class="px-2 py-8" @click="setEditStatus(true)">
+          <i class="fas fa-pen"></i>
+        </button>
+        <div v-if="isEditingStatus">
+          <input v-model="userStatus" />
+          <button @click="sendNewStatus">Update Status</button>
+        </div>
       </div>
       <div>
         Avatar:
         <img :src="user.image" />
       </div>
       <!-- <template> -->
-        <div class="flex">
-          <button class="px-2 py-8 " @click.stop="selectFile">
-            <i
-              class="fas fa-paperclip text-gray-500 transform"
-              style="--tw-rotate: -225deg"
-            ></i>
-          </button>
-          <input
-            class="hidden"
-            type="file"
-            id="fileinput"
-            ref="fileinput"
-            @change="changeFile"
-          />
-          <div
-            class="file-message col-span-6 w-full h-full pl-4 bg-blue-100"
-            v-if="file"
-          >
-            <span class="truncate"> {{ file.name }}</span>
-            <button class="px-2 py-8" @click.stop="removeFile">
-              <i class="fas fa-minus-circle text-gray-500"></i>
-            </button>
-          </div>
-          <button class="px-2 py-8" @click="sendNewAvatar">
-            <i class="fas fa-paper-plane"></i>
+      <div class="flex">
+        <button class="px-2 py-8" @click.stop="selectFile">
+          <i
+            class="fas fa-paperclip text-gray-500 transform"
+            style="--tw-rotate: -225deg"
+          ></i>
+        </button>
+        <input
+          class="hidden"
+          type="file"
+          id="fileinput"
+          ref="fileinput"
+          @change="changeFile"
+        />
+        <div
+          class="file-message col-span-6 w-full h-full pl-4 bg-blue-100"
+          v-if="file"
+        >
+          <span class="truncate"> {{ file.name }}</span>
+          <button class="px-2 py-8" @click.stop="removeFile">
+            <i class="fas fa-minus-circle text-gray-500"></i>
           </button>
         </div>
+        <button class="px-2 py-8" @click="sendNewAvatar">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </div>
       <!-- </template> -->
 
       <!-- @closeDialog="showDialog = false"> -->
@@ -60,21 +66,22 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useAuthState } from "../store/authStore";
-import { useSocketActions } from "../store/socketStore"
+import { useSocketActions } from "../store/socketStore";
 import Dialog from "./Dialog.vue";
 import AvatarImg from "@/components/AvatarImg.vue";
 
 export default defineComponent({
   name: "Topbar",
-  components: {AvatarImg, jdialog: Dialog },
+  components: { AvatarImg, jdialog: Dialog },
   setup() {
     const { user } = useAuthState();
     const showDialog = ref(false);
     const fileinput = ref();
     const file = ref();
-    const userStatus = ref(user.status)
+    const userStatus = ref("");
+    const isEditingStatus = ref(false);
 
     const selectFile = () => {
       fileinput.value.click();
@@ -86,10 +93,23 @@ export default defineComponent({
       file.value = null;
     };
 
-    const sendNewAvatar =  async () => {
-      const {sendSocketAvatar} = useSocketActions()
-      const buffer = await file.value.arrayBuffer()
-      sendSocketAvatar(buffer)
+    const sendNewAvatar = async () => {
+      const { sendSocketAvatar } = useSocketActions();
+      const buffer = await file.value.arrayBuffer();
+      sendSocketAvatar(buffer);
+    };
+
+    const setEditStatus = (edit: boolean) => {
+      console.log(edit)
+      isEditingStatus.value = edit;
+      userStatus.value = user.status;
+    };
+    const sendNewStatus = async () => {
+      const { sendSocketUserStatus } = useSocketActions();
+      sendSocketUserStatus(userStatus.value);
+      user.status = userStatus.value;
+      isEditingStatus.value = false;
+
     };
 
     return {
@@ -101,7 +121,10 @@ export default defineComponent({
       changeFile,
       removeFile,
       sendNewAvatar,
-      userStatus
+      sendNewStatus,
+      userStatus,
+      setEditStatus,
+      isEditingStatus
     };
   },
 });
