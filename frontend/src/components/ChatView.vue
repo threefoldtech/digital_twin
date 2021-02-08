@@ -65,6 +65,7 @@ import ChatInput from "@/components/ChatInput.vue";
 import {popupCenter} from "@/services/popupService";
 import * as crypto from "crypto-js";
 import AvatarImg from "@/components/AvatarImg.vue";
+import {sendRemoveChat} from "@/store/socketStore";
 
 
 export default defineComponent({
@@ -143,7 +144,7 @@ export default defineComponent({
     }
 
     const deleteChat = () => {
-
+      sendRemoveChat(chat.value.chatId)
     }
 
     return {
