@@ -1,11 +1,9 @@
 import {getBlocklist, persistChat} from './../service/dataService';
-import {IdInterface, MessageOperations, PersonChatInterface} from './../types/index';
 import {Router} from 'express';
 import Message from "../models/message";
 import {contactRequests} from "../store/contactRequests";
 import {sendEventToConnectedSockets} from "../service/socketService";
-import {connections} from "../store/connections";
-import {ContactRequest, MessageBodyTypeInterface, MessageTypes} from "../types";
+import {ContactRequest, MessageBodyTypeInterface, MessageTypes, MessageOperations} from "../types";
 import Contact from "../models/contact";
 import {editMessage, handleRead, parseMessage} from "../service/messageService";
 import {persistMessage} from "../service/chatService";
@@ -13,7 +11,7 @@ import {getChat} from "../service/dataService";
 import {config} from "../config/config";
 import {sendMessageToApi} from "../service/apiService";
 import Chat from '../models/chat';
-import { uuidv4 } from '../common';
+import {uuidv4} from '../common';
 
 const router = Router();
 
@@ -88,7 +86,7 @@ router.put("/", (req, res) => {
     if (chat.isGroup && chat.adminId == config.userid ){
         chat.contacts.filter(c => c.id !== config.userid).forEach(c => {
             console.log(`group sendMessage to ${c.id}`)
-            sendMessageToApi(c.id, message,MessageOperations.NEW);
+            sendMessageToApi(c.id, message);
         })
 
 
@@ -117,6 +115,13 @@ router.put("/", (req, res) => {
         return;
     }
 
+    if (message.type === MessageTypes.EDIT || message.type === MessageTypes.DELETE) {
+        editMessage(chatId,message)
+        sendEventToConnectedSockets("message", message)
+        res.json({status:"success"})
+        return;
+    }
+
 
     if (message.type === MessageTypes.READ) {
         handleRead(message as Message<string>);
@@ -134,25 +139,5 @@ router.put("/", (req, res) => {
 
     res.sendStatus(200);
 });
-
-// router.put("/file", (req, res) => {
-//     if(!req.query.chatId){
-//         res.status(403).json({status:'Forbidden',reason:'ChatId is required as a parameter'})
-//         return
-//     }
-//     res.sendStatus(200)
-// })
-
-router.patch("/", (req,res) => {
-    if(!req.query.chatId){
-        return res.status(500).json("Please provide chatId and messageId")
-    }
-    const chatId:IdInterface = <IdInterface>req.query.chatId
-    const msg = req.body;
-    const message: Message<MessageBodyTypeInterface> = parseMessage(msg);
-    editMessage(chatId,message)
-    sendEventToConnectedSockets("message", message)
-    res.sendStatus(200)
-})
 
 export default router

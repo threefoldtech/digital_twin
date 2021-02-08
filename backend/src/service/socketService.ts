@@ -57,12 +57,12 @@ export const startSocketIo = (httpServer: http.Server) => {
 
             if (newMessage.type === MessageTypes.READ) {
                 handleRead(<Message<string>>newMessage);
-                sendMessageToApi(location, newMessage, MessageOperations.NEW)
+                sendMessageToApi(location, newMessage)
                 return;
             }
 
             persistMessage(chat.chatId, newMessage);
-            sendMessageToApi(location, newMessage, MessageOperations.NEW)
+            sendMessageToApi(location, newMessage)
         });
 
         socket.on('slice upload', (data) => {
@@ -82,7 +82,7 @@ export const startSocketIo = (httpServer: http.Server) => {
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
             editMessage(messageData.chatId, newMessage)
             let location1 = getLocationForId(<string>newMessage.to);
-            sendMessageToApi(location1, newMessage, MessageOperations.UPDATE)
+            sendMessageToApi(location1, newMessage)
         })
         socket.on('new_avatar', (data) => {
             console.log(data)

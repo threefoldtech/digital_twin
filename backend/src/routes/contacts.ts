@@ -46,7 +46,7 @@ router.post("/", (req, res) => {
         "timeStamp": new Date()
     }
     console.log("sending to ",url)
-    sendMessageToApi(contact.location,data,MessageOperations.NEW)
+    sendMessageToApi(contact.location,data)
     sendEventToConnectedSockets("connectionRequest",chat)
 });
 
