@@ -70,6 +70,9 @@
         />
         {{ message.body.message }}
       </div>
+      <div v-else-if="message.type === 'GIF'">
+        <img :src="message.body"/>
+      </div>
       <div v-else>
         {{ message.body }}
       </div>

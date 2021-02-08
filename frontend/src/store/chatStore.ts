@@ -139,7 +139,7 @@ const addMessage = (chatId, message) => {
   setLastMessage(chatId, message);
 };
 
-const sendMessage = (chatId, message) => {
+const sendMessage = (chatId, message, type: string = "STRING") => {
   const { sendSocketMessage } = useSocketActions();
   const { user } = useAuthState();
   const msg: Message<String> = {
@@ -148,7 +148,7 @@ const sendMessage = (chatId, message) => {
     from: user.id,
     to: chatId,
     timeStamp: new Date(),
-    type: "STRING"
+    type: type
   };
   addMessage(chatId, msg);
   sendSocketMessage(chatId, msg);

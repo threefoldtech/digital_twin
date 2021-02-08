@@ -5,10 +5,16 @@
     <!--      >{{ contact.name }} is typing ...-->
     <!--    </span>-->
     <!--    </p>-->
-
+    <GifSelector v-if="showGif" v-on:sendgif="sendGif" style="z-index: 10000" v-on:close="hideGif"/>
+    <div class="overlay" :class="{hidden: !showGif}" @click="hideGif"
+         style="position: fixed; width: 100vw; height: 100vh; background:transparent; top: 0; left: 0; z-index: 9999">
+    </div>
     <div
         class="flex rounded-xl h place-items-center bg-white mx-4 px-4"
     >
+      <button class="px-2 py-8" @click.stop="toggleGif">
+        <h2>GIF</h2>
+      </button>
       <button class="px-2 py-8" @click.stop="selectFile">
         <i class="fas fa-paperclip text-gray-500 transform" style="--tw-rotate: -225deg;"></i>
       </button>
@@ -55,10 +61,12 @@
 </template>
 <script lang="ts">
 import {nextTick, ref} from "vue";
-import {usechatsActions} from "@/store/chatStore";
+import {selectedId, usechatsActions} from "@/store/chatStore";
+import GifSelector from "@/components/GifSelector.vue";
 
 export default {
   name: 'ChatInput',
+  components: {GifSelector},
   props: {
     selectedid: {},
   },
@@ -138,6 +146,18 @@ export default {
       showEmoji.value = false
     }
 
+    const showGif = ref(true)
+    const toggleGif = () => {
+      showGif.value = !showGif.value
+    }
+    const sendGif = async (gif) => {
+      const {sendMessage} = usechatsActions()
+      sendMessage(props.selectedid, gif, "GIF")
+    }
+    const hideGif = async (gif) => {
+      showGif.value = false
+    }
+
     nextTick(() => {
       emojipicker.value.addEventListener('emoji-click', event => {
         message.value = `${message.value}${event.detail.unicode}`;
@@ -158,7 +178,11 @@ export default {
       showEmoji,
       toggleEmoji,
       hideEmoji,
-      emojipicker
+      emojipicker,
+      showGif,
+      toggleGif,
+      sendGif,
+      hideGif
     }
   }
 }

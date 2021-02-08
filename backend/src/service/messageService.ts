@@ -23,6 +23,15 @@ export const parseMessage = (
                 msg.id,
                 type
             );
+        case MessageTypes.GIF:
+            return new Message<String>(
+                msg.from,
+                msg.to,
+                msg.body,
+                new Date(msg.timeStamp),
+                msg.id,
+                type
+            );
         case MessageTypes.CONTACT_REQUEST:
             return new Message<ContactRequest>(
                 msg.from,
