@@ -42,7 +42,6 @@
         ></audio>
 
         <img
-
             v-if="message.body.filename.indexOf('.gif') !== -1"
             :src="`http://${message.from.replace(
             'localhost:8080',
