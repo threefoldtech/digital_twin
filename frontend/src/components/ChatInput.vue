@@ -146,7 +146,7 @@ export default {
       showEmoji.value = false
     }
 
-    const showGif = ref(true)
+    const showGif = ref(false)
     const toggleGif = () => {
       showGif.value = !showGif.value
     }

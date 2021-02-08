@@ -1,5 +1,5 @@
 <template>
-  <div class="test mx-4 px-4" style="width: 100%; height: 220px; overflow-x: scroll">
+  <div class="test mx-4 p-4 bg-accent" style="width: 100%; height: 220px; overflow-y: scroll">
     <input type="text" v-model="searchTerm">
     <button @click="$emit('close')">close</button>
     <img
