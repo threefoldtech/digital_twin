@@ -144,7 +144,7 @@ export default defineComponent({
       console.log(`str = ${str}`)
 
       const ID = crypto.SHA1(str)
-      popupCenter('https://meetings.jimber.org/room/' + ID, "Threefold login", 800, 550)
+      popupCenter('https://freeflowconnect.threefold.me/room/' + ID, "video chat", 800, 550)
     }
 
     const deleteChat = () => {
