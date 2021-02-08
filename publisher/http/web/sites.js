@@ -34,10 +34,11 @@ router.get('/drive/:id/sites/:sitename', asyncHandler(async (req, res) => {
     try {
         entry = await driveObj.promises.stat(filepath)
         var content = await  driveObj.promises.readFile(filepath, 'utf8');
-        content = content.split("\/assets\/").join(`/drive/${req.params.id}/sites/${req.params.sitename}/assets/`);
-        content = content.split("\/img\/").join(`/drive/${req.params.id}/sites/${req.params.sitename}/img/`);
-        content = content.split('href=\"/\"').join(`/drive/${req.params.id}/sites/${req.params.sitename}/`);
-        
+        content = content.replace(/src="\//g, `src="/drive/${req.params.id}/sites/${req.params.sitename}/`)
+            content = content.replace(/href="\//g, `href="/drive/${req.params.id}/sites/${req.params.sitename}/`)
+            content = content.replace(/data-srcset="\//g, `data-srcset="/drive/${req.params.id}/sites/${req.params.sitename}/`)
+            content = content.replace(/url\(\//g, `url(/drive/${req.params.id}/sites/${req.params.sitename}/`)
+
         return res.send(content)
        
     } catch (e) {
@@ -54,7 +55,11 @@ router.get('/drive/:id/sites/:sitename/flexsearch', asyncHandler(async (req, res
     try {
         entry = await driveObj.promises.stat(filepath)
         var content = await  driveObj.promises.readFile(filepath, 'utf8');
-        content = content.split("\/assets\/").join(`\/drive/${req.params.id}\/sites\/${req.params.sitename}\/assets\/`);
+        content = content.replace(/src="\//g, `src="/drive/${req.params.id}/sites/${req.params.sitename}/`)
+        content = content.replace(/href="\//g, `href="/drive/${req.params.id}/sites/${req.params.sitename}/`)
+        content = content.replace(/data-srcset="\//g, `data-srcset="/drive/${req.params.id}/sites/${req.params.sitename}/`)
+        content = content.replace(/url\(\//g, `url(/drive/${req.params.id}/sites/${req.params.sitename}/`)
+
         res.type("application/json");
         
         return res.send(content)
@@ -74,6 +79,7 @@ router.get('/drive/:id/sites/:sitename/*', asyncHandler(async (req, res) => {
     var str = `/drive/${req.params.id}/sites`
 
     var filepath = req.url.replace(str, "").trim()
+    console.log(filepath)
     var encoding = 'utf-8'
     if(filepath.endsWith('png') || filepath.endsWith('jpg') || filepath.endsWith('jpeg')){
         encoding = 'binary'
@@ -89,9 +95,20 @@ router.get('/drive/:id/sites/:sitename/*', asyncHandler(async (req, res) => {
     var entry = null
     try {
         entry = await driveObj.promises.stat(filepath)
+        if(entry.isDirectory()){
+            filepath = filepath + "/index.html"
+            entry = await driveObj.promises.stat(filepath)
+        }
+
         var content = await  driveObj.promises.readFile(filepath, encoding);
         if (encoding != 'binary'){
-            content = content.split("\/assets\/").join(`\/drive\/${req.params.id}\/sites\/${req.params.sitename}/assets/`);
+            content = content.replace(/src="\//g, `src="/drive/${req.params.id}/sites/${req.params.sitename}/`)
+            content = content.replace(/href="\//g, `href="/drive/${req.params.id}/sites/${req.params.sitename}/`)
+            content = content.replace(/data-srcset="\//g, `data-srcset="/drive/${req.params.id}/sites/${req.params.sitename}/`)
+            content = content.replace(/url\(\//g, `url(/drive/${req.params.id}/sites/${req.params.sitename}/`)
+            if (filepath.endsWith("js")){
+                content = content.replace(/assets/g, `drive/${req.params.id}/sites/${req.params.sitename}/assets`)
+            }
             content = content.split("/flexsearch").join(`/drive/${req.params.id}/sites/${req.params.sitename}/flexsearch`);
         }
        

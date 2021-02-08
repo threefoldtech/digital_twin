@@ -1,94 +1,116 @@
 <template>
   <div
-      class=" flex "
-      :class="{
+    @mouseover="showActions = true"
+    @mouseleave="showActions = false"
+    class="flex relative"
+    :class="{
       'justify-end': isMine(message),
-      'my-2': !disabled
+      'my-2': !disabled,
     }"
   >
-    <div class="bg-white  rounded-lg truncate"
-         :class="{
-      'bg-gray-100': disabled,
-      'p-4': !disabled
-    }">
+    <div
+      class="bg-white rounded-lg truncate"
+      :class="{
+        'bg-gray-100': disabled,
+        'p-4': !disabled,
+      }"
+    >
       <pre v-if="config.showdebug">{{ message }}</pre>
-      <div class="btn-group">
-        <button
-            v-if="(message.type == 'EDIT' || message.type == 'STRING') && !disabled"
-            @click="setEditMessage"
+      <transition name="fade">
+        <div
+          v-if="showActions"
+          class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-black text-gray-500 px-2"
         >
-          <i class="fas fa-pen text-gray-500"></i>
-        </button>
-        <button @click="setQuoteMessage" v-if="!disabled">
-          <i class="fas fa-reply-all text-gray-500"></i>
-        </button>
-        <button v-if="message.type !== 'DELETE' && !disabled" @click="sendUpdateMessage(true)">
-          <i class="fas fa-minus-circle text-gray-500"></i>
-        </button>
-      </div>
-      <br/>
+          <button
+            class="mx-0"
+            v-if="
+              (message.type == 'EDIT' || message.type == 'STRING') && !disabled
+            "
+            @click="setEditMessage"
+          >
+            <i class="fas fa-pen"></i>
+          </button>
+          <button class="mx-0" @click="setQuoteMessage" v-if="!disabled">
+            <i class="fas fa-reply-all"></i>
+          </button>
+          <button
+            class="mx-0"
+            v-if="message.type !== 'DELETE' && !disabled"
+            @click="sendUpdateMessage(true)"
+          >
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+      </transition>
       <span v-if="message.type === 'FILE'">
         <audio
-            controls
-            v-if="message.body.filename.indexOf('.WebM') !== -1"
-            :src="`https://${message.from.replace(
-            'localhost:8080',
-            'localhost:3000'
-          )}.digitaltwin.jimbertesting.be/api/files/${message.to}/${message.body.filename}`
-          .replace(
-            'https://localhost:3000.digitaltwin.jimbertesting.be/',
-            'http://localhost:3000/'
-          )"
+          controls
+          v-if="message.body.filename.indexOf('.WebM') !== -1"
+          :src="
+            `https://${message.from.replace(
+              'localhost:8080',
+              'localhost:3000'
+            )}.digitaltwin.jimbertesting.be/api/files/${message.to}/${
+              message.body.filename
+            }`.replace(
+              'https://localhost:3000.digitaltwin.jimbertesting.be/',
+              'http://localhost:3000/'
+            )
+          "
         ></audio>
 
         <img
-            v-if="message.body.filename.indexOf('.gif') !== -1"
-            :src="`http://${message.from.replace(
+          v-if="message.body.filename.indexOf('.gif') !== -1"
+          :src="`http://${message.from.replace(
             'localhost:8080',
             'localhost:3000'
           )}/api/files/${message.to}/${message.body.filename}`"
         />
-        <br/>
+        <br />
         <a
-            class="py-2 px-2 bg-green-200 border-r-2"
-            :href="`http://${message.from.replace(
+          class="py-2 px-2 bg-green-200 border-r-2"
+          :href="`http://${message.from.replace(
             'localhost:8080',
             'localhost:3000'
           )}/api/files/${message.to}/${message.body.filename}`"
-            download
-        >{{ message.body.filename }}</a
+          download
+          >{{ message.body.filename }}</a
         >
       </span>
       <div v-else-if="message.type === 'QUOTE'">
-        <b> {{ message.body.quotedMessage.from }} said: </b> <br/>
-        <MessageCard :message="message.body.quotedMessage" :chat-id="chatId" disabled/>
+        <b> {{ message.body.quotedMessage.from }} said: </b> <br />
+        <MessageCard
+          :message="message.body.quotedMessage"
+          :chat-id="chatId"
+          disabled
+        />
         {{ message.body.message }}
       </div>
       <div v-else>
         {{ message.body }}
       </div>
       <div v-if="quoteMessage" class="flex">
-        <input class="col-span-6" stype="text" v-model="quoteMessageValue"/>
+        <input class="col-span-6" stype="text" v-model="quoteMessageValue" />
         <button class="px-2 py-8" @click="sendQuoteMessage(false)">
           <i class="fas fa-paper-plane"></i>
         </button>
       </div>
       <div v-if="editMessage" class="flex">
-        <input class="col-span-6" stype="text" v-model="editMessageValue"/>
+        <input class="col-span-6" stype="text" v-model="editMessageValue" />
         <button class="px-2 py-8" @click="sendUpdateMessage(false)">
           <i class="fas fa-paper-plane"></i>
         </button>
       </div>
       <p
-          class="font-thin"
-          :class="{
+        class="font-thin"
+        :class="{
           'text-right': isMine(message),
         }"
       >
         <span v-if="message.type == 'EDIT'"> edited - </span>
         <span v-if="message.type == 'DELETE'"> deleted - </span>
 
-        <small class="font-thin text-right " v-if="isread">is read</small>
+        <small class="font-thin text-right" v-if="isread">is read</small>
         {{ m(message.timeStamp).fromNow() }}
       </p>
     </div>
@@ -96,12 +118,12 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, nextTick, ref} from "vue";
-import {useAuthState} from "../store/authStore";
+import { defineComponent, nextTick, ref } from "vue";
+import { useAuthState } from "../store/authStore";
 import moment from "moment";
-import {usechatsActions} from "../store/chatStore";
-import {Message, MessageBodyType, QuoteBodyType} from "../types/index";
-import {uuidv4} from "@/common";
+import { usechatsActions } from "../store/chatStore";
+import { Message, MessageBodyType, QuoteBodyType } from "../types/index";
+import { uuidv4 } from "@/common";
 import config from "../../public/config/config";
 
 export default defineComponent({
@@ -111,19 +133,20 @@ export default defineComponent({
     chatId: String,
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isread: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isreadbyme: {
       type: Boolean,
-      default: false
+      default: false,
     },
   },
   setup(props) {
-    const {user} = useAuthState();
+    const showActions = ref(false);
+    const { user } = useAuthState();
 
     const isMine = (message) => {
       return message.from == user.id;
@@ -136,8 +159,7 @@ export default defineComponent({
 
     const quoteMessage = ref(false);
     const quoteMessageValue = ref("");
-    const {sendMessageObject} = usechatsActions();
-
+    const { sendMessageObject } = usechatsActions();
 
     const setEditMessage = () => {
       editMessage.value = true;
@@ -146,7 +168,7 @@ export default defineComponent({
     const sendUpdateMessage = (isDelete: Boolean) => {
       editMessage.value = false;
       if (props.message.value != editMessageValue.value) {
-        const {sendMessageObject} = usechatsActions();
+        const { sendMessageObject } = usechatsActions();
         const oldmessage = props.message;
         console.log(props.message);
         const updatedMessage: Message<String> = {
@@ -170,7 +192,7 @@ export default defineComponent({
       console.log("quote");
       if (quoteMessageValue.value !== "") {
         quoteMessage.value = false;
-        const {user} = useAuthState();
+        const { user } = useAuthState();
         const messageToQuote = props.message;
         // from: user.id,
         // to: chatId,
@@ -194,16 +216,17 @@ export default defineComponent({
     };
 
     const read = () => {
-      const {readMessage} = usechatsActions()
-      readMessage(props.chatId, props.message.id)
-    }
+      const { readMessage } = usechatsActions();
+      readMessage(props.chatId, props.message.id);
+    };
     nextTick(() => {
-      if (!props.isreadbyme){
-        read()
+      if (!props.isreadbyme) {
+        read();
       }
-    })
+    });
 
     return {
+      showActions,
       isMine,
       m,
       setEditMessage,
@@ -215,7 +238,7 @@ export default defineComponent({
       quoteMessageValue,
       sendQuoteMessage,
       config,
-      read
+      read,
     };
   },
 });
