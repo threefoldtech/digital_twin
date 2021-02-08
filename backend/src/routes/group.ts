@@ -8,6 +8,7 @@ import { sendEventToConnectedSockets } from '../service/socketService';
 const router = Router();
 
 router.put('/invite', async (req, res) => {
+    console.log("received group invite")
     const chat = parseChat(req.body)
     console.log(chat)
     persistChat(chat);
@@ -24,7 +25,7 @@ router.put('/', async (req, res) => {
 
     chat.contacts.forEach(async c => {
         const dtUrl = getDigitalTwinUrl(c.location)
-        const path = `${dtUrl}/group/invite`;
+        const path = `${dtUrl}/api/group/invite`;
         console.log("sending group request to ", path)
         try {
             await axios.put(path, chat)
