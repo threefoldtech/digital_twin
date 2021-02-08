@@ -33,9 +33,8 @@
 
       </div>
       <div class="flex place-items-center">
-        <label class="mr-2" for="location">Location: {{isActive('user')}}</label>
+        <label class="mr-2" for="location">Location:</label>
         <input
-            v-if="!isActive('group')"
             id="location"
             disabled="true"
             class="mb-2"
@@ -56,15 +55,6 @@
             id="username"
             class="mb-2"
             placeholder="Group name"
-        />
-      </div>
-      <div class="flex place-items-center">
-        <label class="mr-2" for="location">Location: </label>
-        <input
-            id="location"
-            disabled="true"
-            class="mb-2"
-            :placeholder="location"
         />
       </div>
       <div

@@ -94,7 +94,7 @@ export default defineComponent({
       }
     };
     const searchResults = () => {
-      return props.data.filter((item) => {
+      return props.data.filter((item:string) => {
         return item.toLowerCase().includes(searchTerm.value.toLowerCase());
       });
     };
