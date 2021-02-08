@@ -5,6 +5,7 @@ const path = require('path');
 let config = JSON.parse(fs.readFileSync('config.json'));
 
 config.filesystem.path = resolveHome(config.filesystem.path)
+config.hyperdrive.path = resolveHome(config.hyperdrive.path)
 
 console.log(chalk.green('✓ (Config) loaded'))
 

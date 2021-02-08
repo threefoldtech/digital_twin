@@ -13,10 +13,10 @@ router.get('/', (req, res) => {
 router.post('/drive', asyncHandler(async (req, res) => {
     try{
         var body = req.body
-        if(!body.name){
+        if(!body.name ){
             return res.status(400).json('');
         }
-        if(cache[body.name]){
+        if(cache.drives[body.name] || body.name == "local"){
             return res.status(419).json('duplicated');
         }
         const key = await drive.create(body.name)

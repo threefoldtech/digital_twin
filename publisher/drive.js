@@ -46,7 +46,7 @@ async function load(){
         await client.network.configure(drive, {announce: false, lookup: false})
         console.log(chalk.blue(`✓ (HyperSpace Drive) loaded ${item.name} (${item.key})`))
         cache.drives[item.name] = drive
-        cache.drives[item.id] = drive
+        cache.drives[item.key] = drive
 
     })
 }
@@ -60,7 +60,8 @@ async function ensureHyperSpace () {
         await client.ready()
     } catch (e) {
         // no daemon, start it in-process
-        server = new HyperspaceServer({storage: config.filesystem.path})
+        console.log(config.hyperdrive.path)
+        server = new HyperspaceServer({storage: config.hyperdrive.path})
         await server.ready()
         client = new HyperspaceClient()
         await client.ready()
