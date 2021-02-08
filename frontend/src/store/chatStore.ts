@@ -134,7 +134,7 @@ const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
   console.log(chatId, message);
   addMessage(chatId, message);
   let isEdit = false;
-  if (message.type === "UPDATE") {
+  if (message.type === "EDIT" || message.type === "DELETE") {
     isEdit = true;
   }
 
