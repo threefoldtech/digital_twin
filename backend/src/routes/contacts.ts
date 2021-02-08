@@ -1,4 +1,3 @@
-import { sendEventToConnectedSockets } from './../service/socketService';
 import { sendMessageToApi } from './../service/apiService';
 import { ContactRequest, DtIdInterface, MessageInterface, MessageOperations, MessageTypes } from './../types/index';
 import { parseMessage } from './../service/messageService';
@@ -47,7 +46,6 @@ router.post("/", (req, res) => {
         "timeStamp": new Date()
     }
     console.log("sending to ",url)
-    //@todo: check if this is duplicate
     sendMessageToApi(contact.location,data,MessageOperations.NEW)
     sendEventToConnectedSockets("connectionRequest",chat)
 });
