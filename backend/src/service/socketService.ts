@@ -7,7 +7,7 @@ import {connections} from "../store/connections";
 import * as http from "http";
 import {editMessage, handleRead, parseMessage} from "./messageService";
 import {MessageBodyTypeInterface, MessageOperations, MessageTypes} from "../types";
-import {saveFile, saveAvatar} from "./dataService"
+import {saveFile, saveAvatar, deleteChat} from "./dataService"
 import {getLocationForId, sendMessageToApi} from './apiService';
 import {user} from "../store/user"
 
@@ -55,7 +55,7 @@ export const startSocketIo = (httpServer: http.Server) => {
             });
             let location = getLocationForId(<string>chat.adminId);
 
-            if (newMessage.type === MessageTypes.READ){
+            if (newMessage.type === MessageTypes.READ) {
                 handleRead(<Message<string>>newMessage);
                 sendMessageToApi(location, newMessage, MessageOperations.NEW)
                 return;
@@ -91,11 +91,19 @@ export const startSocketIo = (httpServer: http.Server) => {
             saveAvatar(avatar)
             user.updateAvatar(url)
         });
+        socket.on('remove_chat', (id) => {
+            const success = deleteChat(id);
+            if (!success) {
+                return;
+            }
+            sendEventToConnectedSockets('chat_removed', id)
+
+        });
 
     });
 }
 
-export const sendEventToConnectedSockets = (connections: Connections, event: string, body: any) => {
+export const sendEventToConnectedSockets = (event: string, body: any) => {
     connections.getConnections().forEach((connection: string) => {
         io.to(connection).emit(event, body);
         console.log(`send message to ${connection}`);

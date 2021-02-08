@@ -39,7 +39,7 @@ function handleContactRequest(message: Message<ContactRequest>) {
         false,
         message.from
     )
-    sendEventToConnectedSockets(connections,"connectionRequest",newchat)
+    sendEventToConnectedSockets("connectionRequest",newchat)
     persistChat(newchat)
 }
 
@@ -77,7 +77,7 @@ router.put("/", (req, res) => {
 
 
         console.log(`received new group message from ${message.from}`);
-        sendEventToConnectedSockets(connections, "message", message)
+        sendEventToConnectedSockets( "message", message)
 
         if (message.type === MessageTypes.READ) {
             handleRead(message as Message<string>);
@@ -114,7 +114,7 @@ router.put("/", (req, res) => {
     //
     persistMessage(chat.adminId, message);
     //
-    sendEventToConnectedSockets(connections, "message", message)
+    sendEventToConnectedSockets( "message", message)
 
     res.sendStatus(200);
 });
@@ -135,7 +135,7 @@ router.patch("/", (req,res) => {
     const msg = req.body;
     const message: Message<MessageBodyTypeInterface> = parseMessage(msg);
     editMessage(chatId,message)
-    sendEventToConnectedSockets(connections, "message", message)
+    sendEventToConnectedSockets("message", message)
     res.sendStatus(200)
 })
 

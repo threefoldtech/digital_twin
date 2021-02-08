@@ -1,7 +1,7 @@
 import {DtId, Id, Message} from "@/types";
 import { reactive } from "@vue/reactivity";
 import { inject } from "vue";
-import {handleRead, usechatsActions} from "./chatStore";
+import {handleRead, removeChat, usechatsActions} from "./chatStore";
 import { useContactsActions } from "./contactStore";
 import { useAuthState } from "@/store/authStore";
 
@@ -16,6 +16,10 @@ const initializeSocket = (username: string) => {
     });
     state.socket.emit("identify", {
         name: username,
+    });
+    state.socket.on("chat_removed", (chatId) => {
+        console.log('chat_removed')
+        removeChat(chatId)
     });
     state.socket.on("message", (message) => {
         console.log(message);
@@ -67,8 +71,8 @@ const sendSocketAvatar = async (avatar: ArrayBuffer) => {
     state.socket.emit("new_avatar", data);
 };
 
-const sendRemoveChat = async (id: Id) => {
-    state.socket.emit("delete_chat", id);
+export const sendRemoveChat = async (id: Id) => {
+    state.socket.emit("remove_chat", id);
 };
 
 const getSocket = () => {

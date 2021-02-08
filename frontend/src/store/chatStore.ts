@@ -51,6 +51,14 @@ const addChat = (chat: Chat) => {
   sortChats();
 };
 
+export const removeChat = (chatId) => {
+  console.log('remove')
+  state.chats = state.chats.filter(c => c.chatId !== chatId)
+  console.log(state.chats)
+  sortChats();
+
+};
+
 const addGroupchat = (name: string, contacts: Contact[]) => {
   const { user } = useAuthState();
   const newGroupchat: GroupChat = {
@@ -267,7 +275,7 @@ export const handleRead = (message: Message<string>) => {
   ) {
     return;
   }
-  
+
 
   chat.read[<string>message.from] = message.body;
 };
