@@ -79,7 +79,7 @@
     </div>
 
     <div class="md:col-span-6 w-full h-full relative">
-      <chat-view v-if="selectedId" :selectedId="selectedId" :key="selectedId" @showContacts="showContacts=true"></chat-view>
+      <chat-view v-if="selectedId && chats.find((c) => c.chatId === selectedId)" :selectedId="selectedId" :key="selectedId" @showContacts="showContacts=true"></chat-view>
       <div v-else class="text-center">
         <p>It feels lonely over here :(</p>
         <button
