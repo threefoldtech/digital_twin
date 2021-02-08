@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ref } from "vue";
 import { reactive } from "@vue/reactivity";
+import {useAuthState} from "@/store/authStore";
 
 export const statusList = reactive<Object>({});
 export const watchingUsers = [];
@@ -14,6 +15,14 @@ const fetchStatus = async digitalTwinId => {
   const response = await axios.get(url);
   let status = response.data;
   statusList[digitalTwinId] = status;
+
+  const {user} = useAuthState()
+
+  if (user.id === digitalTwinId){
+    user.status = status
+    user.image = status.avatar ? status.avatar : user.image
+  }
+
   return status;
 };
 
