@@ -1,7 +1,7 @@
 import { Message } from "@/types";
 import { reactive } from "@vue/reactivity";
 import { inject } from "vue";
-import { usechatsActions } from "./chatStore";
+import {handleRead, usechatsActions} from "./chatStore";
 import { useContactsActions } from "./contactStore";
 import { useAuthState } from "@/store/authStore";
 
@@ -20,6 +20,8 @@ const initializeSocket = (username: string) => {
     state.socket.on("message", (message) => {
         console.log(message);
         if (message.type === 'READ'){
+            handleRead(message)
+
             return;
         }
         const {addMessage} = usechatsActions()

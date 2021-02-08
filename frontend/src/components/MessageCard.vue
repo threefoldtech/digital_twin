@@ -114,6 +114,10 @@ export default defineComponent({
       type: Boolean,
       default: false
     },
+    isreadbyme: {
+      type: Boolean,
+      default: false
+    },
   },
   setup(props) {
     const {user} = useAuthState();
@@ -191,7 +195,7 @@ export default defineComponent({
       readMessage(props.chatId, props.message.id)
     }
     nextTick(() => {
-      if (!props.isread){
+      if (!props.isreadbyme){
         read()
       }
     })

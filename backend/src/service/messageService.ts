@@ -2,6 +2,11 @@ import {IdInterface} from "./../types/index";
 import {ContactRequest, FileMessageType, MessageBodyTypeInterface, MessageInterface, MessageTypes,} from "../types";
 import Message from "../models/message";
 import {getChat, persistChat, saveFile} from "./dataService";
+import get = Reflect.get;
+import Chat from "../models/chat";
+import {config} from "../config/config";
+import {sendEventToConnectedSockets} from "./socketService";
+import {connections} from "../store/connections";
 
 export const parseMessage = (
     msg: any
@@ -101,7 +106,9 @@ export const editMessage = (
 
 export const handleRead = (message: Message<string>) => {
     console.log('reading')
-    const chat = getChat(message.to);
+
+    let chatId = message.to === config.userid ? message.from : message.to;
+    const chat = getChat(chatId);
 
     const newRead = chat.messages.find(m => m.id === message.body)
     const oldRead = chat.messages.find(m => m.id === chat.read[<string>message.from])
@@ -114,4 +121,5 @@ export const handleRead = (message: Message<string>) => {
 
     chat.read[<string>message.from] = message.body
     persistChat(chat);
+    sendEventToConnectedSockets(connections, "message", message)
 };
