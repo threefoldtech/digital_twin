@@ -25,9 +25,9 @@ export const addChat = (
     acceptedChat: boolean,
     adminId: DtIdInterface
 ) => {
-    persistChat(
-        new Chat(chatId, contacts, isGroupchat, [message], name, acceptedChat, adminId, {})
-    );
+    const chat = new Chat(chatId, contacts, isGroupchat, [message], name, acceptedChat, adminId, {})
+    persistChat(chat );
+    return chat
 };
 
 export const getMessagesFromId = (chatId: IdInterface) =>

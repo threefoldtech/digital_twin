@@ -1,3 +1,4 @@
+import { sendEventToConnectedSockets } from './../service/socketService';
 import { sendMessageToApi } from './../service/apiService';
 import { ContactRequest, DtIdInterface, MessageInterface, MessageOperations, MessageTypes } from './../types/index';
 import { parseMessage } from './../service/messageService';
@@ -14,6 +15,7 @@ import {addChat, getMessagesFromId} from "../service/chatService";
 import { uuidv4 } from '../common';
 import {sendEventToConnectedSockets} from "../service/socketService";
 
+
 const router = Router();
 
 router.get("/", (req, res) => {
@@ -29,7 +31,7 @@ router.post("/", (req, res) => {
 
     const message:MessageInterface<MessageBodyTypeInterface> = parseMessage(con.message)
     console.log(`creating chat`)
-    addChat(contact.id,[contact],false, message ,contact.id, true, contact.id)
+    const chat = addChat(contact.id,[contact],false, message ,contact.id, true, contact.id)
 
 
     const url = `/api/messages`
@@ -47,18 +49,7 @@ router.post("/", (req, res) => {
     console.log("sending to ",url)
     //@todo: check if this is duplicate
     sendMessageToApi(contact.location,data,MessageOperations.NEW)
-    try{
-        axios.put(
-            url,
-            data).then( () => {
-            console.log("Send request to ", contact.location)
-        }).catch((e)=>{
-            console.log("couldnt send contact request")
-        })
-    }catch (e) {
-        console.log("couldn't send contact request")
-    }
-    res.sendStatus(200);
+    sendEventToConnectedSockets("connectionRequest",chat)
 });
 
 
