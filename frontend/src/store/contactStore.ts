@@ -43,7 +43,7 @@ const addContact = (username:DtId, location, dontCheck = false) => {
     const {user} = useAuthState()
     const addMessage:Message<String> = {
         id: uuidv4(),
-        body: `Request has been send to ${username}`,
+        body: `Request has been sent to ${username}`,
         from: user.id,
         to: username,
         timeStamp: new Date(),
