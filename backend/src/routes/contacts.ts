@@ -12,6 +12,7 @@ import {contactRequests} from "../store/contactRequests";
 import {MessageBodyTypeInterface} from "../types";
 import {addChat, getMessagesFromId} from "../service/chatService";
 import { uuidv4 } from '../common';
+import {sendEventToConnectedSockets} from "../service/socketService";
 
 const router = Router();
 
@@ -44,6 +45,7 @@ router.post("/", (req, res) => {
         "timeStamp": new Date()
     }
     console.log("sending to ",url)
+    //@todo: check if this is duplicate
     sendMessageToApi(contact.location,data,MessageOperations.NEW)
     try{
         axios.put(

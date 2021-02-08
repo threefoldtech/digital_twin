@@ -79,11 +79,7 @@
     </div>
 
     <div class="md:col-span-6 w-full h-full relative">
-      <chat-view
-        v-if="selectedId"
-        :selectedId="selectedId"
-        @showContacts="showContacts = true"
-      ></chat-view>
+      <chat-view v-if="selectedId" :selectedId="selectedId" :key="selectedId" @showContacts="showContacts=true"></chat-view>
       <div v-else class="text-center">
         <p>It feels lonely over here :(</p>
         <button
@@ -141,7 +137,7 @@
 import moment from "moment";
 import { useSocketActions } from "../../store/socketStore";
 import { defineComponent, ref, computed, onBeforeMount } from "vue";
-import { usechatsState, usechatsActions } from "../../store/chatStore";
+import {usechatsState, usechatsActions, selectedId} from "../../store/chatStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
 import { useAuthState, useAuthActions } from "../../store/authStore";
 import addContact from "../../components/ContactAdd.vue";

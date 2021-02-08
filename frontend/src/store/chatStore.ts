@@ -1,5 +1,5 @@
 import { reactive } from "@vue/reactivity";
-import { toRefs } from "vue";
+import {ref, toRefs} from "vue";
 import axios from "axios";
 import moment from "moment";
 import {
@@ -21,6 +21,8 @@ const state = reactive<chatstate>({
   chats: [],
   chatRequests: []
 });
+
+export const selectedId = ref("");
 
 const retrievechats = async () => {
   const response = await axios
@@ -56,6 +58,7 @@ export const removeChat = (chatId) => {
   state.chats = state.chats.filter(c => c.chatId !== chatId)
   console.log(state.chats)
   sortChats();
+  selectedId.value = <string>state.chats.find(()=>true)?.chatId
 
 };
 

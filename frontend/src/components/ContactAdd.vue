@@ -109,8 +109,8 @@
 </template>
 
 <script lang="ts">
-import {usechatsActions} from "@/store/chatStore";
-import {defineComponent, ref, computed} from "vue";
+import {selectedId, usechatsActions} from "@/store/chatStore";
+import {defineComponent, ref, computed, nextTick} from "vue";
 import {useContactsActions, useContactsState} from "../store/contactStore";
 import {useAuthState} from "../store/authStore";
 import {Contact} from "../types/index"
@@ -134,11 +134,16 @@ export default defineComponent({
 
     const contactAdd = () => {
       try {
-        console.log(usernameAdd.value)
-        addContact(usernameAdd.value, location.value, false);
+        let userId = usernameAdd.value;
+        console.log(userId)
+        addContact(userId, location.value, false);
         usernameAdd.value = "";
         contactAddError.value = "";
         emit("closeDialog");
+
+        //@todo: setTimeout is dirty should be removed
+        // next tick was not possible reason: chat was not loaded yet
+        setTimeout(() => { selectedId.value = userId},1000)
       } catch (err) {
         console.log("adding contact failed");
         contactAddError.value = err;
@@ -171,6 +176,9 @@ export default defineComponent({
       })
 
       addGroupchat(groupnameAdd.value, contacts)
+      //@todo: setTimeout is dirty should be removed
+      // next tick was not possible reason: chat was not loaded yet
+      setTimeout(() => { selectedId.value = groupnameAdd.value},1000)
       usersInGroup.value = []
       emit('closeDialog')
     };
