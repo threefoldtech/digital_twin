@@ -7,7 +7,7 @@ import {connections} from "../store/connections";
 import * as http from "http";
 import {editMessage, handleRead, parseMessage} from "./messageService";
 import {MessageBodyTypeInterface, MessageOperations, MessageTypes} from "../types";
-import {saveFile, saveAvatar, deleteChat} from "./dataService"
+import {saveFile, saveAvatar, deleteChat, getBlocklist, persistBlocklist} from "./dataService"
 import {getLocationForId, sendMessageToApi} from './apiService';
 import {user} from "../store/user"
 
@@ -93,6 +93,19 @@ export const startSocketIo = (httpServer: http.Server) => {
         });
         socket.on('remove_chat', (id) => {
             const success = deleteChat(id);
+            if (!success) {
+                return;
+            }
+            sendEventToConnectedSockets('chat_removed', id)
+
+        });
+        socket.on('block_chat', (id) => {
+
+            const blocklist = getBlocklist();
+            blocklist.push(id)
+            persistBlocklist(blocklist)
+            const success = deleteChat(id);
+
             if (!success) {
                 return;
             }

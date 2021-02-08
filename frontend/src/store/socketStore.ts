@@ -21,6 +21,9 @@ const initializeSocket = (username: string) => {
         console.log('chat_removed')
         removeChat(chatId)
     });
+    state.socket.on("chat_blocked", (chatId) => {
+        removeChat(chatId)
+    });
     state.socket.on("message", (message) => {
         console.log(message);
         if (message.type === 'READ'){
@@ -73,6 +76,9 @@ const sendSocketAvatar = async (avatar: ArrayBuffer) => {
 
 export const sendRemoveChat = async (id: Id) => {
     state.socket.emit("remove_chat", id);
+};
+export const sendBlockChat = async (id: Id) => {
+    state.socket.emit("block_chat", id);
 };
 
 const getSocket = () => {
