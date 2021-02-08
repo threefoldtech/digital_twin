@@ -70,16 +70,15 @@ const addMessage = (chatId, message) => {
     const oldRead = chat.messages.find(
       m => m.id === chat.read[<string>message.from]
     );
-
     if (
       oldRead &&
-      new Date(newRead.timeStamp).getTime() <
+      new Date(newRead.timeStamp).getTime() >
         new Date(oldRead.timeStamp).getTime()
     ) {
       return;
     }
 
-    chat.read[<string>message.from] = message.body;
+    chat.read = { ...chat.read, [<string>message.from]: message.body };
 
     return;
   }
@@ -215,23 +214,27 @@ interface chatstate {
 }
 
 export const handleRead = (message: Message<string>) => {
-  console.log('reading')
+  console.log("reading");
 
-  const { user} = useAuthState()
+  const { user } = useAuthState();
 
   let chatId = message.to === user.id ? message.from : message.to;
 
-  const {chats} = usechatsState();
-  const chat = chats.value.find((c) => c.chatId == chatId);
+  const { chats } = usechatsState();
+  const chat = chats.value.find(c => c.chatId == chatId);
 
-  const newRead = chat.messages.find(m => m.id === message.body)
-  const oldRead = chat.messages.find(m => m.id === chat.read[<string>message.from])
+  const newRead = chat.messages.find(m => m.id === message.body);
+  const oldRead = chat.messages.find(
+    m => m.id === chat.read[<string>message.from]
+  );
 
-
-  if (oldRead && (new Date(newRead.timeStamp)).getTime() < (new Date(oldRead.timeStamp)).getTime()){
+  if (
+    oldRead &&
+    new Date(newRead.timeStamp).getTime() <
+      new Date(oldRead.timeStamp).getTime()
+  ) {
     return;
   }
 
-
-  chat.read[<string>message.from] = message.body
+  chat.read[<string>message.from] = message.body;
 };

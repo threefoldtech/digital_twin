@@ -58,7 +58,7 @@
         <div class="absolute w-full px-2">
           <ChatCard
               v-for="(chat, i) in filteredChats"
-              :key="i"
+              :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
               class="grid grid-cols-12 rounded-lg mb-2 py-2"
               :class="{
               'bg-white': chat.chatId !== selectedId,
@@ -189,6 +189,7 @@ export default defineComponent({
       filteredChats,
       showDialog,
       showContacts,
+      user,
       m,
     };
   },
