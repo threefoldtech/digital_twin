@@ -1,5 +1,5 @@
 <template>
-  <div class="md:grid-cols-12 relative h-full w-full">
+  <div class="md:grid-cols-12 md:grid relative h-full w-full">
     <div class="fixed h-screen w-screen bg-black bg-opacity-25 top-0 left-0 md:hidden transition-all z-20"
          :class="{'hidden': !showContacts}" @click="showContacts = false"></div>
     <div
@@ -7,7 +7,7 @@
         :class="{'-left-full' : !showContacts}">
       <div>
         <div class="flex m-2 mt-5">
-          <button @click="showContacts = false">
+          <button @click="showContacts = false" class="md:hidden">
             <i class="fas fa-chevron-left"></i>
           </button>
           <h1>Chats</h1>
@@ -80,7 +80,7 @@
     </div>
 
     <div
-        class="hidden col-span-3 relative h-full w-full overflow-y-auto flex-col"
+        class="hidden md:block col-span-3 relative h-full w-full overflow-y-auto flex-col"
     >
       <div class="absolute max-w-full w-full px-4 pb-4">
         <div
