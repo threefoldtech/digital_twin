@@ -58,7 +58,7 @@
         </div>
       </div>
       <div class="relative overflow-y-auto w-full max-h-full h-full mt-4">
-        <div class="absolute w-full px-2">
+        <div class="absolute w-full px-2 pt-2">
           <ChatCard
               v-for="chat in filteredChats"
               :key="`${chat.chatId}-${chat.messages.length}-${chat.read[user.id]}`"
