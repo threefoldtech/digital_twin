@@ -1,4 +1,4 @@
-import { Message } from "@/types";
+import {DtId, Message} from "@/types";
 import { reactive } from "@vue/reactivity";
 import { inject } from "vue";
 import {handleRead, usechatsActions} from "./chatStore";
@@ -59,12 +59,16 @@ const sendSocketMessage = async (
 // };
 
 const sendSocketAvatar = async (avatar: ArrayBuffer) => {
-  const url = `${window.location.origin}/api/user/avatar`.replace("http://localhost:8080","http://localhost:3000")
-  const data = {
-    avatar,
-    url
-  }
-  state.socket.emit("new_avatar", data);
+    const url = `${window.location.origin}/api/user/avatar`.replace("http://localhost:8080","http://localhost:3000")
+    const data = {
+        avatar,
+        url
+    }
+    state.socket.emit("new_avatar", data);
+};
+
+const sendRemoveChat = async (id: Id) => {
+    state.socket.emit("delete_chat", id);
 };
 
 const getSocket = () => {

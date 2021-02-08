@@ -8,7 +8,7 @@ import {
   Message,
   GroupChat,
   MessageBodyType,
-  PersonChat
+  PersonChat, DtId
 } from "../types";
 import { useSocketActions } from "./socketStore";
 import { useAuthState } from "./authStore";
@@ -267,6 +267,7 @@ export const handleRead = (message: Message<string>) => {
   ) {
     return;
   }
+  
 
   chat.read[<string>message.from] = message.body;
 };
