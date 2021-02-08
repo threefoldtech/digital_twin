@@ -111,17 +111,18 @@
             ></div>
           </div>
           <h2 class="my-3">
-            {{selectedId}}
+            {{selectedChat.name}}
           </h2>
           <p>
             {{status?.status}}
           </p>
         </div>
-        <div
+        <group-management v-if="selectedChat.isGroup" :groupChat="selectedChat"></group-management>
+        <!-- <div
           class="bg-white p-2 w-full h-52 relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1"
-        >
+        > -->
 
-        </div>
+        <!-- </div> -->
       </div>
     </div>
     <jdialog v-model="showDialog" @close="showDialog = false" noActions>
@@ -146,6 +147,7 @@ import AvatarImg from "../../components/AvatarImg.vue";
 import Dialog from "../../components/Dialog.vue";
 // import contactpopup from "../../components/ContactPopup.vue";
 import ChatCard from "../../components/ChatCard.vue";
+import GroupManagement from "../../components/GroupManagement.vue"
 import config from "../../../public/config/config";
 import axios from "axios";
 import { startFetchStatusLoop } from "@/store/statusStore";
@@ -153,7 +155,7 @@ import {statusList} from "@/store/statusStore";
 
 export default defineComponent({
   name: "Apps",
-  components: { addContact, chatView, jdialog: Dialog, ChatCard, AvatarImg },
+  components: { addContact, chatView, jdialog: Dialog, ChatCard, AvatarImg, GroupManagement },
   setup(_, context) {
     const { chats, chatRequests } = usechatsState();
     const { updateUserInfo } = useAuthActions();
@@ -200,6 +202,8 @@ export default defineComponent({
       });
     });
 
+    const selectedChat = computed(()=>chats.value.find(chat=> chat.chatId == selectedId.value))
+
     startFetchStatusLoop(user.id);
 
     const acceptChatRequest = (id) => {
@@ -210,6 +214,7 @@ export default defineComponent({
     return {
       status,
       selectedId,
+      selectedChat,
       setSelected,
       chats,
       chatRequests,

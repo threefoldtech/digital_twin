@@ -72,7 +72,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
       {
         from: user.id,
         to: name,
-        body: `${user.id} has created ${name}`,
+        body: `${user.id} has created and invited you to${name}`,
         timeStamp: new Date(),
         id: uuidv4(),
         type: "STRING"
