@@ -39,7 +39,7 @@ async function get(id_or_name){
 
 async function load(){
     db.hyperdrives.map( async function(item) {
-        let drive = new HyperDrive(client.corestore(), item)
+        let drive = new HyperDrive(client.corestore(), item.key)
         await drive.promises.ready()
         await client.replicate(drive)
         await new Promise(r => setTimeout(r, 3e3)) // just a few seconds

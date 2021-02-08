@@ -40,6 +40,39 @@ router.get('/drive/:id/wikis/:wikiname', asyncHandler(async (req, res) => {
     }
 }))
 
+router.get('/drive/:id/wikis/:wikiname/errors', asyncHandler(async (req, res) => {
+    var driveObj = await drive.get(req.params.id)
+    var wikiname = req.params.wikiname
+    
+    filepath = `/${wikiname}/errors.json`
+    var entry = null
+    try {
+        entry = await driveObj.promises.stat(filepath)
+
+        var content = await  driveObj.promises.readFile(filepath, 'utf-8');
+        
+        var data = JSON.parse(content)
+        var errors = {
+            page_errors : []
+        }
+        errors.site_errors = data.site_errors
+        
+        for (var key in data.page_errors){
+            var e = {
+                page : key,
+                errors : data.page_errors[key]
+            }
+            errors.page_errors.push(e)
+        }
+        res.render('wikis/errors.mustache', {site_name: wikiname, site_errors : errors.site_errors, page_errors: errors.page_errors});
+       
+    } catch (e) {
+        console.log(e)
+        return res.status(404).json('');
+    }
+}))
+
+
 // MD File
 router.get('/drive/:id/wikis/:wikiname/:filename', asyncHandler(async (req, res) => {
     var driveObj = await drive.get(req.params.id)
