@@ -97,6 +97,7 @@ export default defineComponent({
       const { sendSocketAvatar } = useSocketActions();
       const buffer = await file.value.arrayBuffer();
       sendSocketAvatar(buffer);
+      showDialog.value = false
     };
 
     const setEditStatus = (edit: boolean) => {
