@@ -19,7 +19,7 @@ const fetchStatus = async digitalTwinId => {
   const {user} = useAuthState()
 
   if (user.id === digitalTwinId){
-    user.status = status
+    user.status = status.status
     user.image = status.avatar ? status.avatar : user.image
   }
 
