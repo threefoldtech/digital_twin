@@ -61,6 +61,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
   axios
     .put(`${config.baseUrl}api/group`, newGroupchat)
     .then(res => {
+      addChat(newGroupchat)
       console.log(res);
     })
     .catch(e => {

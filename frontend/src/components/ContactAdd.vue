@@ -72,27 +72,27 @@
             <div class="col-span-2 place-items-center grid">
               <img
                   :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-                  contact
+                  contact.id
                 )}.svg`"
                   alt="contact image"
                   class="h-12 bg-icon rounded-full"
               />
             </div>
             <div class="col-span-8 pl-4 flex flex-col justify-center">
-              {{ contact }}
+              {{ contact.id }}
             </div>
             <div class="col-span-2 place-items-center grid">
               <button
                   class="h-12 rounded-full"
-                  @click="removeUserFromGroup(contact)"
-                  v-if="userIsInGroup(contact)"
+                  @click="removeUserFromGroup(contact.id)"
+                  v-if="userIsInGroup(contact.id)"
               >
                 <i class="fas fa-times"></i>
               </button>
               <button
                   class="h-12 rounded-full"
-                  @click="usersInGroup.push(contact)"
-                  v-if="!userIsInGroup(contact)"
+                  @click="usersInGroup.push(contact.id)"
+                  v-if="!userIsInGroup(contact.id)"
               >
                 <i class="fas fa-plus"></i>
               </button>

@@ -19,6 +19,7 @@ const retrieveContacts = async () => {
     return axios.get(`${config.baseUrl}api/contacts`).then(function(response) {
         const contacts = response.data
         console.log(`here are the contacts`, contacts)
+        
         state.contacts = contacts;
     })
 
