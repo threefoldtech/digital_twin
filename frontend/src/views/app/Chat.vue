@@ -114,13 +114,13 @@
             {{selectedId}}
           </h2>
           <p>
-            {{status.status}}
+            {{status?.status}}
           </p>
         </div>
         <div
           class="bg-white p-2 w-full h-52 relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1"
         >
-          
+
         </div>
       </div>
     </div>

@@ -59,6 +59,9 @@ const addContact = (username:DtId, location, dontCheck = false) => {
         state.contacts.push(contact)
         const {addChat} = usechatsActions()
         const chat:PersonChat = {
+            adminId: username,
+            //@todo: change location
+            contacts: [contact, {id: user.id, location:`${user.id}-chat`}],
             isGroup: false,
             read: {},
             chatId:username,

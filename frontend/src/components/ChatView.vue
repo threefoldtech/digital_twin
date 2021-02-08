@@ -138,7 +138,10 @@ export default defineComponent({
     const popupMeeting = () => {
 
       // @ts-ignore
-      const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
+      // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
+      const str:string = chat.value.isGroup ? chat.value.chatId : chat.value.contacts.map(c=>c.id).sort().join();
+
+      console.log(`str = ${str}`)
 
       const ID = crypto.SHA1(str)
       popupCenter('https://meetings.jimber.org/room/' + ID, "Threefold login", 800, 550)

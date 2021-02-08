@@ -42,20 +42,16 @@ export interface Chat {
     read: {
         [key: string]: string
     };
+    contacts: (AnonymousContact|Contact)[];
     acceptedChat: boolean;
     name: string;
     isGroup:boolean
-}
-export interface PersonChat extends Chat{
-    chatId: DtId;
-    messages: Message<MessageBodyType>[];
-}
-
-export interface GroupChat extends Chat{
-    chatId: Id;
-    contacts: (AnonymousContact|Contact)[];
     adminId: Id;
+
 }
+export interface PersonChat extends Chat{}
+
+export interface GroupChat extends Chat{}
 
 export interface Contact extends AnonymousContact {
     location:string,
