@@ -25,7 +25,8 @@
       </div>
       <emoji-picker
           ref="emojipicker"
-          :class="{hidden: !showEmoji}" style="position: absolute; bottom: 140px; z-index: 10000"></emoji-picker>
+          :class="{hidden: !showEmoji}"
+          style="position: absolute; bottom: 140px; z-index: 10000"></emoji-picker>
       <button class="px-2 py-8" @click.stop="toggleEmoji" v-if="!file">
         😃
       </button>
@@ -127,10 +128,6 @@ export default {
       }
 
     }
-    const selectEmoji = (emoji) => {
-      console.log(emoji)
-      // message.value = emo
-    }
     const toggleEmoji = () => {
       showEmoji.value = !showEmoji.value
     }
@@ -158,7 +155,6 @@ export default {
       removeFile,
       startRecording,
       stopRecording,
-      selectEmoji,
       showEmoji,
       toggleEmoji,
       hideEmoji,
