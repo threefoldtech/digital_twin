@@ -9,7 +9,9 @@
       </div>
       <div class="col-span-6 py-4 pl-2">
         <p class="font-bold font">{{ chat.name }}</p>
-        <p class="font-thin" v-if="!chat.isGroup">{{ statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline" }}</p>
+        <p class="font-thin" v-if="!chat.isGroup">{{
+            statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline"
+          }}</p>
         <p class="font-thin" v-if="chat.isGroup">GroupChat ## change this copy ##</p>
         <!-- <p class="font-thin">
           <span v-if=".isOnline">Is online</span>
@@ -17,10 +19,11 @@
         </p> -->
       </div>
       <div class="col-end-13 pr-2 flex justify-end">
+        <button class="text-red-600">Delete</button>
 
-          <button @click="popupMeeting" class="flex flex-col items-center justify-center">
-            <i class="fas fa-video"></i>
-          </button>
+        <button @click="popupMeeting" class="flex flex-col items-center justify-center">
+          <i class="fas fa-video"></i>
+        </button>
       </div>
     </div>
     <div class="flex-grow row-span-4 relative overflow-y-auto" ref="messageBox">
@@ -85,7 +88,7 @@ export default defineComponent({
       console.log(chat.value)
       let id = <string>user.id;
       //@ts-ignore
-      const { [id]: _, ...read } = chat.value.read;
+      const {[id]: _, ...read} = chat.value.read;
 
       const reads = Object.values(read)
 
