@@ -9,7 +9,8 @@
       </div>
       <div class="col-span-6 py-4 pl-2">
         <p class="font-bold font">{{ chat.name }}</p>
-        <p class="font-thin">{{ statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline" }}</p>
+        <p class="font-thin" v-if="!chat.isGroup">{{ statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline" }}</p>
+        <p class="font-thin" v-if="chat.isGroup">GroupChat ## change this copy ##</p>
         <!-- <p class="font-thin">
           <span v-if=".isOnline">Is online</span>
           <span v-else> Last seen {{ m(contact.lastSeen).fromNow() }} </span>

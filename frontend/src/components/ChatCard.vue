@@ -5,13 +5,18 @@
     </div>
     <div class="md:col-span-2 col-span-3 place-items-center grid relative">
       <AvatarImg :id="chat.chatId"/>
-        <div class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-2 transition-all" :class="{'bg-red-500': status && !status.isOnline, 'bg-green-500': status && status.isOnline}"></div>
+        <div
+            v-if="!chat.isGroup"
+            class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-2 transition-all"
+            :class="{'bg-red-500': status && !status.isOnline, 'bg-green-500': status && status.isOnline}"
+        ></div>
     </div>
     <div class="md:col-span-10 col-span-9 pl-2">
       <p class="flex place-content-between">
         <span class="font-bold">
           {{ chat.name }}
         </span>
+        <span class="font-thin" v-if="chat.isGroup"> group</span>
         <span class="font-thin pr-2" v-if="lastMessage">
           {{ timeAgo(lastMessage.timeStamp)}}
         </span>
