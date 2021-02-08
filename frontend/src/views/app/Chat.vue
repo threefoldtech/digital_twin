@@ -205,7 +205,6 @@ export default defineComponent({
     const acceptChatRequest = (id) => {
       const { acceptChat } = usechatsActions();
       acceptChat(id);
-      console.log("TODO here", id);
     };
 
     return {

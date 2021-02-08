@@ -97,7 +97,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
 const acceptChat = id => {
   axios.post(`${config.baseUrl}api/chats?id=${id}`).then(res => {
     const index = state.chatRequests.findIndex(c => c.chatId == id);
-    console.log(state.chatRequests[index]);
+    state.chatRequests[index].acceptedChat = true
     addChat(state.chatRequests[index]);
     state.chatRequests.splice(index, 1);
   });
