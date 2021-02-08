@@ -16,7 +16,7 @@
     <div class="md:col-span-10 col-span-9 pl-2">
       <p class="flex place-content-between">
         <span class="font-bold">
-          {{ chat.chatId }}
+          {{ chat.name }}
         </span>
         <span class="font-thin pr-2" v-if="lastMessage">
           {{ timeAgo(lastMessage.timeStamp)}}
