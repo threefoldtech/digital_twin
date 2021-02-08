@@ -21,6 +21,10 @@
 
       <div>Username: {{ user.id }}</div>
       <div>
+        Status: {{user.status}}
+        <input v-model="userStatus" />
+      </div>
+      <div>
         Avatar:
         <img :src="user.image" />
       </div>
@@ -73,6 +77,7 @@ export default defineComponent({
     const showDialog = ref(false);
     const fileinput = ref();
     const file = ref();
+    const userStatus = ref(user.status)
 
     const selectFile = () => {
       fileinput.value.click();
@@ -83,6 +88,7 @@ export default defineComponent({
     const removeFile = () => {
       file.value = null;
     };
+
     const sendNewAvatar =  async () => {
       const {sendSocketAvatar} = useSocketActions()
       const buffer = await file.value.arrayBuffer()
@@ -97,7 +103,8 @@ export default defineComponent({
       selectFile,
       changeFile,
       removeFile,
-      sendNewAvatar
+      sendNewAvatar,
+      userStatus
     };
   },
 });

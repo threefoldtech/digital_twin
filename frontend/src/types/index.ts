@@ -1,6 +1,7 @@
 export interface User extends AnonymousContact {
     image: string,
-    email: string
+    email: string,
+    status: string
 }
 
 export interface App {

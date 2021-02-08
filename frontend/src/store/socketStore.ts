@@ -59,7 +59,7 @@ const sendSocketMessage = async (
 // };
 
 const sendSocketAvatar = async (avatar: ArrayBuffer) => {
-  const url = `https://${window.location.origin}/api/user/avatar`.replace("https://localhost:8080","http://localhost:3000")
+  const url = `${window.location.origin}/api/user/avatar`.replace("http://localhost:8080","http://localhost:3000")
   const data = {
     avatar,
     url

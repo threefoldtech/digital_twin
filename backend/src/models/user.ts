@@ -10,6 +10,8 @@ export default class User implements UserInterface {
     try {
       const userData = getUserdata();
       this.status = userData.status;
+      this.image = userData.image;
+      this.id = userData.id
     } catch (error) {
       this.status = "Exploring the new DigitalTwin";
       this.image = `https://avatars.dicebear.com/4.5/api/avataaars/${config.userid}.svg`;

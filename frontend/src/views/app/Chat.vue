@@ -118,6 +118,8 @@ import chatView from "../../components/ChatView.vue";
 import Dialog from "../../components/Dialog.vue";
 // import contactpopup from "../../components/ContactPopup.vue";
 import ChatCard from "../../components/ChatCard.vue";
+import config from "../../../public/config/config"
+import axios from "axios"
 
 export default defineComponent({
   name: "Apps",
@@ -176,8 +178,9 @@ export default defineComponent({
     onBeforeMount(()=>{
       const { updateUserInfo } = useAuthActions()
       const { user } = useAuthState()
-      fetchStatus(user.id).then((status)=>{
-        console.log(status)
+      axios.get(`${config.baseUrl}api/user/getStatus`).then((resp)=>{
+        const status = resp.data
+        user.status = <string>status.status
         updateUserInfo(status.avatar)
       })
     }

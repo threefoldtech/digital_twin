@@ -8,7 +8,6 @@ router.get('/getStatus', async(req, res) => {
     const isOnline = connections.getConnections().length ? true : false
     const status = user.getStatus()
     const avatar = user.getAvatar()
-    console.log(avatar)
     const data = {
         status,
         avatar,
