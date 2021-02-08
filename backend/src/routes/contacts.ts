@@ -16,9 +16,6 @@ import { uuidv4 } from '../common';
 const router = Router();
 
 router.get("/", (req, res) => {
-    // const resp = contacts.map((contact) => {
-    //     return contact.id
-    // });
     res.json(contacts);
 });
 

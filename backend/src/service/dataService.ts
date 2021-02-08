@@ -5,7 +5,7 @@ import User from "../models/user";
 import Chat from "../models/chat";
 import {parseChat} from "./chatService";
 
-export const getChatIds = () => {
+export const getChatIds = ():IdInterface[] => {
     const location = config.baseDir + "chats"
     const locations = fs.readdirSync(location)
     console.log(locations)
