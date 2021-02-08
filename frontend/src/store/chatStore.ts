@@ -2,7 +2,7 @@ import { reactive } from "@vue/reactivity";
 import { toRefs } from "vue";
 import axios from "axios";
 import moment from "moment";
-import { Chat, Contact, Message, GroupChat, MessageBodyType } from "../types";
+import { Chat, Contact, Message, GroupChat, MessageBodyType, PersonChat } from "../types";
 import { useSocketActions } from "./socketStore";
 import { useAuthState } from "./authStore";
 import { useContactsActions } from "./contactStore";
@@ -10,7 +10,8 @@ import config from "../../public/config/config";
 import { uuidv4 } from "@/common";
 
 const state = reactive<chatstate>({
-  chats: []
+  chats: [],
+  chatRequests: []
 });
 
 const retrievechats = async () => {
@@ -29,7 +30,11 @@ const retrievechats = async () => {
 };
 
 const addChat = (chat: Chat) => {
-  state.chats.push(chat);
+  if(chat.acceptedChat){
+    state.chats.push(chat);
+  }else{
+    state.chatRequests.push(chat)
+  }
   sortChats();
 };
 
@@ -50,17 +55,28 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
     ],
     name: name,
     adminId: user.id,
-    read: {}
+    read: {},
+    acceptedChat: true
   };
   axios
     .put(`${config.baseUrl}api/group`, newGroupchat)
     .then(res => {
+      addChat(newGroupchat)
       console.log(res);
     })
     .catch(e => {
       console.log("failed to add groupchat", e);
     });
 };
+
+const acceptChat = (id) => {
+  axios.post(`${config.baseUrl}api/chats?id=${id}`).then( (res) => {
+      const index = state.chatRequests.findIndex(c=>c.chatId==id)
+      console.log(state.chatRequests[index])
+      state.chats.push(state.chatRequests[index])
+      state.chatRequests.splice(index,1)
+  })
+}
 
 const addMessage = (chatId, message) => {
   if (message.type === "READ") {
@@ -70,16 +86,15 @@ const addMessage = (chatId, message) => {
     const oldRead = chat.messages.find(
       m => m.id === chat.read[<string>message.from]
     );
-
     if (
       oldRead &&
-      new Date(newRead.timeStamp).getTime() <
+      new Date(newRead.timeStamp).getTime() >
         new Date(oldRead.timeStamp).getTime()
     ) {
       return;
     }
 
-    chat.read[<string>message.from] = message.body;
+    chat.read = { ...chat.read, [<string>message.from]: message.body };
 
     return;
   }
@@ -119,7 +134,7 @@ const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
   console.log(chatId, message);
   addMessage(chatId, message);
   let isEdit = false;
-  if (message.type === "UPDATE") {
+  if (message.type === "EDIT" || message.type === "DELETE") {
     isEdit = true;
   }
 
@@ -206,32 +221,38 @@ export const usechatsActions = () => {
     sendFile,
     sendMessageObject,
     addGroupchat,
-    readMessage
+    readMessage,
+    acceptChat
   };
 };
 
 interface chatstate {
   chats: Chat[];
+  chatRequests: Chat[];
 }
 
 export const handleRead = (message: Message<string>) => {
-  console.log('reading')
+  console.log("reading");
 
-  const { user} = useAuthState()
+  const { user } = useAuthState();
 
   let chatId = message.to === user.id ? message.from : message.to;
 
-  const {chats} = usechatsState();
-  const chat = chats.value.find((c) => c.chatId == chatId);
+  const { chats } = usechatsState();
+  const chat = chats.value.find(c => c.chatId == chatId);
 
-  const newRead = chat.messages.find(m => m.id === message.body)
-  const oldRead = chat.messages.find(m => m.id === chat.read[<string>message.from])
+  const newRead = chat.messages.find(m => m.id === message.body);
+  const oldRead = chat.messages.find(
+    m => m.id === chat.read[<string>message.from]
+  );
 
-
-  if (oldRead && (new Date(newRead.timeStamp)).getTime() < (new Date(oldRead.timeStamp)).getTime()){
+  if (
+    oldRead &&
+    new Date(newRead.timeStamp).getTime() <
+      new Date(oldRead.timeStamp).getTime()
+  ) {
     return;
   }
 
-
-  chat.read[<string>message.from] = message.body
+  chat.read[<string>message.from] = message.body;
 };

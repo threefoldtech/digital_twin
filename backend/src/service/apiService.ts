@@ -57,7 +57,7 @@ export const getDigitalTwinUrl = (location: IdInterface) => {
         return 'http://localhost:3000'
     }
 
-    return `http://${location}`
+    return `http://${getLocationForId(<string>location)}`
 };
 
 export const getLocationForId= (id:string) => {

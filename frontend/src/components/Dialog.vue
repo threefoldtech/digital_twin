@@ -2,9 +2,9 @@
   <transition name="fade">
     <div
       v-if="modelValue"
-      class="fixed z-10 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
+      class="fixed z-50 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
     >
-      <div class="form-container bg-white p-4 w-1/5 rounded">
+      <div class="form-container bg-white p-4 lg:w-1/5 w-10/12 max-w-full rounded">
         <div class="flex justify-between">
           <slot name="title"/>
           <button @click="$emit('close', false)">

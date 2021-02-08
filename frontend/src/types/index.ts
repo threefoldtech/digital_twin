@@ -41,6 +41,7 @@ export interface Chat {
     read: {
         [key: string]: string
     };
+    acceptedChat: boolean;
     name: string;
 }
 export interface PersonChat extends Chat{

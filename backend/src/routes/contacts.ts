@@ -1,4 +1,5 @@
-import { MessageInterface } from './../types/index';
+import { sendMessageToApi } from './../service/apiService';
+import { ContactRequest, DtIdInterface, MessageInterface, MessageOperations, MessageTypes } from './../types/index';
 import { parseMessage } from './../service/messageService';
 import {Router} from 'express';
 import {appCallback, getAppLoginUrl} from "../service/authService";
@@ -10,27 +11,15 @@ import {contacts} from "../store/contacts";
 import {contactRequests} from "../store/contactRequests";
 import {MessageBodyTypeInterface} from "../types";
 import {addChat, getMessagesFromId} from "../service/chatService";
+import { uuidv4 } from '../common';
 
 const router = Router();
 
 router.get("/", (req, res) => {
-    const resp = contacts.map((contact) => {
-        return contact.id
-    });
-    res.json(resp);
+    res.json(contacts);
 });
 
 router.post("/", (req, res) => {
-    if(req.query.id){
-        //Flow to add contact request to contacts
-        const id = req.query.id
-        const index = contactRequests.findIndex(c=>c.id==id)
-        contacts.push(contactRequests[index]);
-        contactRequests.splice(index,1)
-        res.json([]);
-        return
-    }
-
     const con = req.body;
     const contact = new Contact(con.id, con.location);
 
@@ -41,14 +30,23 @@ router.post("/", (req, res) => {
     console.log(`creating chat`)
     addChat(contact.id,[contact],false, message ,contact.id, true, contact.id)
 
-    const url = `http://${contact.location}/api/messageRequest`
-    const data = {
-        username:config.userid,
-        location: `${config.userid}-chat`
+
+    const url = `/api/messages`
+    const data:Message<ContactRequest> = {
+        "id": uuidv4(),
+        "to": contact.id,
+        "body": {
+            "id": <DtIdInterface>contact.id,
+            "location": <string>contact.location
+        },
+        "from": config.userid,
+        "type": MessageTypes.CONTACT_REQUEST,
+        "timeStamp": new Date()
     }
     console.log("sending to ",url)
+    sendMessageToApi(contact.location,data,MessageOperations.NEW)
     try{
-        axios.post(
+        axios.put(
             url,
             data).then( () => {
             console.log("Send request to ", contact.location)

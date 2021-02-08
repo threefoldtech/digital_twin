@@ -49,10 +49,12 @@ export interface MessageInterface <T>{
     timeStamp: Date,
 }
 
-
-export interface MessageBodyTypeInterface extends String{
-
+export interface MessageBodyTypeInterface {
+    
 }
+// export interface String  extends MessageBodyTypeInterface {
+
+// }
 export interface ContactRequest extends MessageBodyTypeInterface, ContactInterface{
 
 }
