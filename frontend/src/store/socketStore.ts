@@ -1,4 +1,4 @@
-import {DtId, Message} from "@/types";
+import {DtId, Id, Message} from "@/types";
 import { reactive } from "@vue/reactivity";
 import { inject } from "vue";
 import {handleRead, usechatsActions} from "./chatStore";
