@@ -70,11 +70,11 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
     contacts: contacts,
     messages: [
       {
-        from: "localhost:8080",
-        to: "testgroup",
-        body: "testing",
+        from: user.id,
+        to: name,
+        body: `${user.id} has created ${name}`,
         timeStamp: new Date(),
-        id: "3d11c0cf-0fa9-4177-90c3-1ac08d2313f7",
+        id: uuidv4(),
         type: "STRING"
       }
     ],
