@@ -7,7 +7,7 @@
     <!--    </p>-->
 
     <div
-        class="flex rounded-xl h place-items-center bg-white mx-4"
+        class="flex rounded-xl h place-items-center bg-white mx-4 px-4"
     >
       <button class="px-2 py-8" @click.stop="selectFile">
         <i class="fas fa-paperclip text-gray-500 transform" style="--tw-rotate: -225deg;"></i>

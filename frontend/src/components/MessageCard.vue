@@ -19,7 +19,7 @@
       <transition name="fade">
         <div
             v-if="showActions"
-            class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-black text-gray-500 px-2"
+            class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-icon text-white px-2"
         >
           <button
               class="mx-0"
