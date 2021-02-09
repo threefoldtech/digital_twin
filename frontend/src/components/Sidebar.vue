@@ -1,5 +1,5 @@
 <template>
-  <nav>
+  <nav class="hidden">
     <div class="flex flex-col h-full items-center justify-center mx-2">
       <div v-for="app in apps" :key="app.name" class="mb-4 grid text-center">
         <div class=" bg-icon h-20 w-20 rounded-full grid place-items-center mb-1">
@@ -9,10 +9,6 @@
           {{app.name}}
         </h3>
         </div>
-
-      <!-- <router-link v-for="index of 10" :key="index" class="w-full h-20 flex justify-center items-center" :class="[currentRoute.params.tab === tab.name ? 'active' : 'opacity-50']" :to="`/vault/files/${tab.name.toLowerCase()}`">
-        <i class="text-2xl text-primary" :class="tab.icon"></i>
-      </router-link> -->
     </div>
   </nav>
 </template>

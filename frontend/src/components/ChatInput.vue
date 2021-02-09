@@ -10,7 +10,8 @@
          style="position: fixed; width: 100vw; height: 100vh; background:transparent; top: 0; left: 0; z-index: 9999">
     </div>
     <div
-        class="flex rounded-xl h place-items-center bg-white mx-4 px-4"
+        class="flex rounded-b-xl h place-items-center bg-white mx-4 px-4"
+        :class="{'rounded-t-xl': !showGif}"
     >
       <button class="px-2 py-8" @click.stop="toggleGif">
         <h2>GIF</h2>
@@ -151,8 +152,10 @@ export default {
       showGif.value = !showGif.value
     }
     const sendGif = async (gif) => {
+      showGif.value = false
       const {sendMessage} = usechatsActions()
       sendMessage(props.selectedid, gif, "GIF")
+      emit('messageSend')
     }
     const hideGif = async (gif) => {
       showGif.value = false

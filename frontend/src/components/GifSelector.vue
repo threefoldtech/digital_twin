@@ -1,15 +1,21 @@
 <template>
-  <div class="test mx-4 p-4 bg-accent" style="width: 100%; height: 220px; overflow-y: scroll">
-    <input type="text" v-model="searchTerm">
-    <button @click="$emit('close')">close</button>
-    <img
-        height="200"
-        style="height: 200px; display: inline-block; "
-        v-for="gif in gifs"
-        :src="gif"
-        alt=""
-        @click="$emit('sendgif', gif)"
-    >
+  <div class="relative mx-4 px-4 bg-white rounded-t-xl" style="height: 220px; overflow-y: scroll">
+    <div class="sticky top-0 bg-white flex py-4">
+      <input type="text" placeholder="Search for gif..." v-model="searchTerm">
+      <button @click="$emit('close')">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="grid grid-cols-3 place-items-center bg-black">
+      <img
+          class="h-40"
+          v-for="gif in gifs"
+          :src="gif"
+          :key="gif"
+          alt=""
+          @click="$emit('sendgif', gif)"
+      >
+    </div>
     <span v-if="gifs.length === 0">no Gifs found</span >
   </div>
 </template>
