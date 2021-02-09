@@ -1,5 +1,6 @@
 const chalk = require('chalk');
 const fs = require('fs');
+var path = require('path');
 
 const { Server: HyperspaceServer } = require('hyperspace');
 const { Client: HyperspaceClient } = require('hyperspace')
@@ -10,6 +11,27 @@ const cache = require('./cache.js')
 
 let client
 let server
+
+class LocalDrive{
+    constructor(){
+        var base = config.filesystem.path
+        console.log(base)
+        this.promises =  {
+            stat : async function(filepath){
+                return fs.lstatSync(path.join(base, filepath));
+            },
+            readdir: async function(dirpath){
+                return fs.readdirSync(path.join(base, dirpath));
+            },
+            readFile: async function(filepath, encoding){
+                if (encoding == 'binary'){
+                    return fs.readFileSync(path.join(base, filepath))
+                }
+                return fs.readFileSync(path.join(base, filepath), encoding)
+            },
+        }
+    }
+}
 
 async function create(name){
     let drive = new HyperDrive(client.corestore(), null)
@@ -30,6 +52,7 @@ async function create(name){
     });
     cache.drives[key] = drive
     cache.drives[name] = drive
+    
     return key
 }
 
@@ -47,8 +70,10 @@ async function load(){
         console.log(chalk.blue(`✓ (HyperSpace Drive) loaded ${item.name} (${item.key})`))
         cache.drives[item.name] = drive
         cache.drives[item.key] = drive
-
+        
     })
+    cache.drives["local"] = new LocalDrive()
+    console.log(chalk.blue(`✓ (LocalDrive Drive) loaded`))
 }
 
 

@@ -36,6 +36,7 @@ router.get('/drive/:id/wikis/:wikiname', asyncHandler(async (req, res) => {
         return res.send(content)
        
     } catch (e) {
+        console.log(e)
         return res.status(404).json('');
     }
 }))
@@ -104,7 +105,9 @@ router.get('/drive/:id/wikis/:wikiname/:filename', asyncHandler(async (req, res)
         splitted.shift()
         filename = splitted.join("__")
 
-	}
+	}else if (filename == "_sidebar.md"){
+        filename = "sidebar.md"
+    }
 
     filepath = `/${wikiname}/${filename}`
     // `/${req.params.wikiname}/${req.params.filename}`

@@ -10,6 +10,6 @@
     },
 
     "filesystem" : {
-        "path" : "~/.publisher/pubish"
+        "path" : "~/.publisher/publish/"
     }
 }
