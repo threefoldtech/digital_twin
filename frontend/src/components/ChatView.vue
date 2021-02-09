@@ -49,6 +49,11 @@
               :isGroup="chat.isGroup"
               :isMine="message.from === user.id"
           />
+          <span v-if="reads[message.id]">
+            <span v-if="!chat.isGroup || reads[message.id].length === 1">read by {{ reads[message.id][0] }}</span>
+            <span v-else-if="reads[message.id].length === 2">read by {{reads[message.id][0]}} and {{ reads[message.id][1] }}</span>
+            <span v-else>read by {{reads[message.id][0]}}, {{ reads[message.id][1] }} and {{reads[message.id].length -2}} others</span>
+          </span>
 
         </template>
 
@@ -76,7 +81,7 @@ import {
   nextTick,
   computed,
 } from "vue";
-import {findLastIndex} from 'lodash'
+import {findLastIndex, each} from 'lodash'
 
 import {statusList} from "@/store/statusStore"
 import {usechatsState, usechatsActions} from "../store/chatStore";
@@ -184,13 +189,24 @@ export default defineComponent({
     const showDivider = (message, index) => {
       const previousMessage = chat.value.messages[index - 1];
       if (!previousMessage) {
-        console.log('oh no')
         return true;
       }
       const time = moment(message.timeStamp);
 
       return time.diff(previousMessage.timeStamp, "m") > 5;
     }
+
+    const reads = computed(()=>{
+      const preReads = {}
+      each( chat.value.read, ( val:string, key:string ) => {
+        console.log( key, val );
+        if (key === user.id){
+          // return;
+        }
+        preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key]
+      } );
+      return preReads
+    })
 
 
     const viewAnchor = ref(null)
@@ -213,7 +229,7 @@ export default defineComponent({
       user,
       viewAnchor,
       showDivider,
-
+      reads,
       ...propRefs,
     };
   },
