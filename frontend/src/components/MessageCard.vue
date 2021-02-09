@@ -9,10 +9,11 @@
     }"
   >
     <div
-        class="bg-white relative rounded-lg"
+        class=" relative rounded-lg"
         :class="{
-        'bg-gray-100': disabled,
         'p-2': !disabled,
+        'bg-white': !disabled,
+        'bg-gray-100': disabled,
       }"
         style="min-width: 5rem;"
     >
@@ -75,13 +76,16 @@
         </span>
       </div>
       <div v-else-if="message.type === 'QUOTE'">
-        <b> {{ message.body.quotedMessage.from }} said: </b> <br/>
-        <MessageCard
-            :message="message.body.quotedMessage"
-            :chat-id="chatId"
-            disabled
-            isGroup="false"
-        />
+        <div class="bg-gray-100 py-1 px-1" v-if="showQuoted">
+          <b>{{ message.body.quotedMessage.from }} said: </b> <br/>
+          <MessageCard
+              :message="message.body.quotedMessage"
+              :chat-id="chatId"
+              disabled
+              isGroup="false"
+              :showQuoted="false"
+          />
+        </div>
         {{ message.body.message }}
       </div>
       <div v-else>
@@ -149,6 +153,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    showQuoted: {
+      type: Boolean,
+      default: true
+    }
   },
   setup(props) {
     const showActions = ref(false);
@@ -250,7 +258,8 @@ export default defineComponent({
       config,
       read,
       fileUrl,
-      isGroup: props.isGroup
+      isGroup: props.isGroup,
+      showQuoted: props.showQuoted
     };
   },
 });
