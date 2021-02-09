@@ -36,6 +36,11 @@ export interface QuoteBodyType extends MessageBodyType{
     quotedMessage: Message<MessageBodyType>
 }
 
+export interface GroupUpdate extends MessageBodyType{
+    type: string
+    contact: Contact
+}
+
 export interface Chat {
     chatId: Id,
     messages: Message<MessageBodyType>[];
