@@ -110,7 +110,7 @@
         <span v-if="message.type == 'DELETE'"> deleted - </span>
 
         <small class="font-thin text-right" v-if="isread">is read</small>
-        {{ m(message.timeStamp).fromNow() }}
+<!--        {{ m(message.timeStamp).fromNow() }}-->
       </p>
     </div>
   </div>
