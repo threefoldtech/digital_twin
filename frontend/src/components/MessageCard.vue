@@ -5,46 +5,45 @@
       class="flex"
       :class="{
       'justify-end': isMine(message),
-      'my-2': !disabled,
+      'my-1': !disabled,
     }"
   >
     <div
         class="bg-white relative rounded-lg"
         :class="{
         'bg-gray-100': disabled,
-        'p-4': !disabled,
+        'p-2': !disabled,
       }"
+        style="min-width: 5rem;"
     >
       <pre v-if="config.showdebug">{{ message }}</pre>
       <div v-if="isGroup &&  !isMine(message)">
         <b>{{ message.from }}</b>
       </div>
-      <transition name="fade">
-        <div
-            v-if="showActions"
-            class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-icon text-white px-2"
-        >
-          <button
-              class="mx-0"
-              v-if="
+      <div
+          v-if="showActions"
+          class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-icon text-white px-2"
+      >
+        <button
+            class="mx-0"
+            v-if="
                isMine(message) && (message.type == 'EDIT' || message.type == 'STRING') && !disabled
             "
-              @click="setEditMessage"
-          >
-            <i class="fas fa-pen"></i>
-          </button>
-          <button class="mx-0" @click="setQuoteMessage" v-if="!disabled">
-            <i class="fas fa-reply-all"></i>
-          </button>
-          <button
-              class="mx-0"
-              v-if="isMine(message) && message.type !== 'DELETE' && !disabled"
-              @click="sendUpdateMessage(true)"
-          >
-            <i class="fas fa-trash"></i>
-          </button>
-        </div>
-      </transition>
+            @click="setEditMessage"
+        >
+          <i class="fas fa-pen"></i>
+        </button>
+        <button class="mx-0" @click="setQuoteMessage" v-if="!disabled">
+          <i class="fas fa-reply-all"></i>
+        </button>
+        <button
+            class="mx-0"
+            v-if="isMine(message) && message.type !== 'DELETE' && !disabled"
+            @click="sendUpdateMessage(true)"
+        >
+          <i class="fas fa-trash"></i>
+        </button>
+      </div>
       <span v-if="message.type === 'FILE'">
         <audio
             controls
@@ -110,7 +109,7 @@
         <span v-if="message.type == 'DELETE'"> deleted - </span>
 
         <small class="font-thin text-right" v-if="isread">is read</small>
-<!--        {{ m(message.timeStamp).fromNow() }}-->
+        <!--        {{ m(message.timeStamp).fromNow() }}-->
       </p>
     </div>
   </div>
