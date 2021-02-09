@@ -7,7 +7,7 @@
         :class="{ active: isActive('user') }"
         href="#"
       >
-        Add an user
+        Add a user
       </a>
       <a
         class="nav-link grid-cols-6 text-center py-2"
