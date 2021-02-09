@@ -64,6 +64,14 @@
        <div v-else-if="message.type === 'GIF'">
         <img :src="message.body"/>
       </div>
+      <div v-else-if="message.type === 'GROUP_UPDATE'">
+        <span v-if="message.body.type === 'REMOVEUSER'">
+          <b>{{message.body.contact.id}}</b> removed from the group.
+        </span>
+        <span v-else-if="message.body.type === 'ADDUSER'">
+          <b>{{message.body.contact.id}}</b> added to the group.
+        </span>
+      </div>
       <div v-else-if="message.type === 'QUOTE'">
         <b> {{ message.body.quotedMessage.from }} said: </b> <br/>
         <MessageCard
