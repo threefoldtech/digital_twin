@@ -12,53 +12,58 @@
     </div>
     <jdialog v-model="showDialog" @close="showDialog = false" noActions>
       <template v-slot:title>
-        <h1>Profile settings</h1>
+        <h1>Profile settings {{ showEditPic }}</h1>
       </template>
-
-      <div>Username: {{ user.id }}</div>
-      <div
-        class="relative w-full h-full"
-        @mouseover="showEdit = true"
-        @mouseleave="showEdit = false"
-      >
-        <transition name="fade">
-          <button
-            v-if="!isEditingStatus"
-            :class="showEdit ? 'block' : 'hidden'"
-            class="absolute top-0 right-0"
-            @click="setEditStatus(true)"
-          >
-            <i class="fas fa-pen"></i>
-          </button>
-        </transition>
-
-        <transition name="fade">
-          <button
-            v-if="isEditingStatus"
-            class="absolute top-1 right-0"
-            @click="sendNewStatus"
-          >
-            <i class="fas fa-check"></i>
-          </button>
-        </transition>
-        <textarea
-          v-model="userStatus"
-          class="w-full"
-          :disabled="!isEditingStatus"
-        ></textarea>
-      </div>
       <div>
-        Avatar:
-        <img :src="user.image" />
-      </div>
-      <!-- <template> -->
-      <div class="flex">
-        <button class="px-2 py-8" @click.stop="selectFile">
-          <i
-            class="fas fa-paperclip text-gray-500 transform"
-            style="--tw-rotate: -225deg"
-          ></i>
-        </button>
+        <div
+          class="relative flex justify-center h-52"
+          @mouseover="showEditPic = true"
+          @mouseleave="showEditPic = false"
+        >
+          <transition name="fade">
+            <div
+              v-if="showEditPic"
+              class="grid place-items-center bg-red-500 absolute w-full h-full top-0 left-0"
+            >
+              <button @click.stop="selectFile">
+                <i class="fas fa-pen"></i>
+              </button>
+            </div>
+          </transition>
+          <img class="h-full w-52 bg-black" :src="user.image" />
+        </div>
+        <h1 class="text-center my-4">{{ user.id }}</h1>
+        <div
+          class="relative w-full h-full"
+          @mouseover="showEdit = true"
+          @mouseleave="showEdit = false"
+        >
+          <transition name="fade">
+            <button
+              v-if="!isEditingStatus"
+              :class="showEdit ? 'block' : 'hidden'"
+              class="absolute top-0 right-0"
+              @click="setEditStatus(true)"
+            >
+              <i class="fas fa-pen"></i>
+            </button>
+          </transition>
+
+          <transition name="fade">
+            <button
+              v-if="isEditingStatus"
+              class="absolute top-1 right-0"
+              @click="sendNewStatus"
+            >
+              <i class="fas fa-check"></i>
+            </button>
+          </transition>
+          <textarea
+            v-model="userStatus"
+            class="w-full"
+            :disabled="!isEditingStatus"
+          ></textarea>
+        </div>
         <input
           class="hidden"
           type="file"
@@ -66,22 +71,7 @@
           ref="fileinput"
           @change="changeFile"
         />
-        <div
-          class="file-message col-span-6 w-full h-full pl-4 bg-blue-100"
-          v-if="file"
-        >
-          <span class="truncate"> {{ file.name }}</span>
-          <button class="px-2 py-8" @click.stop="removeFile">
-            <i class="fas fa-minus-circle text-gray-500"></i>
-          </button>
-        </div>
-        <button class="px-2 py-8" @click="sendNewAvatar">
-          <i class="fas fa-paper-plane"></i>
-        </button>
       </div>
-      <!-- </template> -->
-
-      <!-- @closeDialog="showDialog = false"> -->
     </jdialog>
   </div>
 </template>
@@ -98,8 +88,9 @@ export default defineComponent({
   components: { AvatarImg, jdialog: Dialog },
   setup() {
     const { user } = useAuthState();
-    const showDialog = ref(true);
+    const showDialog = ref(false);
     const showEdit = ref(false);
+    const showEditPic = ref(false);
     const fileinput = ref();
     const file = ref();
     const userStatus = ref("");
@@ -136,6 +127,7 @@ export default defineComponent({
 
     return {
       user,
+      showEditPic,
       showEdit,
       showDialog,
       fileinput,
