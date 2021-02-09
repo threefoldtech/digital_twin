@@ -36,7 +36,7 @@
   >
     <div class="h-full">
       <div v-if="!contacts.length">
-        <p class="text-gray-300 text-center py-4">Not able to any contacts in group yet</p>
+        <p class="text-gray-300 text-center py-4">Not able to add any contacts to this group</p>
       </div>
       <div
         v-for="(contact, i) in contacts"
