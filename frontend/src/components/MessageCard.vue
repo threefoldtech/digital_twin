@@ -17,7 +17,7 @@
         style="min-width: 5rem;"
     >
       <pre v-if="config.showdebug">{{ message }}</pre>
-      <div v-if="isGroup &&  !isMine">
+      <div v-if="isGroup &&  !isMine && !disabled">
         <b>{{ message.from }}</b>
       </div>
       <div
