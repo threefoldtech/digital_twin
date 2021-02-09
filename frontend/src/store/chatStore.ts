@@ -99,15 +99,6 @@ const acceptChat = id => {
     state.chatRequests[index].acceptedChat = true
     addChat(state.chatRequests[index]);
     state.chatRequests.splice(index, 1);
-
-    const { contacts } = useContactsState();
-    const {user} = useAuthState() 
-    if(!state.chatRequests[index].isGroup && state.chatRequests[index].acceptedChat){
-      const newContact = state.chatRequests[index].contacts.find(c=> c.id !== user.id)
-      if(newContact){
-        contacts.value.push(<Contact>newContact)
-      }
-    }
   });
 };
 

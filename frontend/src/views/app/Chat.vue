@@ -65,7 +65,8 @@
     <main class="md:col-span-6 w-full h-full relative">
       <chat-view v-if="selectedId && chats.find((c) => c.chatId === selectedId)" :selectedId="selectedId" :key="selectedId" @showContacts="showContacts=true"></chat-view>
       <div class="text-center" v-else-if="chats.length >= 1">
-        select a chat on the left
+        No chat has been selected <br>
+        Please select a chat from the left side
       </div>
       <div v-else class="text-center">
         <p>It feels lonely over here :(</p>
@@ -147,9 +148,6 @@ export default defineComponent({
     const status = computed(() => {
       return statusList[selectedId.value]
     })
-    const {
-      retrieveContacts,
-    } = useContactsActions();
     const { initializeSocket } = useSocketActions();
     const { user } = useAuthState();
 
@@ -178,11 +176,6 @@ export default defineComponent({
       initializeSocket(user.id.toString());
     });
     onBeforeMount(retrievechats);
-    onBeforeMount(() => {
-      retrieveContacts().then(() => {
-        selectedId.value = <string>chats.value[0].chatId;
-      });
-    });
 
     const selectedChat = computed(()=>chats.value.find(chat=> chat.chatId == selectedId.value))
 

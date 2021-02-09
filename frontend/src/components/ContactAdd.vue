@@ -118,7 +118,6 @@ export default defineComponent({
   name: "ContactAdd",
   components: { autoComplete },
   setup(props, { emit }) {
-    const { addContact } = useContactsActions();
     const { contacts } = useContactsState();
     let addGroup = ref(false);
     let usernameAdd = ref("");
@@ -137,7 +136,6 @@ export default defineComponent({
           return;
         }
         console.log(userId);
-        addContact(userId, location.value, false);
         usernameAdd.value = "";
         contactAddError.value = "";
         emit("closeDialog");

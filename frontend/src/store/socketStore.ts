@@ -40,12 +40,6 @@ const initializeSocket = (username: string) => {
     const { contacts } = useContactsState();
     const {user} = useAuthState() 
     addChat(newContactRequest);
-    if(!newContactRequest.isGroup && newContactRequest.acceptedChat){
-      const newContact = newContactRequest.contacts.find(c=> c.id !== user.id)
-      if(newContact){
-        contacts.value.push(newContact)
-      }
-    }
   });
   state.socket.on("chat_updated", (chat) => {
     const {updateChat} = usechatsActions()
