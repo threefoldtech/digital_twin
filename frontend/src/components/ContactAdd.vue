@@ -125,12 +125,17 @@ export default defineComponent({
     let groupnameAdd = ref("");
     let usernameInGroupAdd = ref("");
     let usersInGroup = ref([]);
-    let possibleUsers = ref([]);
+    let possibleUsers = ref<string[]>([]);
     let contactAddError = ref("");
 
     const contactAdd = () => {
       try {
         let userId = usernameAdd.value;
+        if (!possibleUsers.value.find(pu => pu === userId)){
+          //@todo: no alert
+          alert('user not found')
+          return;
+        }
         console.log(userId);
         addContact(userId, location.value, false);
         usernameAdd.value = "";
@@ -203,8 +208,8 @@ export default defineComponent({
 
     // @todo: config
     axios.get(`${config.spawnerUrl}api/v1/list`, {}).then((r) => {
-      console.log(r.data);
-      possibleUsers.value = r.data;
+      const {user} = useAuthState();
+      possibleUsers.value = r.data.filter(pu => pu !== user.id);
     });
 
     return {
