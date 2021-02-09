@@ -126,7 +126,7 @@
     </div>
     <jdialog v-model="showDialog" @close="showDialog = false" noActions>
       <template v-slot:title>
-        <h1>New chat</h1>
+        <h1>Create a new chat</h1>
       </template>
       <add-contact @closeDialog="showDialog = false"> </add-contact>
     </jdialog>

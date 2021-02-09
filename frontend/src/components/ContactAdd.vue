@@ -164,6 +164,9 @@ export default defineComponent({
     const groupAdd = () => {
       const { addGroupchat } = usechatsActions();
       const { user } = useAuthState();
+      if(groupnameAdd.value == ""){
+        return
+      }
       usersInGroup.value.push(user.id);
       const contacts: Contact[] = usersInGroup.value.map((id) => {
         const contact: Contact = {
