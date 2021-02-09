@@ -13,6 +13,7 @@ import Chat from "../models/chat";
 import { config } from "../config/config";
 import { sendEventToConnectedSockets } from "./socketService";
 import { connections } from "../store/connections";
+import {determinChatId} from "../routes/messages";
 
 export const parseMessage = (
   msg: any
@@ -131,7 +132,7 @@ export const editMessage = (
 export const handleRead = (message: Message<string>) => {
   console.log("reading");
 
-  let chatId = message.to === config.userid ? message.from : message.to;
+  let chatId = determinChatId(message);
   const chat = getChat(chatId);
 
   const newRead = chat.messages.find((m) => m.id === message.body);
@@ -139,7 +140,7 @@ export const handleRead = (message: Message<string>) => {
     (m) => m.id === chat.read[<string>message.from]
   );
 
-  if (oldRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) {
+  if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) {
     return;
   }
 

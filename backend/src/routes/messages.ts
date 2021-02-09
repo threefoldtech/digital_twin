@@ -42,7 +42,7 @@ function handleContactRequest(message: Message<ContactRequest>) {
     persistChat(newchat)
 }
 
-const determinChatId = (message: Message<MessageBodyTypeInterface>): DtIdInterface => {
+export const determinChatId = (message: Message<MessageBodyTypeInterface>): DtIdInterface => {
 
     if (message.to === config.userid) {
         return message.from;
@@ -94,15 +94,7 @@ router.put("/", (req, res) => {
 
     let chat = getChat(chatId)
 
-
-    console.log(`chat.isGroup ${chat.isGroup}`)
-    console.log(`chat.chatId ${chat.chatId}`)
-    console.log(`chat.adminId ${chat.adminId}`)
-    console.log(`config.userid ${config.userid}`)
-    console.log(`works? ${chat.isGroup && chat.adminId === config.userid}`)
     if (chat.isGroup && chat.adminId == config.userid) {
-
-
         chat.contacts.filter(c => c.id !== config.userid).forEach(c => {
             console.log(`group sendMessage to ${c.id}`)
             sendMessageToApi(c.id, message);
@@ -132,8 +124,9 @@ router.put("/", (req, res) => {
             return;
         }
 
-
+        console.log(`persistMessage:${chat.chatId}`)
         persistMessage(chat.chatId, message);
+        res.json({status: "success"})
         return;
     }
 
