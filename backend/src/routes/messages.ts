@@ -168,7 +168,7 @@ router.put("/", (req, res) => {
     // const message = new Message(msg.from, msg.to, msg.body);
     console.log(`received new message from ${message.from}`);
     //
-    persistMessage(chat.adminId, message);
+    persistMessage(chat.chatId, message);
     //
     sendEventToConnectedSockets("message", message)
 
