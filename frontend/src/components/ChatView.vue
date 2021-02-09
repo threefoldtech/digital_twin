@@ -29,14 +29,27 @@
     </div>
     <div class="flex-grow row-span-4 relative overflow-y-auto" ref="messageBox">
       <div class="absolute w-full px-4">
-        <MessageCard v-for="(message, i) in chat.messages"
-                     :key="i"
-                     :isread="i <= lastRead"
-                     :isreadbyme="i <= lastReadByMe"
-                     :message="message"
-                     :chatId="chat.chatId"
-                     :isGroup="chat.isGroup"
-        />
+        <template v-for="(message, i) in chat.messages"  :key="i">
+          <MessageCard
+
+                       :isread="i <= lastRead"
+                       :isreadbyme="i <= lastReadByMe"
+                       :message="message"
+                       :chatId="chat.chatId"
+                       :isGroup="chat.isGroup"
+          />
+          <div
+              v-if="showDivider(message, i)"
+              class="text-center px-4"
+          >
+                    <span
+                        class="font-thin"
+                    >
+                      {{ m(message.timeStamp).fromNow()  }}
+                    </span>
+          </div>
+        </template>
+
         <div id="viewAnchor" ref="viewAnchor" style="
     height: 20vh;
     position: absolute;
@@ -166,6 +179,18 @@ export default defineComponent({
       }
     }
 
+    const showDivider = (message, index) => {
+      const previousMessage = chat.value.messages[index - 1];
+      if (!previousMessage) {
+        console.log('oh no')
+        return true;
+      }
+      const time = moment(message.timeStamp);
+
+      return time.diff(previousMessage.timeStamp, "m") > 5;
+    }
+
+
     const viewAnchor = ref(null)
     return {
       chats,
@@ -185,6 +210,8 @@ export default defineComponent({
       blockChat,
       user,
       viewAnchor,
+      showDivider,
+
       ...propRefs,
     };
   },
