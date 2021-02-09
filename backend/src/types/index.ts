@@ -30,8 +30,8 @@ export enum MessageTypes {
     READ = "READ",
     CONTACT_REQUEST = "CONTACT_REQUEST",
     DELETE = "DELETE",
-    QUOTE = "QUOTE"
-
+    GROUP_UPDATE = "GROUP_UPDATE",
+    QUOTE = "QUOTE",
 }
 
 export enum MessageOperations {
