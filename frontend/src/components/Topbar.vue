@@ -4,12 +4,8 @@
     <div
       class="col-end-13 text-right text-gray-500 flex items-center justify-end"
     >
-      <img
-        :src="user.image"
-        alt="User image"
-        class="h-10 mr-4 bg-icon rounded-full"
-      />
-      <span class="mr-2">{{ user.id }}</span>
+      <AvatarImg :id="user.id" />
+      <span class="ml-2">{{ user.id }}</span>
       <button @click="showDialog = true">
         <i class="fas fa-cog text-gray-500"></i>
       </button>
@@ -18,61 +14,88 @@
       <template v-slot:title>
         <h1>Profile settings</h1>
       </template>
-
-      <div>Username: {{ user.id }}</div>
       <div>
-        Avatar:
-        <img :src="user.image" />
-      </div>
-      <!-- <template> -->
-        <div class="flex">
-          <button class="px-2 py-8 " @click.stop="selectFile">
-            <i
-              class="fas fa-paperclip text-gray-500 transform"
-              style="--tw-rotate: -225deg"
-            ></i>
-          </button>
-          <input
-            class="hidden"
-            type="file"
-            id="fileinput"
-            ref="fileinput"
-            @change="changeFile"
-          />
-          <div
-            class="file-message col-span-6 w-full h-full pl-4 bg-blue-100"
-            v-if="file"
-          >
-            <span class="truncate"> {{ file.name }}</span>
-            <button class="px-2 py-8" @click.stop="removeFile">
-              <i class="fas fa-minus-circle text-gray-500"></i>
-            </button>
-          </div>
-          <button class="px-2 py-8" @click="sendNewAvatar">
-            <i class="fas fa-paper-plane"></i>
-          </button>
+        <div
+          class="relative flex justify-center h-52"
+          @mouseover="showEditPic = true"
+          @mouseleave="showEditPic = false"
+        >
+          <transition name="fade">
+            <div
+              @click.stop="selectFile"
+              v-if="showEditPic"
+              class="grid cursor-pointer place-items-center bg-black bg-opacity-75 absolute w-full h-full top-0 left-0"
+            >
+              <button class="text-white">
+                <i class="fas fa-pen"></i>
+              </button>
+            </div>
+          </transition>
+          <img class="h-full w-52 bg-black" :src="user.image" />
         </div>
-      <!-- </template> -->
+        <h1 class="text-center my-4">{{ user.id }}</h1>
+        <div
+          class="relative w-full h-full"
+          @mouseover="showEdit = true"
+          @mouseleave="showEdit = false"
+        >
+          <transition name="fade">
+            <button
+              v-if="!isEditingStatus"
+              :class="showEdit ? 'block' : 'hidden'"
+              class="absolute top-0 right-0"
+              @click="setEditStatus(true)"
+            >
+              <i class="fas fa-pen"></i>
+            </button>
+          </transition>
 
-      <!-- @closeDialog="showDialog = false"> -->
+          <transition name="fade">
+            <button
+              v-if="isEditingStatus"
+              class="absolute top-1 right-0"
+              @click="sendNewStatus"
+            >
+              <i class="fas fa-check"></i>
+            </button>
+          </transition>
+          <textarea
+            v-model="userStatus"
+            class="w-full"
+            :disabled="!isEditingStatus"
+          ></textarea>
+        </div>
+        <input
+          class="hidden"
+          type="file"
+          id="fileinput"
+          ref="fileinput"
+          @change="changeFile"
+        />
+      </div>
     </jdialog>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useAuthState } from "../store/authStore";
-import { useSocketActions } from "../store/socketStore"
+import { useSocketActions } from "../store/socketStore";
 import Dialog from "./Dialog.vue";
+import AvatarImg from "@/components/AvatarImg.vue";
 
 export default defineComponent({
   name: "Topbar",
-  components: { jdialog: Dialog },
+  components: { AvatarImg, jdialog: Dialog },
   setup() {
     const { user } = useAuthState();
     const showDialog = ref(false);
+    const showEdit = ref(false);
+    const showEditPic = ref(false);
     const fileinput = ref();
     const file = ref();
+    const userStatus = ref("");
+    const isEditingStatus = ref(false);
 
     const selectFile = () => {
       fileinput.value.click();
@@ -83,21 +106,41 @@ export default defineComponent({
     const removeFile = () => {
       file.value = null;
     };
-    const sendNewAvatar =  async () => {
-      const {sendSocketAvatar} = useSocketActions()
-      const buffer = await file.value.arrayBuffer()
-      sendSocketAvatar(buffer)
+
+    const sendNewAvatar = async () => {
+      const { sendSocketAvatar } = useSocketActions();
+      const buffer = await file.value.arrayBuffer();
+      sendSocketAvatar(buffer);
+      showDialog.value = false;
+    };
+
+    const setEditStatus = (edit: boolean) => {
+      console.log(edit);
+      isEditingStatus.value = edit;
+      userStatus.value = user.status;
+    };
+    const sendNewStatus = async () => {
+      const { sendSocketUserStatus } = useSocketActions();
+      sendSocketUserStatus(userStatus.value);
+      user.status = userStatus.value;
+      isEditingStatus.value = false;
     };
 
     return {
       user,
+      showEditPic,
+      showEdit,
       showDialog,
       fileinput,
       file,
       selectFile,
       changeFile,
       removeFile,
-      sendNewAvatar
+      sendNewAvatar,
+      sendNewStatus,
+      userStatus,
+      setEditStatus,
+      isEditingStatus,
     };
   },
 });

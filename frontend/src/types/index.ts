@@ -1,6 +1,7 @@
 export interface User extends AnonymousContact {
     image: string,
-    email: string
+    email: string,
+    status: string
 }
 
 export interface App {
@@ -35,25 +36,27 @@ export interface QuoteBodyType extends MessageBodyType{
     quotedMessage: Message<MessageBodyType>
 }
 
+export interface GroupUpdate extends MessageBodyType{
+    type: string
+    contact: Contact
+}
+
 export interface Chat {
     chatId: Id,
     messages: Message<MessageBodyType>[];
     read: {
         [key: string]: string
     };
+    contacts: (AnonymousContact|Contact)[];
     acceptedChat: boolean;
     name: string;
-}
-export interface PersonChat extends Chat{
-    chatId: DtId;
-    messages: Message<MessageBodyType>[];
-}
-
-export interface GroupChat extends Chat{
-    chatId: Id;
-    contacts: (AnonymousContact|Contact)[];
+    isGroup:boolean
     adminId: Id;
+
 }
+export interface PersonChat extends Chat{}
+
+export interface GroupChat extends Chat{}
 
 export interface Contact extends AnonymousContact {
     location:string,

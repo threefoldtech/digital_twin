@@ -1,4 +1,4 @@
-import { sendMessageToApi } from './../service/apiService';
+import {getDigitalTwinUrl, getLocationForId, sendMessageToApi} from './../service/apiService';
 import { ContactRequest, DtIdInterface, MessageInterface, MessageOperations, MessageTypes } from './../types/index';
 import { parseMessage } from './../service/messageService';
 import {Router} from 'express';
@@ -12,6 +12,8 @@ import {contactRequests} from "../store/contactRequests";
 import {MessageBodyTypeInterface} from "../types";
 import {addChat, getMessagesFromId} from "../service/chatService";
 import { uuidv4 } from '../common';
+import {sendEventToConnectedSockets} from "../service/socketService";
+
 
 const router = Router();
 
@@ -28,7 +30,7 @@ router.post("/", (req, res) => {
 
     const message:MessageInterface<MessageBodyTypeInterface> = parseMessage(con.message)
     console.log(`creating chat`)
-    addChat(contact.id,[contact],false, message ,contact.id, true, contact.id)
+    const chat = addChat(contact.id,[contact, new Contact(config.userid, getLocationForId(config.userid))],false, message ,contact.id, true, contact.id)
 
 
     const url = `/api/messages`
@@ -44,19 +46,9 @@ router.post("/", (req, res) => {
         "timeStamp": new Date()
     }
     console.log("sending to ",url)
-    sendMessageToApi(contact.location,data,MessageOperations.NEW)
-    try{
-        axios.put(
-            url,
-            data).then( () => {
-            console.log("Send request to ", contact.location)
-        }).catch((e)=>{
-            console.log("couldnt send contact request")
-        })
-    }catch (e) {
-        console.log("couldn't send contact request")
-    }
-    res.sendStatus(200);
+    sendMessageToApi(contact.location,data)
+    sendEventToConnectedSockets("connectionRequest",chat)
+    res.sendStatus(200)
 });
 
 

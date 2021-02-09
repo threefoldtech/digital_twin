@@ -1,10 +1,11 @@
 <template>
   <transition name="fade">
     <div
+      @keydown.esc="$emit('close', false)"
       v-if="modelValue"
       class="fixed z-50 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
     >
-      <div class="form-container bg-white p-4 lg:w-1/5 w-10/12 max-w-full rounded">
+      <div class="form-container bg-white p-4 lg:w-2/5 w-10/12 max-w-full rounded">
         <div class="flex justify-between">
           <slot name="title"/>
           <button @click="$emit('close', false)">

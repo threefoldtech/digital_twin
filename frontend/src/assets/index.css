@@ -23,10 +23,10 @@
   label {
     white-space: nowrap
   }
-  input, select {
+  input, textarea, select {
     @apply my-1 border-b-2 w-full p-1 transition;
   }
-  input:focus, select {
+  input:focus, textarea:focus, select {
     @apply outline-none border-accent;
   }
   button {

@@ -22,6 +22,7 @@ export interface TabInterface {
 
 export enum MessageTypes {
     STRING = "STRING",
+    GIF = "GIF",
     MESSAGE = "MESSAGE",
     FILE = "FILE",
     FILE_UPLOAD = "FILE_UPLOAD",
@@ -29,8 +30,8 @@ export enum MessageTypes {
     READ = "READ",
     CONTACT_REQUEST = "CONTACT_REQUEST",
     DELETE = "DELETE",
-    QUOTE = "QUOTE"
-
+    GROUP_UPDATE = "GROUP_UPDATE",
+    QUOTE = "QUOTE",
 }
 
 export enum MessageOperations {
@@ -50,7 +51,7 @@ export interface MessageInterface <T>{
 }
 
 export interface MessageBodyTypeInterface {
-    
+
 }
 // export interface String  extends MessageBodyTypeInterface {
 

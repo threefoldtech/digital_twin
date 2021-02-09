@@ -19,7 +19,7 @@ const retrieveContacts = async () => {
     return axios.get(`${config.baseUrl}api/contacts`).then(function(response) {
         const contacts = response.data
         console.log(`here are the contacts`, contacts)
-        
+
         state.contacts = contacts;
     })
 
@@ -43,7 +43,7 @@ const addContact = (username:DtId, location, dontCheck = false) => {
     const {user} = useAuthState()
     const addMessage:Message<String> = {
         id: uuidv4(),
-        body: `Request has been send to ${username}`,
+        body: `Request has been sent to ${username}`,
         from: user.id,
         to: username,
         timeStamp: new Date(),
@@ -51,21 +51,6 @@ const addContact = (username:DtId, location, dontCheck = false) => {
     }
     const chatname:String = username
     axios.post(`${config.baseUrl}api/contacts`, {id:username,location,message:addMessage}).then( (res) => {
-        const contact:Contact = {
-            id:username,
-            location
-        }
-
-        state.contacts.push(contact)
-        const {addChat} = usechatsActions()
-        const chat:PersonChat = {
-            read: {},
-            chatId:username,
-            messages:[addMessage],
-            name: chatname.toString(),
-            acceptedChat: true
-        }
-        addChat(chat)
     })
 }
 

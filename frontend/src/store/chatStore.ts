@@ -1,18 +1,28 @@
 import { reactive } from "@vue/reactivity";
-import { toRefs } from "vue";
+import {ref, toRefs} from "vue";
 import axios from "axios";
 import moment from "moment";
-import { Chat, Contact, Message, GroupChat, MessageBodyType, PersonChat } from "../types";
+import {
+  Chat,
+  Contact,
+  Message,
+  GroupChat,
+  MessageBodyType,
+  PersonChat, DtId, GroupUpdate
+} from "../types";
 import { useSocketActions } from "./socketStore";
 import { useAuthState } from "./authStore";
-import { useContactsActions } from "./contactStore";
+import { useContactsActions, useContactsState } from "./contactStore";
 import config from "../../public/config/config";
 import { uuidv4 } from "@/common";
+import {startFetchStatusLoop} from "@/store/statusStore";
 
 const state = reactive<chatstate>({
   chats: [],
   chatRequests: []
 });
+
+export const selectedId = ref("");
 
 const retrievechats = async () => {
   const response = await axios
@@ -30,26 +40,41 @@ const retrievechats = async () => {
 };
 
 const addChat = (chat: Chat) => {
-  if(chat.acceptedChat){
+
+  if (!chat.isGroup){
+    startFetchStatusLoop(chat.chatId)
+  }
+
+  if (chat.acceptedChat) {
     state.chats.push(chat);
-  }else{
-    state.chatRequests.push(chat)
+  } else {
+    state.chatRequests.push(chat);
   }
   sortChats();
+};
+
+export const removeChat = (chatId) => {
+  console.log('remove')
+  state.chats = state.chats.filter(c => c.chatId !== chatId)
+  console.log(state.chats)
+  sortChats();
+  selectedId.value = <string>state.chats.find(()=>true)?.chatId
+
 };
 
 const addGroupchat = (name: string, contacts: Contact[]) => {
   const { user } = useAuthState();
   const newGroupchat: GroupChat = {
+    isGroup: true,
     chatId: uuidv4(),
     contacts: contacts,
     messages: [
       {
-        from: "localhost:8080",
-        to: "testgroup",
-        body: "testing",
+        from: user.id,
+        to: name,
+        body: `${user.id} has created and invited you to${name}`,
         timeStamp: new Date(),
-        id: "3d11c0cf-0fa9-4177-90c3-1ac08d2313f7",
+        id: uuidv4(),
         type: "STRING"
       }
     ],
@@ -61,7 +86,6 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
   axios
     .put(`${config.baseUrl}api/group`, newGroupchat)
     .then(res => {
-      addChat(newGroupchat)
       console.log(res);
     })
     .catch(e => {
@@ -69,13 +93,28 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
     });
 };
 
-const acceptChat = (id) => {
-  axios.post(`${config.baseUrl}api/chats?id=${id}`).then( (res) => {
-      const index = state.chatRequests.findIndex(c=>c.chatId==id)
-      console.log(state.chatRequests[index])
-      state.chats.push(state.chatRequests[index])
-      state.chatRequests.splice(index,1)
-  })
+const acceptChat = id => {
+  axios.post(`${config.baseUrl}api/chats?id=${id}`).then(res => {
+    const index = state.chatRequests.findIndex(c => c.chatId == id);
+    state.chatRequests[index].acceptedChat = true
+    addChat(state.chatRequests[index]);
+    state.chatRequests.splice(index, 1);
+
+    const { contacts } = useContactsState();
+    const {user} = useAuthState() 
+    if(!state.chatRequests[index].isGroup && state.chatRequests[index].acceptedChat){
+      const newContact = state.chatRequests[index].contacts.find(c=> c.id !== user.id)
+      if(newContact){
+        contacts.value.push(<Contact>newContact)
+      }
+    }
+  });
+};
+
+const updateChat = (chat:Chat) => {
+  const index = state.chats.findIndex(c => c.chatId == chat.chatId)
+  removeChat(chat.chatId)
+  addChat(chat)
 }
 
 const addMessage = (chatId, message) => {
@@ -99,8 +138,13 @@ const addMessage = (chatId, message) => {
     return;
   }
 
-  console.log("in addmessage chatid", chatId);
-  console.log("in addmessage message", message);
+  if(message.type === "REMOVEUSER"||message.type === "ADDUSER"){
+    //@todo
+    return
+  }
+
+  // console.log("in addmessage chatid", chatId);
+  // console.log("in addmessage message", message);
 
   const chat: Chat = state.chats.find(chat => chat.chatId == chatId);
   const index = chat.messages.findIndex(mes => mes.id == message.id);
@@ -114,7 +158,7 @@ const addMessage = (chatId, message) => {
   setLastMessage(chatId, message);
 };
 
-const sendMessage = (chatId, message) => {
+const sendMessage = (chatId, message, type: string = "STRING") => {
   const { sendSocketMessage } = useSocketActions();
   const { user } = useAuthState();
   const msg: Message<String> = {
@@ -123,7 +167,7 @@ const sendMessage = (chatId, message) => {
     from: user.id,
     to: chatId,
     timeStamp: new Date(),
-    type: "STRING"
+    type: type
   };
   addMessage(chatId, msg);
   sendSocketMessage(chatId, msg);
@@ -131,7 +175,7 @@ const sendMessage = (chatId, message) => {
 
 const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
   const { sendSocketMessage } = useSocketActions();
-  console.log(chatId, message);
+  // console.log(chatId, message);
   addMessage(chatId, message);
   let isEdit = false;
   if (message.type === "EDIT" || message.type === "DELETE") {
@@ -206,6 +250,27 @@ const readMessage = (chatId, messageId) => {
   sendMessageObject(chatId, newMessage);
 };
 
+const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => { 
+  const { user } = useAuthState();
+
+  const operation = remove? "REMOVEUSER": "ADDUSER"
+  console.log(`${operation} ${contact.id} from ${groupId}`)
+  const message:Message<GroupUpdate> = {
+    id: uuidv4(),
+    from: user.id,
+    to: groupId,
+    body: <GroupUpdate>{
+      type: operation,
+      contact
+    },
+    timeStamp: new Date(),
+    type: "GROUP_UPDATE"
+  }
+  console.log(message)
+  sendMessageObject(groupId,message)
+}
+
+
 export const usechatsState = () => {
   return {
     ...toRefs(state)
@@ -222,7 +287,9 @@ export const usechatsActions = () => {
     sendMessageObject,
     addGroupchat,
     readMessage,
-    acceptChat
+    acceptChat,
+    updateContactsInGroup,
+    updateChat
   };
 };
 
@@ -232,8 +299,6 @@ interface chatstate {
 }
 
 export const handleRead = (message: Message<string>) => {
-  console.log("reading");
-
   const { user } = useAuthState();
 
   let chatId = message.to === user.id ? message.from : message.to;
@@ -253,6 +318,7 @@ export const handleRead = (message: Message<string>) => {
   ) {
     return;
   }
+
 
   chat.read[<string>message.from] = message.body;
 };

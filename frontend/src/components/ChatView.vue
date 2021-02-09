@@ -1,39 +1,63 @@
 <template>
   <div class="relative h-full w-full flex flex-col">
-    <div class="grid grid-cols-12 bg-white rounded-lg shadow z-10">
+    <div class="grid bg-white grid-cols-12 rounded-lg shadow z-10">
       <button @click="$emit('showContacts')" class="md:hidden">
         <i class="fas fa-chevron-left"></i>
       </button>
       <div class="col-span-2 place-items-center grid">
-        <img
-            :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-            chat.name
-          )}.svg`"
-            alt="User image"
-            class="h-12 bg-icon rounded-full"
-        />
+        <AvatarImg :id="chat.chatId"></AvatarImg>
       </div>
       <div class="col-span-6 py-4 pl-2">
         <p class="font-bold font">{{ chat.name }}</p>
-        <p class="font-thin">{{ statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline" }}</p>
+        <p class="font-thin" v-if="!chat.isGroup">{{
+            statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline"
+          }}</p>
+        <p class="font-thin" v-if="chat.isGroup">GroupChat ## change this copy ##</p>
         <!-- <p class="font-thin">
           <span v-if=".isOnline">Is online</span>
           <span v-else> Last seen {{ m(contact.lastSeen).fromNow() }} </span>
         </p> -->
       </div>
-      <div class="col-span-3 py-4 pl-2">
-        <button @click="popupMeeting">goto video</button>
+      <div class="col-end-13 pr-2 flex justify-end">
+        <button @click="deleteChat" class="text-red-600">Delete</button>
+        <button @click="blockChat" class="text-red-600">Block</button>
+
+        <button @click="popupMeeting" class="flex flex-col items-center justify-center">
+          <i class="fas fa-video"></i>
+        </button>
       </div>
     </div>
     <div class="flex-grow row-span-4 relative overflow-y-auto" ref="messageBox">
       <div class="absolute w-full px-4">
-        <MessageCard v-for="(message, i) in chat.messages"
-                     :key="i"
-                     :isread="i <= lastRead"
-                     :isreadbyme="i <= lastReadByMe"
-                     :message="message"
-                     :chatId="chat.chatId"
-        />
+        <template v-for="(message, i) in chat.messages" :key="i">
+          <div
+              v-if="showDivider(message, i)"
+              class="text-center px-4"
+          >
+                    <span
+                        class="font-thin"
+                    >
+                      {{ m(message.timeStamp).fromNow() }}
+                    </span>
+          </div>
+          <MessageCard
+
+              :isread="i <= lastRead"
+              :isreadbyme="i <= lastReadByMe"
+              :message="message"
+              :chatId="chat.chatId"
+              :isGroup="chat.isGroup"
+              :isMine="message.from === user.id"
+          />
+
+        </template>
+
+        <div id="viewAnchor" ref="viewAnchor" style="
+    height: 20vh;
+    position: absolute;
+    bottom: 0;
+    width: 50%;
+"></div>
       </div>
     </div>
 
@@ -63,11 +87,13 @@ import MessageCard from "@/components/MessageCard.vue";
 import ChatInput from "@/components/ChatInput.vue";
 import {popupCenter} from "@/services/popupService";
 import * as crypto from "crypto-js";
+import AvatarImg from "@/components/AvatarImg.vue";
+import {sendBlockChat, sendRemoveChat} from "@/store/socketStore";
 
 
 export default defineComponent({
   name: "ChatView",
-  components: {ChatInput, MessageCard},
+  components: {AvatarImg, ChatInput, MessageCard},
   props: {
     selectedId: String,
   },
@@ -86,7 +112,7 @@ export default defineComponent({
       console.log(chat.value)
       let id = <string>user.id;
       //@ts-ignore
-      const { [id]: _, ...read } = chat.value.read;
+      const {[id]: _, ...read} = chat.value.read;
 
       const reads = Object.values(read)
 
@@ -134,12 +160,40 @@ export default defineComponent({
     const popupMeeting = () => {
 
       // @ts-ignore
-      const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
+      // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
+      const str: string = chat.value.isGroup ? chat.value.chatId : chat.value.contacts.map(c => c.id).sort().join();
+
+      console.log(`str = ${str}`)
 
       const ID = crypto.SHA1(str)
-      popupCenter('https://meetings.jimber.org/room/' + ID, "Threefold login", 800, 550)
+      popupCenter('https://freeflowconnect.threefold.me/room/' + ID, "video chat", 800, 550)
     }
 
+    const deleteChat = () => {
+      sendRemoveChat(chat.value.chatId)
+    }
+
+    const blockChat = () => {
+      // @ts-ignore
+      const confirmed = confirm(`do you really want do block ${chat?.name}?`);
+      if (confirmed == true) {
+        sendBlockChat(chat.value.chatId)
+      }
+    }
+
+    const showDivider = (message, index) => {
+      const previousMessage = chat.value.messages[index - 1];
+      if (!previousMessage) {
+        console.log('oh no')
+        return true;
+      }
+      const time = moment(message.timeStamp);
+
+      return time.diff(previousMessage.timeStamp, "m") > 5;
+    }
+
+
+    const viewAnchor = ref(null)
     return {
       chats,
       chat,
@@ -154,6 +208,12 @@ export default defineComponent({
       popupMeeting,
       lastRead,
       lastReadByMe,
+      deleteChat,
+      blockChat,
+      user,
+      viewAnchor,
+      showDivider,
+
       ...propRefs,
     };
   },

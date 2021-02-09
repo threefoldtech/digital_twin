@@ -1,67 +1,87 @@
 <template>
   <div
-      class=" flex "
+      @mouseover="showActions = true"
+      @mouseleave="showActions = false"
+      class="flex"
       :class="{
-      'justify-end': isMine(message),
-      'my-2': !disabled
+      'justify-end': isMine,
+      'my-1': !disabled,
     }"
   >
-    <div class="bg-white  rounded-lg truncate"
-         :class="{
-      'bg-gray-100': disabled,
-      'p-4': !disabled
-    }">
+    <div
+        class="bg-white relative rounded-lg"
+        :class="{
+        'bg-gray-100': disabled,
+        'p-2': !disabled,
+      }"
+        style="min-width: 5rem;"
+    >
       <pre v-if="config.showdebug">{{ message }}</pre>
-      <div class="btn-group">
+      <div v-if="isGroup &&  !isMine">
+        <b>{{ message.from }}</b>
+      </div>
+      <div
+          v-if="showActions"
+          class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-icon text-white px-2"
+      >
         <button
-            v-if="(message.type == 'EDIT' || message.type == 'STRING') && !disabled"
+            class="mx-0"
+            v-if="
+               isMine && (message.type == 'EDIT' || message.type == 'STRING') && !disabled
+            "
             @click="setEditMessage"
         >
-          <i class="fas fa-pen text-gray-500"></i>
+          <i class="fas fa-pen"></i>
         </button>
-        <button @click="setQuoteMessage" v-if="!disabled">
-          <i class="fas fa-reply-all text-gray-500"></i>
+        <button class="mx-0" @click="setQuoteMessage" v-if="!disabled">
+          <i class="fas fa-reply-all"></i>
         </button>
-        <button v-if="message.type !== 'DELETE' && !disabled" @click="sendUpdateMessage(true)">
-          <i class="fas fa-minus-circle text-gray-500"></i>
+        <button
+            class="mx-0"
+            v-if="isMine && message.type !== 'DELETE' && !disabled"
+            @click="sendUpdateMessage(true)"
+        >
+          <i class="fas fa-trash"></i>
         </button>
       </div>
-      <br/>
       <span v-if="message.type === 'FILE'">
         <audio
             controls
             v-if="message.body.filename.indexOf('.WebM') !== -1"
-            :src="`https://${message.from.replace(
-            'localhost:8080',
-            'localhost:3000'
-          )}.digitaltwin.jimbertesting.be/api/files/${message.to}/${message.body.filename}`
-          .replace(
-            'https://localhost:3000.digitaltwin.jimbertesting.be/',
-            'http://localhost:3000/'
-          )"
+            :src="fileUrl"
         ></audio>
 
         <img
             v-if="message.body.filename.indexOf('.gif') !== -1"
-            :src="`http://${message.from.replace(
-            'localhost:8080',
-            'localhost:3000'
-          )}/api/files/${message.to}/${message.body.filename}`"
+            :src="fileUrl"
         />
         <br/>
         <a
             class="py-2 px-2 bg-green-200 border-r-2"
-            :href="`http://${message.from.replace(
-            'localhost:8080',
-            'localhost:3000'
-          )}/api/files/${message.to}/${message.body.filename}`"
+            :href="fileUrl"
             download
         >{{ message.body.filename }}</a
         >
       </span>
+      <div v-else-if="message.type === 'GIF'">
+        <img :src="message.body"/>
+      </div>
+      <div v-else-if="message.type === 'GROUP_UPDATE'">
+        <span v-if="message.body.type === 'REMOVEUSER'">
+          <b>{{ message.body.contact.id }}</b> removed from the group.
+        </span>
+        <span v-else-if="message.body.type === 'ADDUSER'">
+          <b>{{ message.body.contact.id }}</b> added to the group.
+        </span>
+      </div>
       <div v-else-if="message.type === 'QUOTE'">
         <b> {{ message.body.quotedMessage.from }} said: </b> <br/>
-        <MessageCard :message="message.body.quotedMessage" :chat-id="chatId" disabled/>
+        <MessageCard
+            :message="message.body.quotedMessage"
+            :chat-id="chatId"
+            disabled
+            isGroup="false"
+        />
         {{ message.body.message }}
       </div>
       <div v-else>
@@ -82,14 +102,14 @@
       <p
           class="font-thin"
           :class="{
-          'text-right': isMine(message),
+          'text-right': isMine,
         }"
       >
-        <span v-if="message.type == 'EDIT'"> edited - </span>
-        <span v-if="message.type == 'DELETE'"> deleted - </span>
+        <span v-if="message.type == 'EDIT'"> edited </span>
+        <span v-if="message.type == 'DELETE'"> deleted  </span>
 
-        <small class="font-thin text-right " v-if="isread">is read</small>
-        {{ m(message.timeStamp).fromNow() }}
+        <small class="font-thin text-right" v-if="isread">is read</small>
+        <!--        {{ m(message.timeStamp).fromNow() }}-->
       </p>
     </div>
   </div>
@@ -111,24 +131,27 @@ export default defineComponent({
     chatId: String,
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isread: {
       type: Boolean,
-      default: false
+      default: false,
     },
     isreadbyme: {
       type: Boolean,
-      default: false
+      default: false,
+    },
+    isGroup: {
+      type: Boolean,
+      default: false,
+    },
+    isMine: {
+      type: Boolean,
+      default: false,
     },
   },
   setup(props) {
-    const {user} = useAuthState();
-
-    const isMine = (message) => {
-      return message.from == user.id;
-    };
-
+    const showActions = ref(false);
     const m = (val) => moment(val);
 
     const editMessage = ref(false);
@@ -137,7 +160,6 @@ export default defineComponent({
     const quoteMessage = ref(false);
     const quoteMessageValue = ref("");
     const {sendMessageObject} = usechatsActions();
-
 
     const setEditMessage = () => {
       editMessage.value = true;
@@ -194,17 +216,28 @@ export default defineComponent({
     };
 
     const read = () => {
-      const {readMessage} = usechatsActions()
-      readMessage(props.chatId, props.message.id)
+      const {readMessage} = usechatsActions();
+      readMessage(props.chatId, props.message.id);
+    };
+    if (!props.isreadbyme) {
+      read();
     }
-    nextTick(() => {
-      if (!props.isreadbyme){
-        read()
-      }
-    })
+
+
+    const fileUrl = props.message.body?.filename ?
+        `https://${props.message.from.replace(
+            'localhost:8080',
+            'localhost:3000'
+        )}.digitaltwin.jimbertesting.be/api/files/${props.message.to}/${
+            props.message.body.filename
+        }`.replace(
+            'https://localhost:3000.digitaltwin.jimbertesting.be/',
+            'http://localhost:3000/'
+        ) : false
 
     return {
-      isMine,
+      showActions,
+      isMine: props.isMine,
       m,
       setEditMessage,
       setQuoteMessage,
@@ -215,7 +248,9 @@ export default defineComponent({
       quoteMessageValue,
       sendQuoteMessage,
       config,
-      read
+      read,
+      fileUrl,
+      isGroup: props.isGroup
     };
   },
 });
