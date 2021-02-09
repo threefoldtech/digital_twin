@@ -16,6 +16,9 @@
       }"
     >
       <pre v-if="config.showdebug">{{ message }}</pre>
+      <div v-if="isGroup &&  !isMine(message)">
+        <b>{{message.from}}</b>
+      </div>
       <transition name="fade">
         <div
             v-if="showActions"
@@ -78,6 +81,7 @@
             :message="message.body.quotedMessage"
             :chat-id="chatId"
             disabled
+            isGroup="false"
         />
         {{ message.body.message }}
       </div>
@@ -135,6 +139,10 @@ export default defineComponent({
       default: false,
     },
     isreadbyme: {
+      type: Boolean,
+      default: false,
+    },
+    isGroup: {
       type: Boolean,
       default: false,
     },
@@ -246,7 +254,8 @@ export default defineComponent({
       sendQuoteMessage,
       config,
       read,
-      fileUrl
+      fileUrl,
+      isGroup: props.isGroup
     };
   },
 });

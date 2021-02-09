@@ -35,6 +35,7 @@
                      :isreadbyme="i <= lastReadByMe"
                      :message="message"
                      :chatId="chat.chatId"
+                     :isGroup="chat.isGroup"
         />
       </div>
     </div>
