@@ -3,7 +3,7 @@ import {Router} from 'express';
 import Message from "../models/message";
 import {contactRequests} from "../store/contactRequests";
 import {sendEventToConnectedSockets} from "../service/socketService";
-import {ContactRequest, MessageBodyTypeInterface, MessageTypes, MessageOperations} from "../types";
+import {ContactRequest, MessageBodyTypeInterface, MessageTypes} from "../types";
 import Contact from "../models/contact";
 import {editMessage, handleRead, parseMessage} from "../service/messageService";
 import {persistMessage} from "../service/chatService";
@@ -12,6 +12,7 @@ import {config} from "../config/config";
 import {getLocationForId, sendMessageToApi} from "../service/apiService";
 import Chat from '../models/chat';
 import {uuidv4} from '../common';
+import { handleGroupUpdate} from "../service/groupService";
 
 const router = Router();
 
@@ -84,11 +85,20 @@ router.put("/", (req, res) => {
     console.log(`config.userid ${config.userid}`)
     console.log(`works? ${chat.isGroup && chat.adminId === config.userid}`)
     if (chat.isGroup && chat.adminId == config.userid ){
+
+
+
         chat.contacts.filter(c => c.id !== config.userid).forEach(c => {
             console.log(`group sendMessage to ${c.id}`)
             sendMessageToApi(c.id, message);
         })
 
+        if (message.type === MessageTypes.GROUP_UPDATE) {
+            handleGroupUpdate(<any>message, chat);
+
+            res.json({status:"success"})
+            return;
+        }
 
         console.log(`received new group message from ${message.from}`);
         sendEventToConnectedSockets( "message", message)
@@ -134,6 +144,14 @@ router.put("/", (req, res) => {
 
     if (message.type === MessageTypes.READ) {
         handleRead(message as Message<string>);
+
+        res.json({status:"success"})
+        return;
+    }
+
+
+    if (message.type === MessageTypes.GROUP_UPDATE) {
+        handleGroupUpdate(<any>message, chat);
 
         res.json({status:"success"})
         return;

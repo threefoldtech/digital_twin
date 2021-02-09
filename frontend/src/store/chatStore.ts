@@ -247,6 +247,7 @@ const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
     timeStamp: new Date(),
     type: "READ"
   }
+  console.log(message)
   sendMessageObject(groupId,message)
 }
 
