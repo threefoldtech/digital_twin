@@ -9,7 +9,7 @@ import {editMessage, handleRead, parseMessage} from "../service/messageService";
 import {persistMessage} from "../service/chatService";
 import {getChat} from "../service/dataService";
 import {config} from "../config/config";
-import {sendMessageToApi} from "../service/apiService";
+import {getLocationForId, sendMessageToApi} from "../service/apiService";
 import Chat from '../models/chat';
 import {uuidv4} from '../common';
 
@@ -17,9 +17,9 @@ const router = Router();
 
 function handleContactRequest(message: Message<ContactRequest>) {
     contactRequests.push(<Contact><unknown>message.body)
-    const otherContact = new Contact(<string>message.body.id,message.body.location)
+    const otherContact = new Contact(<string>message.from,getLocationForId(<string>message.from))
     //@TODO fix this location with config
-    const myself = new Contact(<string>config.userid,`${config.userid}-chat`)
+    const myself = new Contact(<string>config.userid,getLocationForId(<string>config.userid))
     const requestMsg:Message<String> = {
         from:message.from,
         to: message.to,
