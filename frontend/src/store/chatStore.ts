@@ -103,6 +103,12 @@ const acceptChat = id => {
   });
 };
 
+const updateChat = (chat:Chat) => {
+  const index = state.chats.findIndex(c => c.chatId == chat.chatId)
+  removeChat(chat.chatId)
+  addChat(chat)
+}
+
 const addMessage = (chatId, message) => {
   if (message.type === "READ") {
     const chat: Chat = state.chats.find(chat => chat.chatId == chatId);
@@ -124,13 +130,13 @@ const addMessage = (chatId, message) => {
     return;
   }
 
-  if(message.type === "GROUP_UPDATE"){
+  if(message.type === "REMOVEUSER"||message.type === "ADDUSER"){
     //@todo
     return
   }
 
-  console.log("in addmessage chatid", chatId);
-  console.log("in addmessage message", message);
+  // console.log("in addmessage chatid", chatId);
+  // console.log("in addmessage message", message);
 
   const chat: Chat = state.chats.find(chat => chat.chatId == chatId);
   const index = chat.messages.findIndex(mes => mes.id == message.id);
@@ -161,7 +167,7 @@ const sendMessage = (chatId, message, type: string = "STRING") => {
 
 const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
   const { sendSocketMessage } = useSocketActions();
-  console.log(chatId, message);
+  // console.log(chatId, message);
   addMessage(chatId, message);
   let isEdit = false;
   if (message.type === "EDIT" || message.type === "DELETE") {
@@ -275,6 +281,7 @@ export const usechatsActions = () => {
     readMessage,
     acceptChat,
     updateContactsInGroup,
+    updateChat
   };
 };
 
@@ -284,8 +291,6 @@ interface chatstate {
 }
 
 export const handleRead = (message: Message<string>) => {
-  console.log("reading");
-
   const { user } = useAuthState();
 
   let chatId = message.to === user.id ? message.from : message.to;

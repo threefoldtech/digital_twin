@@ -25,7 +25,6 @@ const initializeSocket = (username: string) => {
         removeChat(chatId)
     });
     state.socket.on("message", (message) => {
-        console.log(message);
         if (message.type === 'READ'){
             handleRead(message)
 
@@ -40,9 +39,11 @@ const initializeSocket = (username: string) => {
     const { addChat } = usechatsActions();
     addChat(newContactRequest);
   });
-  state.socket.on("chat_updated", (chatId) => {
-    // @todo
-    console.log("update chat")
+  state.socket.on("chat_updated", (chat) => {
+    const {updateChat} = usechatsActions()
+    console.log(chat)
+    console.log("updating chat", chat.chatId)
+    updateChat(chat)
     // removeChat(chatId)
 });
 };
@@ -52,7 +53,7 @@ const sendSocketMessage = async (
   message: Message<any>,
   isUpdate = false
 ) => {
-  console.log("sending ", message);
+  // console.log("sending ", message);
   const data = {
     chatId,
     message,

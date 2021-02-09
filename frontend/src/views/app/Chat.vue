@@ -121,7 +121,7 @@
             {{status?.status}}
           </p>
         </div>
-        <group-management v-if="selectedChat.isGroup" :groupChat="selectedChat"></group-management>
+        <group-management v-if="selectedChat.isGroup" :groupChat="selectedChat" :key="selectedChat.chatId + selectedChat.contacts.length"></group-management>
       </div>
     </div>
     <jdialog v-model="showDialog" @close="showDialog = false" noActions>

@@ -2,7 +2,7 @@
   <div
     class="bg-white p-2 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1"
   >
-    <div v-for="contact in groupChat.contacts" :key="contact.id">
+    <div v-for="contact in groupChat.contacts" :key="contact.id + groupChat.contacts.length">
       <div class="chatcard relative grid grid-cols-12 rounded-lg mb-2 py-2">
         <div class="md:col-span-2 col-span-3 place-items-center grid relative">
           <AvatarImg :id="contact.id" />

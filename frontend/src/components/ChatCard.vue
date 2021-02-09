@@ -52,7 +52,6 @@ export default defineComponent({
       );
     });
     const lastMessage = computed(() => {
-      console.log(props.chat.messages[props.chat.messages.length-1])
       return props.chat && props.chat.messages && props.chat.messages.length? props.chat.messages[props.chat.messages.length-1] : "No messages yet"
     });
     const newMessages = computed(() => {

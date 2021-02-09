@@ -15,9 +15,6 @@ export default {
     id: {required: true}
   },
   setup(props) {
-
-    console.log(statusList)
-
     const status = computed(() => {
       return statusList[props.id]
     })
