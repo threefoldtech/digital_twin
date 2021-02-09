@@ -10,6 +10,7 @@ import {MessageBodyTypeInterface, MessageOperations, MessageTypes} from "../type
 import {saveFile, saveAvatar, deleteChat} from "./dataService"
 import {getLocationForId, sendMessageToApi} from './apiService';
 import {user} from "../store/user"
+import {determinChatId} from "../routes/messages";
 
 
 const socketio = require("socket.io");
@@ -81,7 +82,8 @@ export const startSocketIo = (httpServer: http.Server) => {
             console.log("updatemsgdata", messageData)
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
             editMessage(messageData.chatId, newMessage)
-            let location1 = getLocationForId(<string>newMessage.to);
+            const chat = getChatById(messageData.chatId)
+            let location1 = getLocationForId(<string>chat.adminId);
             sendMessageToApi(location1, newMessage)
         })
         socket.on('new_avatar', (data) => {

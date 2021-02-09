@@ -7,7 +7,7 @@
             @click.prevent="setActive('user')"
             :class="{ active: isActive('user') }"
             href="#"
-        >Add a user</a
+        >Add an user</a
         >
       </li>
       <li class="nav-item">

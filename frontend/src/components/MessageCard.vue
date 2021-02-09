@@ -16,9 +16,12 @@
       }"
     >
       <pre v-if="config.showdebug">{{ message }}</pre>
+      <div v-if="isGroup &&  !isMine(message)">
+        <b>{{message.from}}</b>
+      </div>
       <transition name="fade">
         <div
-            v-if="showActions"
+            v-if="showActions && isMine(message)"
             class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-icon text-white px-2"
         >
           <button
@@ -64,12 +67,21 @@
        <div v-else-if="message.type === 'GIF'">
         <img :src="message.body"/>
       </div>
+      <div v-else-if="message.type === 'GROUP_UPDATE'">
+        <span v-if="message.body.type === 'REMOVEUSER'">
+          <b>{{message.body.contact.id}}</b> removed from the group.
+        </span>
+        <span v-else-if="message.body.type === 'ADDUSER'">
+          <b>{{message.body.contact.id}}</b> added to the group.
+        </span>
+      </div>
       <div v-else-if="message.type === 'QUOTE'">
         <b> {{ message.body.quotedMessage.from }} said: </b> <br/>
         <MessageCard
             :message="message.body.quotedMessage"
             :chat-id="chatId"
             disabled
+            isGroup="false"
         />
         {{ message.body.message }}
       </div>
@@ -127,6 +139,10 @@ export default defineComponent({
       default: false,
     },
     isreadbyme: {
+      type: Boolean,
+      default: false,
+    },
+    isGroup: {
       type: Boolean,
       default: false,
     },
@@ -238,7 +254,8 @@ export default defineComponent({
       sendQuoteMessage,
       config,
       read,
-      fileUrl
+      fileUrl,
+      isGroup: props.isGroup
     };
   },
 });
