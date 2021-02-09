@@ -61,6 +61,9 @@
         >{{ message.body.filename }}</a
         >
       </span>
+       <div v-else-if="message.type === 'GIF'">
+        <img :src="message.body"/>
+      </div>
       <div v-else-if="message.type === 'QUOTE'">
         <b> {{ message.body.quotedMessage.from }} said: </b> <br/>
         <MessageCard
