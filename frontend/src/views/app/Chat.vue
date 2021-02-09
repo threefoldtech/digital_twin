@@ -68,8 +68,8 @@
             }`"
             class="grid grid-cols-12 rounded-lg mb-2 py-2"
             :class="{
-              'bg-white': chat.chatId !== selectedId,
-              'bg-icon': chat.chatId === selectedId,
+              'bg-white text-black': chat.chatId !== selectedId,
+              'bg-icon text-white': chat.chatId === selectedId,
             }"
             @click="setSelected(chat.chatId)"
             :chat="chat"
