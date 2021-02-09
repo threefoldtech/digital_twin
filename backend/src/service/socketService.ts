@@ -82,7 +82,7 @@ export const startSocketIo = (httpServer: http.Server) => {
             console.log("updatemsgdata", messageData)
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
             editMessage(messageData.chatId, newMessage)
-            let location1 = getLocationForId(messageData.chatId);
+            let location1 = getLocationForId(<string>newMessage.to);
             sendMessageToApi(location1, newMessage)
         })
         socket.on('new_avatar', (data) => {
