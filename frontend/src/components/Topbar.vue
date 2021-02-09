@@ -12,7 +12,7 @@
     </div>
     <jdialog v-model="showDialog" @close="showDialog = false" noActions>
       <template v-slot:title>
-        <h1>Profile settings {{ showEditPic }}</h1>
+        <h1>Profile settings</h1>
       </template>
       <div>
         <div
@@ -22,10 +22,11 @@
         >
           <transition name="fade">
             <div
+              @click.stop="selectFile"
               v-if="showEditPic"
-              class="grid place-items-center bg-red-500 absolute w-full h-full top-0 left-0"
+              class="grid cursor-pointer place-items-center bg-black bg-opacity-75 absolute w-full h-full top-0 left-0"
             >
-              <button @click.stop="selectFile">
+              <button class="text-white">
                 <i class="fas fa-pen"></i>
               </button>
             </div>
