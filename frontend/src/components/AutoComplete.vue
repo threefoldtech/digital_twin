@@ -1,5 +1,5 @@
 <template>
-  <div class="relative w-full" @keydown.esc="showOptions = false" @focusout="showOptions = false">
+  <div class="relative w-full" @keydown.esc="showOptions = false">
     <input
       v-model="searchTerm"
       @input="handleInput"
@@ -81,6 +81,7 @@ export default defineComponent({
     };
 
     const handleClick = (item) => {
+      console.log(chosenOption.value)
       chosenOption.value = item;
       searchTerm.value = item;
       emit("update:modelValue", item);
