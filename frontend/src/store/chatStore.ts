@@ -124,6 +124,11 @@ const addMessage = (chatId, message) => {
     return;
   }
 
+  if(message.type === "GROUP_UPDATE"){
+    //@todo
+    return
+  }
+
   console.log("in addmessage chatid", chatId);
   console.log("in addmessage message", message);
 
@@ -245,7 +250,7 @@ const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
       contact
     },
     timeStamp: new Date(),
-    type: "READ"
+    type: "GROUP_UPDATE"
   }
   console.log(message)
   sendMessageObject(groupId,message)

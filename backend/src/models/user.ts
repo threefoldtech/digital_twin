@@ -28,7 +28,6 @@ export default class User implements UserInterface {
     return this.status;
   }
   getAvatar() {
-    console.log("avatar paht", this.image)
     return this.image;
   }
   getData() {

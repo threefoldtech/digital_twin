@@ -40,6 +40,11 @@ const initializeSocket = (username: string) => {
     const { addChat } = usechatsActions();
     addChat(newContactRequest);
   });
+  state.socket.on("chat_updated", (chatId) => {
+    // @todo
+    console.log("update chat")
+    // removeChat(chatId)
+});
 };
 
 const sendSocketMessage = async (
