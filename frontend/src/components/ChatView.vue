@@ -176,6 +176,7 @@ export default defineComponent({
       lastReadByMe,
       deleteChat,
       blockChat,
+      user,
       ...propRefs,
     };
   },

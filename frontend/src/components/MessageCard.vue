@@ -21,7 +21,7 @@
       </div>
       <transition name="fade">
         <div
-            v-if="showActions"
+            v-if="showActions && isMine(message)"
             class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-icon text-white px-2"
         >
           <button
