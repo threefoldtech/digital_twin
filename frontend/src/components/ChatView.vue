@@ -29,15 +29,7 @@
     </div>
     <div class="flex-grow row-span-4 relative overflow-y-auto" ref="messageBox">
       <div class="absolute w-full px-4">
-        <template v-for="(message, i) in chat.messages"  :key="i">
-          <MessageCard
-
-                       :isread="i <= lastRead"
-                       :isreadbyme="i <= lastReadByMe"
-                       :message="message"
-                       :chatId="chat.chatId"
-                       :isGroup="chat.isGroup"
-          />
+        <template v-for="(message, i) in chat.messages" :key="i">
           <div
               v-if="showDivider(message, i)"
               class="text-center px-4"
@@ -45,9 +37,19 @@
                     <span
                         class="font-thin"
                     >
-                      {{ m(message.timeStamp).fromNow()  }}
+                      {{ m(message.timeStamp).fromNow() }}
                     </span>
           </div>
+          <MessageCard
+
+              :isread="i <= lastRead"
+              :isreadbyme="i <= lastReadByMe"
+              :message="message"
+              :chatId="chat.chatId"
+              :isGroup="chat.isGroup"
+              :isMine="message.from === user.id"
+          />
+
         </template>
 
         <div id="viewAnchor" ref="viewAnchor" style="
@@ -159,7 +161,7 @@ export default defineComponent({
 
       // @ts-ignore
       // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
-      const str:string = chat.value.isGroup ? chat.value.chatId : chat.value.contacts.map(c=>c.id).sort().join();
+      const str: string = chat.value.isGroup ? chat.value.chatId : chat.value.contacts.map(c => c.id).sort().join();
 
       console.log(`str = ${str}`)
 

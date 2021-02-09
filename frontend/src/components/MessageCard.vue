@@ -4,7 +4,7 @@
       @mouseleave="showActions = false"
       class="flex"
       :class="{
-      'justify-end': isMine(message),
+      'justify-end': isMine,
       'my-1': !disabled,
     }"
   >
@@ -17,7 +17,7 @@
         style="min-width: 5rem;"
     >
       <pre v-if="config.showdebug">{{ message }}</pre>
-      <div v-if="isGroup &&  !isMine(message)">
+      <div v-if="isGroup &&  !isMine">
         <b>{{ message.from }}</b>
       </div>
       <div
@@ -27,7 +27,7 @@
         <button
             class="mx-0"
             v-if="
-               isMine(message) && (message.type == 'EDIT' || message.type == 'STRING') && !disabled
+               isMine && (message.type == 'EDIT' || message.type == 'STRING') && !disabled
             "
             @click="setEditMessage"
         >
@@ -38,7 +38,7 @@
         </button>
         <button
             class="mx-0"
-            v-if="isMine(message) && message.type !== 'DELETE' && !disabled"
+            v-if="isMine && message.type !== 'DELETE' && !disabled"
             @click="sendUpdateMessage(true)"
         >
           <i class="fas fa-trash"></i>
@@ -102,7 +102,7 @@
       <p
           class="font-thin"
           :class="{
-          'text-right': isMine(message),
+          'text-right': isMine,
         }"
       >
         <span v-if="message.type == 'EDIT'"> edited - </span>
@@ -145,15 +145,13 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    isMine: {
+      type: Boolean,
+      default: false,
+    },
   },
   setup(props) {
     const showActions = ref(false);
-    const {user} = useAuthState();
-
-    const isMine = (message) => {
-      return message.from == user.id;
-    };
-
     const m = (val) => moment(val);
 
     const editMessage = ref(false);
@@ -221,11 +219,9 @@ export default defineComponent({
       const {readMessage} = usechatsActions();
       readMessage(props.chatId, props.message.id);
     };
-    nextTick(() => {
-      if (!props.isreadbyme) {
-        read();
-      }
-    });
+    if (!props.isreadbyme) {
+      read();
+    }
 
 
     const fileUrl = props.message.body?.filename ?
@@ -241,7 +237,7 @@ export default defineComponent({
 
     return {
       showActions,
-      isMine,
+      isMine: props.isMine,
       m,
       setEditMessage,
       setQuoteMessage,
