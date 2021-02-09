@@ -20,7 +20,7 @@
       </div>
       <div class="col-end-13 pr-2 flex justify-end">
         <button @click="deleteChat" class="text-red-600">Delete</button>
-        <button @click="blockChat" class="text-red-600">block</button>
+        <button @click="blockChat" class="text-red-600">Block</button>
 
         <button @click="popupMeeting" class="flex flex-col items-center justify-center">
           <i class="fas fa-video"></i>
