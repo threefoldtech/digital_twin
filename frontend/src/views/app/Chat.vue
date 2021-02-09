@@ -5,7 +5,7 @@
       :class="{ hidden: !showContacts }"
       @click="showContacts = false"
     ></div>
-    <div
+    <aside
       class="fixed md:static md:col-span-3 flex flex-col md:bg-transparent bg-white rounded-r-lg shadow md:shadow-none h-screen md:h-auto top-0 left-0 z-30 transition-all"
       :class="{ '-left-full': !showContacts }"
     >
@@ -61,9 +61,8 @@
           />
         </div>
       </div>
-    </div>
-
-    <div class="md:col-span-6 w-full h-full relative">
+    </aside>
+    <main class="md:col-span-6 w-full h-full relative">
       <chat-view v-if="selectedId && chats.find((c) => c.chatId === selectedId)" :selectedId="selectedId" :key="selectedId" @showContacts="showContacts=true"></chat-view>
       <div class="text-center" v-else-if="chats.length >= 1">
         select a chat on the left
@@ -77,10 +76,10 @@
           Add a contact
         </button>
       </div>
-    </div>
-
-    <div
+    </main>
+    <aside
       class="hidden md:block col-span-3 relative h-full w-full overflow-y-auto flex-col"
+      v-if="selectedChat"
     >
       <div class="absolute max-w-full w-full px-4 pb-4" v-if="selectedId">
         <div
@@ -107,7 +106,7 @@
         </div>
         <group-management v-if="selectedChat.isGroup" :groupChat="selectedChat" :key="selectedChat.chatId + selectedChat.contacts.length"></group-management>
       </div>
-    </div>
+    </aside>
     <jdialog v-model="showDialog" @close="showDialog = false" noActions>
       <template v-slot:title>
         <h1>Create a new chat</h1>
