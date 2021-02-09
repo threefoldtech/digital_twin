@@ -31,6 +31,7 @@ import { computed } from "vue";
 import { statusList } from "@/store/statusStore";
 import { GroupChat } from "../types/index";
 import AvatarImg from "@/components/AvatarImg.vue"
+import { usechatsActions } from "../store/chatStore"
 export default {
   name: "GroupManagementBlock",
   props: {
@@ -38,8 +39,10 @@ export default {
   },
   components: {AvatarImg},
   setup(props) {
-    const removeFromGroup = () => {
-    
+    const removeFromGroup = (contact) => {
+      const {updateContactsInGroup} = usechatsActions()
+      //@ts-ignore
+      updateContactsInGroup(props.groupChat.chatId, contact, true )
     }
     return {
       groupChat: props.groupChat,

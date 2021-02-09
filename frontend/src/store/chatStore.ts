@@ -8,7 +8,7 @@ import {
   Message,
   GroupChat,
   MessageBodyType,
-  PersonChat, DtId
+  PersonChat, DtId, GroupUpdate
 } from "../types";
 import { useSocketActions } from "./socketStore";
 import { useAuthState } from "./authStore";
@@ -231,6 +231,26 @@ const readMessage = (chatId, messageId) => {
   sendMessageObject(chatId, newMessage);
 };
 
+const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => { 
+  const { user } = useAuthState();
+
+  const operation = remove? "REMOVEUSER": "ADDUSER"
+  console.log(`${operation} ${contact.id} from ${groupId}`)
+  const message:Message<GroupUpdate> = {
+    id: uuidv4(),
+    from: user.id,
+    to: groupId,
+    body: <GroupUpdate>{
+      type: operation,
+      contact
+    },
+    timeStamp: new Date(),
+    type: "READ"
+  }
+  sendMessageObject(groupId,message)
+}
+
+
 export const usechatsState = () => {
   return {
     ...toRefs(state)
@@ -247,7 +267,8 @@ export const usechatsActions = () => {
     sendMessageObject,
     addGroupchat,
     readMessage,
-    acceptChat
+    acceptChat,
+    updateContactsInGroup,
   };
 };
 
