@@ -1,6 +1,7 @@
 <template>
   <transition name="fade">
     <div
+      @keydown.esc="$emit('close', false)"
       v-if="modelValue"
       class="fixed z-50 top-0 left-0 bg-black bg-opacity-50 w-screen h-screen grid place-items-center"
     >

@@ -4,7 +4,7 @@
     <div
       class="col-end-13 text-right text-gray-500 flex items-center justify-end"
     >
-      <AvatarImg :id="user.id"/>
+      <AvatarImg :id="user.id" />
       <span class="ml-2">{{ user.id }}</span>
       <button @click="showDialog = true">
         <i class="fas fa-cog text-gray-500"></i>
@@ -16,15 +16,36 @@
       </template>
 
       <div>Username: {{ user.id }}</div>
-      <div>
-        Status: {{ user.status }}
-        <button class="px-2 py-8" @click="setEditStatus(true)">
-          <i class="fas fa-pen"></i>
-        </button>
-        <div v-if="isEditingStatus">
-          <input v-model="userStatus" />
-          <button @click="sendNewStatus">Update Status</button>
-        </div>
+      <div
+        class="relative w-full h-full"
+        @mouseover="showEdit = true"
+        @mouseleave="showEdit = false"
+      >
+        <transition name="fade">
+          <button
+            v-if="!isEditingStatus"
+            :class="showEdit ? 'block' : 'hidden'"
+            class="absolute top-0 right-0"
+            @click="setEditStatus(true)"
+          >
+            <i class="fas fa-pen"></i>
+          </button>
+        </transition>
+
+        <transition name="fade">
+          <button
+            v-if="isEditingStatus"
+            class="absolute top-1 right-0"
+            @click="sendNewStatus"
+          >
+            <i class="fas fa-check"></i>
+          </button>
+        </transition>
+        <textarea
+          v-model="userStatus"
+          class="w-full"
+          :disabled="!isEditingStatus"
+        ></textarea>
       </div>
       <div>
         Avatar:
@@ -77,7 +98,8 @@ export default defineComponent({
   components: { AvatarImg, jdialog: Dialog },
   setup() {
     const { user } = useAuthState();
-    const showDialog = ref(false);
+    const showDialog = ref(true);
+    const showEdit = ref(false);
     const fileinput = ref();
     const file = ref();
     const userStatus = ref("");
@@ -97,11 +119,11 @@ export default defineComponent({
       const { sendSocketAvatar } = useSocketActions();
       const buffer = await file.value.arrayBuffer();
       sendSocketAvatar(buffer);
-      showDialog.value = false
+      showDialog.value = false;
     };
 
     const setEditStatus = (edit: boolean) => {
-      console.log(edit)
+      console.log(edit);
       isEditingStatus.value = edit;
       userStatus.value = user.status;
     };
@@ -110,11 +132,11 @@ export default defineComponent({
       sendSocketUserStatus(userStatus.value);
       user.status = userStatus.value;
       isEditingStatus.value = false;
-
     };
 
     return {
       user,
+      showEdit,
       showDialog,
       fileinput,
       file,
@@ -125,7 +147,7 @@ export default defineComponent({
       sendNewStatus,
       userStatus,
       setEditStatus,
-      isEditingStatus
+      isEditingStatus,
     };
   },
 });
