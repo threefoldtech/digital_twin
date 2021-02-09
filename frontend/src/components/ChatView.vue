@@ -62,6 +62,7 @@
     position: absolute;
     bottom: 0;
     width: 50%;
+    pointer-events: none;
 "></div>
       </div>
     </div>
