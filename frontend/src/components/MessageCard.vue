@@ -17,7 +17,7 @@
     >
       <pre v-if="config.showdebug">{{ message }}</pre>
       <div v-if="isGroup &&  !isMine(message)">
-        <b>{{message.from}}</b>
+        <b>{{ message.from }}</b>
       </div>
       <transition name="fade">
         <div
@@ -38,7 +38,7 @@
           </button>
           <button
               class="mx-0"
-              v-if="message.type !== 'DELETE' && !disabled"
+              v-if="isMine(message) && message.type !== 'DELETE' && !disabled"
               @click="sendUpdateMessage(true)"
           >
             <i class="fas fa-trash"></i>
@@ -64,15 +64,15 @@
         >{{ message.body.filename }}</a
         >
       </span>
-       <div v-else-if="message.type === 'GIF'">
+      <div v-else-if="message.type === 'GIF'">
         <img :src="message.body"/>
       </div>
       <div v-else-if="message.type === 'GROUP_UPDATE'">
         <span v-if="message.body.type === 'REMOVEUSER'">
-          <b>{{message.body.contact.id}}</b> removed from the group.
+          <b>{{ message.body.contact.id }}</b> removed from the group.
         </span>
         <span v-else-if="message.body.type === 'ADDUSER'">
-          <b>{{message.body.contact.id}}</b> added to the group.
+          <b>{{ message.body.contact.id }}</b> added to the group.
         </span>
       </div>
       <div v-else-if="message.type === 'QUOTE'">
