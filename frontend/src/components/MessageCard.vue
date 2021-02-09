@@ -2,14 +2,14 @@
   <div
       @mouseover="showActions = true"
       @mouseleave="showActions = false"
-      class="flex relative"
+      class="flex"
       :class="{
       'justify-end': isMine(message),
       'my-2': !disabled,
     }"
   >
     <div
-        class="bg-white rounded-lg truncate"
+        class="bg-white relative rounded-lg"
         :class="{
         'bg-gray-100': disabled,
         'p-4': !disabled,
@@ -69,9 +69,6 @@
             disabled
         />
         {{ message.body.message }}
-      </div>
-      <div v-else-if="message.type === 'GIF'">
-        <img :src="message.body"/>
       </div>
       <div v-else>
         {{ message.body }}
