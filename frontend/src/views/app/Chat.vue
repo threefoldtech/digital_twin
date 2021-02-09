@@ -106,6 +106,7 @@
           >
             <AvatarImg :id="selectedId" />
             <div
+              v-if="!selectedChat.isGroup"
               class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-0 transition-all"
               :class="{
                 'bg-red-500': status && !status.isOnline,
