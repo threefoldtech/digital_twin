@@ -209,7 +209,7 @@ export default defineComponent({
     // @todo: config
     axios.get(`${config.spawnerUrl}api/v1/list`, {}).then((r) => {
       const {user} = useAuthState();
-      possibleUsers.value = r.data.filter(pu => pu !== user.id);
+      possibleUsers.value = r.data.filter(pu => pu === user.id);
     });
 
     return {
