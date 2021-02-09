@@ -51,25 +51,6 @@ const addContact = (username:DtId, location, dontCheck = false) => {
     }
     const chatname:String = username
     axios.post(`${config.baseUrl}api/contacts`, {id:username,location,message:addMessage}).then( (res) => {
-        // const contact:Contact = {
-        //     id:username,
-        //     location
-        // }
-        // console.log("addingContact",contact)
-        // state.contacts.push(contact)
-        // const {addChat} = usechatsActions()
-        // const chat:PersonChat = {
-        //     adminId: username,
-        //     //@todo: change location
-        //     contacts: [contact, {id: user.id, location:`${user.id}-chat`}],
-        //     isGroup: false,
-        //     read: {},
-        //     chatId:username,
-        //     messages:[addMessage],
-        //     name: chatname.toString(),
-        //     acceptedChat: true
-        // }
-        // addChat(chat)
     })
 }
 
