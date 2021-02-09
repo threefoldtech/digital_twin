@@ -63,6 +63,7 @@
             v-model="userStatus"
             class="w-full"
             :disabled="!isEditingStatus"
+            :placeholder="user.status"
           ></textarea>
         </div>
         <input
