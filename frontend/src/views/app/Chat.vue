@@ -28,22 +28,7 @@
             <span style="color: red"> {{ chatRequests.length }} </span>
             new connection request<span v-if="chatRequests.length > 1">s</span>
           </h2>
-          <div v-for="(chat, i) in chatRequests" :key="i">
-            <div class="grid grid-cols-12 w-full rounded-lg mb-2 py-2">
-              <span v-if="chat.isGroup" class="truncate col-span-8">
-                {{ chat.admin }} invited you to {{ chat.name }}
-              </span>
-              <span v-else class="truncate col-span-8">
-                <b>{{ chat.name }}</b> wants to have a chat
-              </span>
-              <button
-                class="col-span-4"
-                @click="acceptChatRequest(chat.chatId)"
-              >
-                Accept Chat
-              </button>
-            </div>
-          </div>
+          <ChatRequestList :chat-requests="chatRequests"/>
         </div>
         <div class="relative full">
           <div
@@ -106,7 +91,6 @@
           >
             <AvatarImg :id="selectedId" />
             <div
-              v-if="!selectedChat.isGroup"
               class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-0 transition-all"
               :class="{
                 'bg-red-500': status && !status.isOnline,
@@ -151,10 +135,11 @@ import config from "../../../public/config/config";
 import axios from "axios";
 import { startFetchStatusLoop } from "@/store/statusStore";
 import {statusList} from "@/store/statusStore";
+import ChatRequestList from "@/views/app/ChatRequestList.vue";
 
 export default defineComponent({
   name: "Apps",
-  components: { addContact, chatView, jdialog: Dialog, ChatCard, AvatarImg, GroupManagement },
+  components: {ChatRequestList, addContact, chatView, jdialog: Dialog, ChatCard, AvatarImg, GroupManagement },
   setup(_, context) {
     const { chats, chatRequests } = usechatsState();
     const { updateUserInfo } = useAuthActions();
@@ -204,11 +189,6 @@ export default defineComponent({
 
     startFetchStatusLoop(user.id);
 
-    const acceptChatRequest = (id) => {
-      const { acceptChat } = usechatsActions();
-      acceptChat(id);
-    };
-
     return {
       status,
       selectedId,
@@ -221,12 +201,9 @@ export default defineComponent({
       showDialog,
       showContacts,
       user,
-      acceptChatRequest,
       m,
     };
   },
 });
 </script>
 
-<style scoped>
-</style>
