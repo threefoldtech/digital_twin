@@ -48,6 +48,7 @@ router.post("/", (req, res) => {
     console.log("sending to ",url)
     sendMessageToApi(contact.location,data)
     sendEventToConnectedSockets("connectionRequest",chat)
+    res.sendStatus(200)
 });
 
 

@@ -2,7 +2,7 @@ import {DtId, Id, Message} from "@/types";
 import { reactive } from "@vue/reactivity";
 import { inject } from "vue";
 import {handleRead, removeChat, usechatsActions} from "./chatStore";
-import { useContactsActions } from "./contactStore";
+import { useContactsActions, useContactsState } from "./contactStore";
 import { useAuthState } from "@/store/authStore";
 
 const state = reactive<State>({
@@ -37,7 +37,15 @@ const initializeSocket = (username: string) => {
   });
   state.socket.on("connectionRequest", (newContactRequest) => {
     const { addChat } = usechatsActions();
+    const { contacts } = useContactsState();
+    const {user} = useAuthState() 
     addChat(newContactRequest);
+    if(!newContactRequest.isGroup && newContactRequest.acceptedChat){
+      const newContact = newContactRequest.contacts.find(c=> c.id !== user.id)
+      if(newContact){
+        contacts.value.push(newContact)
+      }
+    }
   });
   state.socket.on("chat_updated", (chat) => {
     const {updateChat} = usechatsActions()

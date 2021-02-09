@@ -37,6 +37,12 @@
                      :chatId="chat.chatId"
                      :isGroup="chat.isGroup"
         />
+        <div id="viewAnchor" ref="viewAnchor" style="
+    height: 20vh;
+    position: absolute;
+    bottom: 0;
+    width: 50%;
+"></div>
       </div>
     </div>
 
@@ -160,6 +166,7 @@ export default defineComponent({
       }
     }
 
+    const viewAnchor = ref(null)
     return {
       chats,
       chat,
@@ -177,6 +184,7 @@ export default defineComponent({
       deleteChat,
       blockChat,
       user,
+      viewAnchor,
       ...propRefs,
     };
   },

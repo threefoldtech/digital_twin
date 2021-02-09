@@ -21,13 +21,13 @@
       </div>
       <transition name="fade">
         <div
-            v-if="showActions && isMine(message)"
+            v-if="showActions"
             class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-icon text-white px-2"
         >
           <button
               class="mx-0"
               v-if="
-              (message.type == 'EDIT' || message.type == 'STRING') && !disabled
+               isMine(message) && (message.type == 'EDIT' || message.type == 'STRING') && !disabled
             "
               @click="setEditMessage"
           >
