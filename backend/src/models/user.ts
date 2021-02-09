@@ -14,7 +14,7 @@ export default class User implements UserInterface {
       this.id = userData.id
     } catch (error) {
       this.status = "Exploring the new DigitalTwin";
-      this.image = `https://avatars.dicebear.com/4.5/api/avataaars/${config.userid}.svg`;
+      this.image = `https://${config.userid}.digitaltwin.jimbertesting.be/api/user/avatar`;
       this.id = config.userid;
       persistUserdata({
         status: this.status,
@@ -28,6 +28,7 @@ export default class User implements UserInterface {
     return this.status;
   }
   getAvatar() {
+    console.log("avatar paht", this.image)
     return this.image;
   }
   getData() {

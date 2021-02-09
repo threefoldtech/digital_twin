@@ -13,7 +13,7 @@ export const login = () => {
             let name = window.location.host.split('.')[0];
             const user = {
                 name,
-                image: `https://avatars.dicebear.com/4.5/api/avataaars/${encodeURIComponent(name)}.svg`,
+                image: `${window.location.origin}/api/user/avatar`,
                 email: `${name.replace(/ /g, '')}@domain.com`
             }
             localStorage.setItem('user', JSON.stringify(user))

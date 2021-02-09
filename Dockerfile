@@ -40,5 +40,6 @@ RUN chmod +x /startup.sh
 
 RUN mkdir /appdata
 RUN mkdir /appdata/user /appdata/chats
+COPY ./avatar.jpg /appdata/user/avatar
 
 CMD /startup.sh
