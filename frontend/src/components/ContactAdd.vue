@@ -26,6 +26,7 @@
           :data="possibleUsers"
           v-model="usernameAdd"
           placeholder="Search for user..."
+          :error="usernameAddError"
         ></auto-complete>
       </div>
       <div class="flex place-items-center">
@@ -39,13 +40,15 @@
       </div>
 
       <div class="flex mt-4 justify-end w-full">
-        <button @click="$emit('closeDialog')">Cancel</button>
+        <button type="button" @click="$emit('closeDialog')">Cancel</button>
         <button>Add contact</button>
       </div>
     </form>
     <form @submit.prevent="groupAdd" class="w-full" v-if="isActive('group')">
       <div class="flex place-items-center">
         <label class="mr-2" for="username">Group name: </label>
+        <span class="text-red-600" v-if="error != ''"> {{groupnameAddError}} </span>
+
         <input
           v-model="groupnameAdd"
           id="username"
@@ -105,9 +108,9 @@
 </template>
 
 <script lang="ts">
-import { selectedId, usechatsActions } from "@/store/chatStore";
+import { selectedId, usechatsActions, usechatsState } from "@/store/chatStore";
 import { defineComponent, ref, computed, nextTick } from "vue";
-import { useContactsActions, useContactsState } from "../store/contactStore";
+import { useContactsState } from "../store/contactStore";
 import { useAuthState } from "../store/authStore";
 import { Contact } from "../types/index";
 import axios from "axios";
@@ -121,18 +124,24 @@ export default defineComponent({
     const { contacts } = useContactsState();
     let addGroup = ref(false);
     let usernameAdd = ref("");
+    let usernameAddError = ref("")
     let groupnameAdd = ref("");
+    let groupnameAddError = ref("")
     let usernameInGroupAdd = ref("");
     let usersInGroup = ref([]);
-    let possibleUsers = ref<string[]>([]);
+    let possibleUsers = ref<string[]>(["tobias"]);
     let contactAddError = ref("");
 
     const contactAdd = () => {
       try {
         let userId = usernameAdd.value;
         if (!possibleUsers.value.find(pu => pu === userId)){
-          //@todo: no alert
-          alert('user not found')
+          usernameAddError.value = "Not able to find threebot of this user"
+          return;
+        }
+        const {chats} = usechatsState()
+        if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == userId)){
+          usernameAddError.value = "Already added this user"
           return;
         }
         console.log(userId);
@@ -167,6 +176,7 @@ export default defineComponent({
     const groupAdd = () => {
       const { addGroupchat } = usechatsActions();
       const { user } = useAuthState();
+      const { chats } = usechatsState();
       if(groupnameAdd.value == ""){
         return
       }
@@ -213,7 +223,9 @@ export default defineComponent({
     return {
       addGroup,
       usernameAdd,
+      usernameAddError,
       groupnameAdd,
+      groupnameAddError,
       usernameInGroupAdd,
       location,
       contactAdd,

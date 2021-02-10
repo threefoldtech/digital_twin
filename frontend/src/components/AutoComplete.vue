@@ -7,6 +7,7 @@
       ref="input"
       tabindex="0"
     />
+    <span class="text-red-600" v-if="error != ''"> {{error}} </span>
     <span
       v-if="modelValue"
       @click.prevent="reset()"
@@ -62,6 +63,10 @@ export default defineComponent({
       default:
         "absolute w-full z-50 bg-white border border-gray-300 mt-1 mh-48 overflow-hidden overflow-y-scroll rounded-md shadow-md",
     },
+    error: {
+      type: String,
+      default: ""
+    }
   },
 
   setup(props, { emit }) {
