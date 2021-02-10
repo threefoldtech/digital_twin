@@ -51,7 +51,7 @@
             :key="`${chat.chatId}-${chat.messages.length}-${
               chat.read[user.id]
             }`"
-            class="grid grid-cols-12 rounded-lg mb-2 py-2"
+            class="grid grid-cols-12 rounded-lg mb-2 py-2 cursor-pointer"
             :class="{
               'bg-white text-black': chat.chatId !== selectedId,
               'bg-icon text-white': chat.chatId === selectedId,
