@@ -5,5 +5,5 @@ export const calculateBaseUrl = (userId) => {
     }
     let url:Array<String> = window.location.host.split('.')
     url.splice(0,1);
-    return location =  `https://${userId}${url.join(".")}`;
+    return location =  `https://${userId}.${url.join(".")}`;
 }
