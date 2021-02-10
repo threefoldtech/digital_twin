@@ -38,16 +38,20 @@ const initializeSocket = (username: string) => {
   state.socket.on("connectionRequest", (newContactRequest) => {
     const { addChat } = usechatsActions();
     const { contacts } = useContactsState();
-    const {user} = useAuthState() 
+    const {user} = useAuthState()
     addChat(newContactRequest);
   });
-  state.socket.on("chat_updated", (chat) => {
-    const {updateChat} = usechatsActions()
-    console.log(chat)
-    console.log("updating chat", chat.chatId)
-    updateChat(chat)
-    // removeChat(chatId)
-});
+    state.socket.on("chat_updated", (chat) => {
+        const {updateChat} = usechatsActions()
+        console.log(chat)
+        console.log("updating chat", chat.chatId)
+        updateChat(chat)
+        // removeChat(chatId)
+    });
+    state.socket.on("new_chat", (chat) => {
+        const { addChat } = usechatsActions();
+        addChat(chat)
+    });
 };
 
 const sendSocketMessage = async (

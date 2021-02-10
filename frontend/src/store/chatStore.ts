@@ -16,6 +16,7 @@ import { useContactsActions, useContactsState } from "./contactStore";
 import config from "../../public/config/config";
 import { uuidv4 } from "@/common";
 import {startFetchStatusLoop} from "@/store/statusStore";
+import {uniqBy} from "lodash";
 
 const state = reactive<chatstate>({
   chats: [],
@@ -46,7 +47,8 @@ const addChat = (chat: Chat) => {
   }
 
   if (chat.acceptedChat) {
-    state.chats.push(chat);
+    state.chats.push(chat)
+    state.chats = uniqBy(state.chats, c => c.chatId);
   } else {
     state.chatRequests.push(chat);
   }

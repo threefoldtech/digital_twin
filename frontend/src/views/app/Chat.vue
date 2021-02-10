@@ -22,13 +22,13 @@
           </button>
         </div>
 
-        <div v-if="chatRequests.length > 0">
+        <div v-if="filteredChatRequests.length > 0">
           <h2 style="font-size: 1.5em">
             You have
-            <span style="color: red"> {{ chatRequests.length }} </span>
-            new connection request<span v-if="chatRequests.length > 1">s</span>
+            <span style="color: red"> {{ filteredChatRequests.length }} </span>
+            new connection request<span v-if="filteredChatRequests.length > 1">s</span>
           </h2>
-          <ChatRequestList :chat-requests="chatRequests"/>
+          <ChatRequestList :chat-requests="filteredChatRequests"/>
         </div>
         <div class="relative full">
           <div
@@ -137,6 +137,7 @@ import axios from "axios";
 import { startFetchStatusLoop } from "@/store/statusStore";
 import {statusList} from "@/store/statusStore";
 import ChatRequestList from "@/views/app/ChatRequestList.vue";
+import {uniqBy} from "lodash";
 
 export default defineComponent({
   name: "Apps",
@@ -182,13 +183,19 @@ export default defineComponent({
 
     startFetchStatusLoop(user.id);
 
+    const filteredChatRequests = computed(() => {
+      chatRequests.value = chatRequests.value.filter(cr => !chats.value.find(c => c.chatId === cr.chatId));
+      const filteredChats = chatRequests.value.filter(cr => !chats.value.find(c => c.chatId === cr.chatId));
+      return uniqBy(filteredChats, c => c.chatId);
+    })
+
     return {
       status,
       selectedId,
       selectedChat,
       setSelected,
       chats,
-      chatRequests,
+      filteredChatRequests,
       searchValue,
       filteredChats,
       showDialog,
