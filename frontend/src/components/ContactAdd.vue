@@ -139,7 +139,7 @@ export default defineComponent({
       try {
         let userId = usernameAdd.value;
         if (!possibleUsers.value.find((pu) => pu === userId)) {
-          usernameAddError.value = "Not able to find threebot of this user";
+          usernameAddError.value = "Not able to find DigitalTwin of this user";
           return;
         }
         const { chats } = usechatsState();
