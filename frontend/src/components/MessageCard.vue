@@ -8,7 +8,7 @@
       'my-1': !disabled,
     }"
   >
-    <AvatarImg small class="mr-2 self-center" v-if="!isMine && isGroup" :id="message.from"></AvatarImg>
+    <AvatarImg small class="mr-2 self-center" v-if="!isMine && isGroup && !disabled" :id="message.from"></AvatarImg>
     <div
         class=" relative rounded-lg"
         :class="{
