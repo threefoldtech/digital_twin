@@ -20,16 +20,16 @@ export default {
     small: {required: false, default: false, type: Boolean}
   },
   setup(props) {
-    startFetchStatusLoop(props.id)
+    // startFetchStatusLoop(props.id)
 
     const status = computed(() => {
       return statusList[props.id]
     })
     const src = computed(() => {
       if (!status.value || !status.value.avatar) {
-        return `https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
+        return `https://avatars.dicebear.com/4.5/api/jdenticon/${encodeURI(
             props.id
-        )}.svg`;
+        )}.svg?m=14&b=%23ffffff`;
       }
       return status.value.avatar;
 
