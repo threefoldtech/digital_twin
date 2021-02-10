@@ -98,6 +98,8 @@ const acceptChat = id => {
     const index = state.chatRequests.findIndex(c => c.chatId == id);
     state.chatRequests[index].acceptedChat = true
     addChat(state.chatRequests[index]);
+    const {user} = useAuthState();
+    sendMessage(id,`${user.id} accepted invitation`, 'SYSTEM' )
     state.chatRequests.splice(index, 1);
   });
 };
@@ -241,7 +243,7 @@ const readMessage = (chatId, messageId) => {
   sendMessageObject(chatId, newMessage);
 };
 
-const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => { 
+const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
   const { user } = useAuthState();
 
   const operation = remove? "REMOVEUSER": "ADDUSER"
