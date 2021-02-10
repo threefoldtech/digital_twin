@@ -16,7 +16,7 @@
         'bg-white': !disabled,
         'bg-gray-100': disabled,
         'bg-gray-200': message.type === 'SYSTEM',
-        'bg-blue-400': !disabled && isMine && message.type !== 'SYSTEM',
+        'bg-blue-200': !disabled && isMine && message.type !== 'SYSTEM',
       }"
         style="min-width: 5rem; max-width: 60%"
     >
@@ -51,6 +51,7 @@
       <span v-if="message.type === 'FILE'">
         <audio
             controls
+            class="max-w-full"
             v-if="message.body.filename.indexOf('.WebM') !== -1"
             :src="fileUrl"
         ></audio>
@@ -61,7 +62,7 @@
         />
         <br/>
         <a
-            class="py-2 px-2 bg-green-200 border-r-2"
+            class="py-2 px-2 bg-blue-300 border-r-2"
             :href="fileUrl"
             download
         >{{ message.body.filename }}</a

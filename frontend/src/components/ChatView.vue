@@ -12,7 +12,7 @@
         <p class="font-thin" v-if="!chat.isGroup">{{
             statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline"
           }}</p>
-        <p class="font-thin" v-if="chat.isGroup">GroupChat ## change this copy ##</p>
+        <p class="font-thin" v-if="chat.isGroup">Group chat</p>
         <!-- <p class="font-thin">
           <span v-if=".isOnline">Is online</span>
           <span v-else> Last seen {{ m(contact.lastSeen).fromNow() }} </span>
@@ -67,7 +67,7 @@
       </div>
     </div>
 
-    <ChatInput :selectedid="chat.chatId" v-on:messageSend="scrollToBottom"/>
+    <ChatInput class="chatInput" :selectedid="chat.chatId" v-on:messageSend="scrollToBottom"/>
   </div>
 </template>
 

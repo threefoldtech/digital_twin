@@ -1,5 +1,5 @@
 <template>
-  <div class="relative mx-4 px-4 bg-white rounded-t-xl" style="height: 220px; overflow-y: scroll">
+  <div class="relative md:mx-4 px-4 bg-white rounded-t-xl" style="height: 220px; overflow-y: scroll">
     <div class="sticky top-0 bg-white flex py-4">
       <input type="text" placeholder="Search for gif..." v-model="searchTerm">
       <button @click="$emit('close')">
