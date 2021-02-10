@@ -5,9 +5,6 @@ const asyncHandler = require('express-async-handler')
 var drive = require('../../drive.js')
 const cache = require('../../cache.js')
 
-router.get('/', (req, res) => {
-    res.json({"one": 1})    
-})
 
 // create new
 router.post('/drive', asyncHandler(async (req, res) => {
