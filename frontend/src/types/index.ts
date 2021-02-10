@@ -39,6 +39,7 @@ export interface QuoteBodyType extends MessageBodyType{
 export interface GroupUpdate extends MessageBodyType{
     type: string
     contact: Contact
+    chat: Chat
 }
 
 export interface Chat {
