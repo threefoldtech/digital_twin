@@ -164,6 +164,7 @@ export default defineComponent({
     });
 
     const popupMeeting = () => {
+      sendMessage(chat.value.chatId, `${user.id} joined the video chat`, 'SYSTEM');
 
       // @ts-ignore
       // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
@@ -202,7 +203,7 @@ export default defineComponent({
       each( chat.value.read, ( val:string, key:string ) => {
         console.log( key, val );
         if (key === user.id){
-          // return;
+          return;
         }
         preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key]
       } );

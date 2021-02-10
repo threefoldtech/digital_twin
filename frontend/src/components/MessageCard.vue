@@ -14,6 +14,7 @@
         'p-2': !disabled,
         'bg-white': !disabled,
         'bg-gray-100': disabled,
+        'bg-gray-200': message.type === 'SYSTEM',
       }"
         style="min-width: 5rem;"
     >
@@ -39,7 +40,7 @@
         </button>
         <button
             class="mx-0"
-            v-if="isMine && message.type !== 'DELETE' && !disabled"
+            v-if="isMine && message.type !== 'DELETE' && !disabled && ! message.type ==='SYSTEM'"
             @click="sendUpdateMessage(true)"
         >
           <i class="fas fa-trash"></i>
@@ -66,6 +67,9 @@
       </span>
       <div v-else-if="message.type === 'GIF'">
         <img :src="message.body"/>
+      </div>
+      <div v-else-if="message.type === 'SYSTEM'">
+       <span>{{ message.body }}</span>
       </div>
       <div v-else-if="message.type === 'GROUP_UPDATE'">
         <span v-if="message.body.type === 'REMOVEUSER'">
