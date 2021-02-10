@@ -69,6 +69,16 @@ router.put("/", (req, res) => {
 
     const blockList = getBlocklist();
 
+    const chatId = determinChatId(message)
+
+    // const chatId = message.from === config.userid ? message.to : message.from;
+
+    if (blockList.includes(<string>chatId)) {
+        //@todo what should i return whenblocked
+        res.json({status: "blocked"})
+        return;
+    }
+
     if (message.type === MessageTypes.CONTACT_REQUEST) {
         if (blockList.includes(<string>message.from)) {
             //@todo what should i return whenblocked
@@ -79,16 +89,6 @@ router.put("/", (req, res) => {
         handleContactRequest(message as Message<ContactRequest>);
 
         res.json({status: "success"})
-        return;
-    }
-
-    const chatId = determinChatId(message)
-
-    // const chatId = message.from === config.userid ? message.to : message.from;
-
-    if (blockList.includes(<string>chatId)) {
-        //@todo what should i return whenblocked
-        res.json({status: "blocked"})
         return;
     }
 
