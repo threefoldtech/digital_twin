@@ -14,7 +14,7 @@ export default class User implements UserInterface {
       this.id = userData.id
     } catch (error) {
       this.status = "Exploring the new DigitalTwin";
-      this.image = `https://${config.userid}.digitaltwin.jimbertesting.be/api/user/avatar`;
+      this.image = `https://${config.appId}/api/user/avatar`;
       this.id = config.userid;
       persistUserdata({
         status: this.status,
