@@ -63,6 +63,7 @@
             v-model="userStatus"
             class="w-full"
             :disabled="!isEditingStatus"
+            :placeholder="user.status"
           ></textarea>
         </div>
         <input
@@ -70,6 +71,7 @@
           type="file"
           id="fileinput"
           ref="fileinput"
+          accept="image/*"
           @change="changeFile"
         />
       </div>
@@ -102,6 +104,7 @@ export default defineComponent({
     };
     const changeFile = () => {
       file.value = fileinput.value?.files[0];
+      sendNewAvatar()
     };
     const removeFile = () => {
       file.value = null;
@@ -110,7 +113,7 @@ export default defineComponent({
     const sendNewAvatar = async () => {
       const { sendSocketAvatar } = useSocketActions();
       const buffer = await file.value.arrayBuffer();
-      sendSocketAvatar(buffer);
+      sendSocketAvatar(buffer).then(b => alert('refresh for new avatar'));
       showDialog.value = false;
     };
 

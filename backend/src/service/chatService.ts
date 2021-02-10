@@ -6,6 +6,7 @@ import Contact from "../models/contact";
 import {getChatIds, persistChat, getChat} from "./dataService";
 import messages from "../routes/messages";
 import {parseMessage} from "./messageService";
+import {sendEventToConnectedSockets} from "./socketService";
 
 export const persistMessage = (
     chatId: IdInterface,
@@ -20,12 +21,13 @@ export const addChat = (
     chatId: IdInterface,
     contacts: Contact[],
     isGroupchat: boolean,
-    message: MessageInterface<MessageBodyTypeInterface>,
+    message: MessageInterface<MessageBodyTypeInterface>[],
     name: string,
     acceptedChat: boolean,
     adminId: DtIdInterface
 ) => {
-    const chat = new Chat(chatId, contacts, isGroupchat, [message], name, acceptedChat, adminId, {})
+    const chat = new Chat(chatId, contacts, isGroupchat, message, name, acceptedChat, adminId, {})
+    sendEventToConnectedSockets('new_chat', chat)
     persistChat(chat );
     return chat
 };

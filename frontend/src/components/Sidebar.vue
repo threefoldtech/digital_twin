@@ -2,24 +2,31 @@
   <nav>
     <div class="flex flex-col h-full items-center justify-center mx-2">
       <div
-        v-for="app in apps"
-        :key="app.name"
-        class="mb-4 grid text-center text-white cursor-pointer"
+          v-for="app in apps"
+          :key="app.name"
+          class="mb-4 grid text-center text-white"
+          :class="{
+            'text-gray-400': !app?.enabled,
+          'cursor-pointer': app.enabled}
+"
       >
-        <div class="h-20 w-20 rounded-full grid place-items-center mb-1">
+        <div class="h-20 w-20 rounded-full grid place-items-center mb-1" style="position: relative">
           <i :class="`fas ${app.icon} text-2xl`"></i>
+          <h3>
+            {{ app.name }}
+          </h3>
+          <!--          <div class="bar" v-if="!app.enabled" style="width: 100%;height: 4px; background-color:#888; position:absolute; left:0;transform: rotate(-45deg)"></div>-->
+
         </div>
-        <h3>
-          {{ app.name }}
-        </h3>
+
       </div>
     </div>
   </nav>
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from "vue";
-import { useRouter } from "vue-router";
+import {defineComponent, computed} from "vue";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
   name: "Sidebar",
@@ -28,6 +35,7 @@ export default defineComponent({
       {
         name: "chat",
         icon: "fas fa-comments",
+        enabled: true
       },
       {
         name: "meetings",
@@ -54,6 +62,7 @@ export default defineComponent({
 .active {
   position: relative;
 }
+
 .active::after {
   position: absolute;
   content: "";

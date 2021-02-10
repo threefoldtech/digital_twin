@@ -12,7 +12,7 @@
         <p class="font-thin" v-if="!chat.isGroup">{{
             statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline"
           }}</p>
-        <p class="font-thin" v-if="chat.isGroup">GroupChat ## change this copy ##</p>
+        <p class="font-thin" v-if="chat.isGroup">Group chat</p>
         <!-- <p class="font-thin">
           <span v-if=".isOnline">Is online</span>
           <span v-else> Last seen {{ m(contact.lastSeen).fromNow() }} </span>
@@ -49,6 +49,11 @@
               :isGroup="chat.isGroup"
               :isMine="message.from === user.id"
           />
+          <span class="font-thin" v-if="reads[message.id]">
+            <template v-if="!chat.isGroup || reads[message.id].length === 1">read by {{ reads[message.id][0] }}</template>
+            <template v-else-if="reads[message.id].length === 2">read by {{reads[message.id][0]}} and {{ reads[message.id][1] }}</template>
+            <template v-else>read by {{reads[message.id][0]}}, {{ reads[message.id][1] }} and {{reads[message.id].length -2}} others</template>
+          </span>
 
         </template>
 
@@ -57,11 +62,12 @@
     position: absolute;
     bottom: 0;
     width: 50%;
+    pointer-events: none;
 "></div>
       </div>
     </div>
 
-    <ChatInput :selectedid="chat.chatId" v-on:messageSend="scrollToBottom"/>
+    <ChatInput class="chatInput" :selectedid="chat.chatId" v-on:messageSend="scrollToBottom"/>
   </div>
 </template>
 
@@ -76,7 +82,7 @@ import {
   nextTick,
   computed,
 } from "vue";
-import {findLastIndex} from 'lodash'
+import {findLastIndex, each} from 'lodash'
 
 import {statusList} from "@/store/statusStore"
 import {usechatsState, usechatsActions} from "../store/chatStore";
@@ -158,6 +164,7 @@ export default defineComponent({
     });
 
     const popupMeeting = () => {
+      sendMessage(chat.value.chatId, `${user.id} joined the video chat`, 'SYSTEM');
 
       // @ts-ignore
       // const str = chat?.contacts ? chat.id : [user.id, chat.id].sort().join();
@@ -184,7 +191,6 @@ export default defineComponent({
     const showDivider = (message, index) => {
       const previousMessage = chat.value.messages[index - 1];
       if (!previousMessage) {
-        console.log('oh no')
         return true;
       }
       const time = moment(message.timeStamp);
@@ -192,6 +198,23 @@ export default defineComponent({
       return time.diff(previousMessage.timeStamp, "m") > 5;
     }
 
+    const reads = computed(()=>{
+      const preReads = {}
+      each( chat.value.read, ( val:string, key:string ) => {
+        console.log( key, val );
+        if (key === user.id){
+          return;
+        }
+        preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key]
+      } );
+      return preReads
+    })
+    //@TODO fix this
+    // @ts-ignore
+    watch(chat.value.messages, ()=>{
+      console.log("inwatch")
+      scrollToBottom()
+    })
 
     const viewAnchor = ref(null)
     return {
@@ -213,7 +236,7 @@ export default defineComponent({
       user,
       viewAnchor,
       showDivider,
-
+      reads,
       ...propRefs,
     };
   },

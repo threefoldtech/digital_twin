@@ -3,6 +3,7 @@ import {Router} from 'express';
 import {appCallback, getAppLoginUrl} from "../service/authService";
 import {getAcceptedChats, getChatRequests, getChatById} from "../service/chatService";
 import { persistChat } from "../service/dataService"
+import {sendEventToConnectedSockets} from "../service/socketService";
 
 const router = Router();
 
@@ -15,6 +16,7 @@ router.post("/", (req,res)=> {
         console.log("accepting", id)
         let chat = getChatById(id)
         chat.acceptedChat = true
+        sendEventToConnectedSockets('new_chat', chat)
         persistChat(chat)
         res.json(chat);
         return

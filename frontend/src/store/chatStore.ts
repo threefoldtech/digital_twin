@@ -16,6 +16,7 @@ import { useContactsActions, useContactsState } from "./contactStore";
 import config from "../../public/config/config";
 import { uuidv4 } from "@/common";
 import {startFetchStatusLoop} from "@/store/statusStore";
+import {uniqBy} from "lodash";
 
 const state = reactive<chatstate>({
   chats: [],
@@ -46,7 +47,8 @@ const addChat = (chat: Chat) => {
   }
 
   if (chat.acceptedChat) {
-    state.chats.push(chat);
+    state.chats.push(chat)
+    state.chats = uniqBy(state.chats, c => c.chatId);
   } else {
     state.chatRequests.push(chat);
   }
@@ -72,10 +74,10 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
       {
         from: user.id,
         to: name,
-        body: `${user.id} has created and invited you to${name}`,
+        body: `${user.id} has created and invited you to ${name}`,
         timeStamp: new Date(),
         id: uuidv4(),
-        type: "STRING"
+        type: "SYSTEM"
       }
     ],
     name: name,
@@ -98,16 +100,9 @@ const acceptChat = id => {
     const index = state.chatRequests.findIndex(c => c.chatId == id);
     state.chatRequests[index].acceptedChat = true
     addChat(state.chatRequests[index]);
+    const {user} = useAuthState();
+    sendMessage(id,`${user.id} accepted invitation`, 'SYSTEM' )
     state.chatRequests.splice(index, 1);
-
-    const { contacts } = useContactsState();
-    const {user} = useAuthState() 
-    if(!state.chatRequests[index].isGroup && state.chatRequests[index].acceptedChat){
-      const newContact = state.chatRequests[index].contacts.find(c=> c.id !== user.id)
-      if(newContact){
-        contacts.value.push(<Contact>newContact)
-      }
-    }
   });
 };
 
@@ -250,9 +245,9 @@ const readMessage = (chatId, messageId) => {
   sendMessageObject(chatId, newMessage);
 };
 
-const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => { 
+const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
   const { user } = useAuthState();
-
+  const { chats } = usechatsState();
   const operation = remove? "REMOVEUSER": "ADDUSER"
   console.log(`${operation} ${contact.id} from ${groupId}`)
   const message:Message<GroupUpdate> = {
@@ -261,7 +256,8 @@ const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
     to: groupId,
     body: <GroupUpdate>{
       type: operation,
-      contact
+      contact,
+      chat: chats.value.find(chat => chat.chatId == groupId)
     },
     timeStamp: new Date(),
     type: "GROUP_UPDATE"

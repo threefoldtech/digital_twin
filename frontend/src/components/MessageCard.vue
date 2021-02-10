@@ -8,16 +8,20 @@
       'my-1': !disabled,
     }"
   >
+    <AvatarImg small class="mr-2 self-center" v-if="!isMine && isGroup && !disabled" :id="message.from"></AvatarImg>
     <div
-        class="bg-white relative rounded-lg"
+        class=" relative rounded-lg"
         :class="{
-        'bg-gray-100': disabled,
         'p-2': !disabled,
+        'bg-white': !disabled,
+        'bg-gray-100': disabled,
+        'bg-gray-200': message.type === 'SYSTEM',
+        'bg-blue-200': !disabled && isMine && message.type !== 'SYSTEM',
       }"
-        style="min-width: 5rem;"
+        style="min-width: 5rem; max-width: 60%"
     >
       <pre v-if="config.showdebug">{{ message }}</pre>
-      <div v-if="isGroup &&  !isMine">
+      <div v-if="isGroup &&  !isMine && !disabled">
         <b>{{ message.from }}</b>
       </div>
       <div
@@ -38,7 +42,7 @@
         </button>
         <button
             class="mx-0"
-            v-if="isMine && message.type !== 'DELETE' && !disabled"
+            v-if="isMine && message.type !== 'DELETE' && !disabled && ! message.type ==='SYSTEM'"
             @click="sendUpdateMessage(true)"
         >
           <i class="fas fa-trash"></i>
@@ -47,6 +51,7 @@
       <span v-if="message.type === 'FILE'">
         <audio
             controls
+            class="max-w-full"
             v-if="message.body.filename.indexOf('.WebM') !== -1"
             :src="fileUrl"
         ></audio>
@@ -57,7 +62,7 @@
         />
         <br/>
         <a
-            class="py-2 px-2 bg-green-200 border-r-2"
+            class="py-2 px-2 bg-blue-300 border-r-2"
             :href="fileUrl"
             download
         >{{ message.body.filename }}</a
@@ -65,6 +70,9 @@
       </span>
       <div v-else-if="message.type === 'GIF'">
         <img :src="message.body"/>
+      </div>
+      <div v-else-if="message.type === 'SYSTEM'">
+       <span>{{ message.body }}</span>
       </div>
       <div v-else-if="message.type === 'GROUP_UPDATE'">
         <span v-if="message.body.type === 'REMOVEUSER'">
@@ -75,13 +83,16 @@
         </span>
       </div>
       <div v-else-if="message.type === 'QUOTE'">
-        <b> {{ message.body.quotedMessage.from }} said: </b> <br/>
-        <MessageCard
-            :message="message.body.quotedMessage"
-            :chat-id="chatId"
-            disabled
-            isGroup="false"
-        />
+        <div class="bg-gray-100 py-1 px-1" v-if="showQuoted">
+          <b>{{ message.body.quotedMessage.from }} said: </b> <br/>
+          <MessageCard
+              :message="message.body.quotedMessage"
+              :chat-id="chatId"
+              disabled
+              isGroup="false"
+              :showQuoted="false"
+          />
+        </div>
         {{ message.body.message }}
       </div>
       <div v-else>
@@ -108,7 +119,7 @@
         <span v-if="message.type == 'EDIT'"> edited </span>
         <span v-if="message.type == 'DELETE'"> deleted  </span>
 
-        <small class="font-thin text-right" v-if="isread">is read</small>
+<!--        <small class="font-thin text-right" v-if="isread">is read</small>-->
         <!--        {{ m(message.timeStamp).fromNow() }}-->
       </p>
     </div>
@@ -116,16 +127,18 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, nextTick, ref} from "vue";
+import {defineComponent, nextTick, ref, watch} from "vue";
 import {useAuthState} from "../store/authStore";
 import moment from "moment";
 import {usechatsActions} from "../store/chatStore";
 import {Message, MessageBodyType, QuoteBodyType} from "../types/index";
 import {uuidv4} from "@/common";
 import config from "../../public/config/config";
+import AvatarImg from "@/components/AvatarImg.vue";
 
 export default defineComponent({
   name: "MessageCard",
+  components: {AvatarImg},
   props: {
     message: Object,
     chatId: String,
@@ -149,6 +162,10 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    showQuoted: {
+      type: Boolean,
+      default: true
+    }
   },
   setup(props) {
     const showActions = ref(false);
@@ -250,7 +267,8 @@ export default defineComponent({
       config,
       read,
       fileUrl,
-      isGroup: props.isGroup
+      isGroup: props.isGroup,
+      showQuoted: props.showQuoted
     };
   },
 });

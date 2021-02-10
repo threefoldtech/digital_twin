@@ -7,7 +7,7 @@
         :class="{ active: isActive('user') }"
         href="#"
       >
-        Add an user
+        Add a user
       </a>
       <a
         class="nav-link grid-cols-6 text-center py-2"
@@ -26,6 +26,7 @@
           :data="possibleUsers"
           v-model="usernameAdd"
           placeholder="Search for user..."
+          :error="usernameAddError"
         ></auto-complete>
       </div>
       <div class="flex place-items-center">
@@ -39,13 +40,17 @@
       </div>
 
       <div class="flex mt-4 justify-end w-full">
-        <button @click="$emit('closeDialog')">Cancel</button>
+        <button type="button" @click="$emit('closeDialog')">Cancel</button>
         <button>Add contact</button>
       </div>
     </form>
     <form @submit.prevent="groupAdd" class="w-full" v-if="isActive('group')">
       <div class="flex place-items-center">
         <label class="mr-2" for="username">Group name: </label>
+        <span class="text-red-600" v-if="error != ''">
+          {{ groupnameAddError }}
+        </span>
+
         <input
           v-model="groupnameAdd"
           id="username"
@@ -66,13 +71,7 @@
             class="grid grid-cols-12 rounded-lg mb-2 py-2"
           >
             <div class="col-span-2 place-items-center grid">
-              <img
-                :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-                  contact.id
-                )}.svg`"
-                alt="contact image"
-                class="h-12 bg-icon rounded-full"
-              />
+              <AvatarImg :id="contact.id"  alt="contact image" />
             </div>
             <div class="col-span-8 pl-4 flex flex-col justify-center">
               {{ contact.id }}
@@ -105,34 +104,51 @@
 </template>
 
 <script lang="ts">
-import { selectedId, usechatsActions } from "@/store/chatStore";
+import { selectedId, usechatsActions, usechatsState } from "@/store/chatStore";
 import { defineComponent, ref, computed, nextTick } from "vue";
 import { useContactsActions, useContactsState } from "../store/contactStore";
 import { useAuthState } from "../store/authStore";
-import { Contact } from "../types/index";
+import { Chat, Contact, Message } from "../types/index";
 import axios from "axios";
 import config from "../../public/config/config";
 import autoComplete from "./AutoComplete.vue";
+import { uuidv4 } from "@/common";
+import AvatarImg from "@/components/AvatarImg.vue";
 
 export default defineComponent({
   name: "ContactAdd",
-  components: { autoComplete },
+  components: {AvatarImg, autoComplete },
   setup(props, { emit }) {
-    const { addContact } = useContactsActions();
     const { contacts } = useContactsState();
     let addGroup = ref(false);
     let usernameAdd = ref("");
+    let usernameAddError = ref("");
     let groupnameAdd = ref("");
+    let groupnameAddError = ref("");
     let usernameInGroupAdd = ref("");
     let usersInGroup = ref([]);
-    let possibleUsers = ref([]);
+    let possibleUsers = ref<string[]>([]);
     let contactAddError = ref("");
 
     const contactAdd = () => {
       try {
         let userId = usernameAdd.value;
+        if (!possibleUsers.value.find((pu) => pu === userId)) {
+          usernameAddError.value = "Not able to find DigitalTwin of this user";
+          return;
+        }
+        const { chats } = usechatsState();
+        if (
+          chats.value
+            .filter((chat) => !chat.isGroup)
+            .find((chat) => <string>chat.chatId == userId)
+        ) {
+          usernameAddError.value = "Already added this user";
+          return;
+        }
+       const {addContact} = useContactsActions()
+        addContact(userId, location.value)
         console.log(userId);
-        addContact(userId, location.value, false);
         usernameAdd.value = "";
         contactAddError.value = "";
         emit("closeDialog");
@@ -164,6 +180,10 @@ export default defineComponent({
     const groupAdd = () => {
       const { addGroupchat } = usechatsActions();
       const { user } = useAuthState();
+      const { chats } = usechatsState();
+      if (groupnameAdd.value == "") {
+        return;
+      }
       usersInGroup.value.push(user.id);
       const contacts: Contact[] = usersInGroup.value.map((id) => {
         const contact: Contact = {
@@ -200,14 +220,17 @@ export default defineComponent({
 
     // @todo: config
     axios.get(`${config.spawnerUrl}api/v1/list`, {}).then((r) => {
-      console.log(r.data);
-      possibleUsers.value = r.data;
+      const { user } = useAuthState();
+      possibleUsers.value = r.data.filter((pu) => pu !== user.id);
     });
+
 
     return {
       addGroup,
       usernameAdd,
+      usernameAddError,
       groupnameAdd,
+      groupnameAddError,
       usernameInGroupAdd,
       location,
       contactAdd,
@@ -225,7 +248,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-a.active{
+a.active {
   background: #e5e7eb;
 }
 </style>

@@ -115,7 +115,14 @@ export const parseMessage = (
       );
 
     default:
-      throw new Error("validation failed");
+      return new Message<MessageBodyTypeInterface>(
+          msg.from,
+          msg.to,
+          <String>msg.body,
+          new Date(msg.timeStamp),
+          msg.id,
+          msg.type
+      );
   }
 };
 

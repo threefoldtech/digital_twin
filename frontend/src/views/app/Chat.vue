@@ -5,7 +5,7 @@
       :class="{ hidden: !showContacts }"
       @click="showContacts = false"
     ></div>
-    <div
+    <aside
       class="fixed md:static md:col-span-3 flex flex-col md:bg-transparent bg-white rounded-r-lg shadow md:shadow-none h-screen md:h-auto top-0 left-0 z-30 transition-all"
       :class="{ '-left-full': !showContacts }"
     >
@@ -22,28 +22,13 @@
           </button>
         </div>
 
-        <div v-if="chatRequests.length > 0">
+        <div v-if="filteredChatRequests.length > 0">
           <h2 style="font-size: 1.5em">
             You have
-            <span style="color: red"> {{ chatRequests.length }} </span>
-            new connection request<span v-if="chatRequests.length > 1">s</span>
+            <span style="color: red"> {{ filteredChatRequests.length }} </span>
+            new connection request<span v-if="filteredChatRequests.length > 1">s</span>
           </h2>
-          <div v-for="(chat, i) in chatRequests" :key="i">
-            <div class="grid grid-cols-12 w-full rounded-lg mb-2 py-2">
-              <span v-if="chat.isGroup" class="truncate col-span-8">
-                {{ chat.admin }} invited you to {{ chat.name }}
-              </span>
-              <span v-else class="truncate col-span-8">
-                <b>{{ chat.name }}</b> wants to have a chat
-              </span>
-              <button
-                class="col-span-4"
-                @click="acceptChatRequest(chat.chatId)"
-              >
-                Accept Chat
-              </button>
-            </div>
-          </div>
+          <ChatRequestList :chat-requests="filteredChatRequests"/>
         </div>
         <div class="relative full">
           <div
@@ -66,7 +51,7 @@
             :key="`${chat.chatId}-${chat.messages.length}-${
               chat.read[user.id]
             }`"
-            class="grid grid-cols-12 rounded-lg mb-2 py-2"
+            class="grid grid-cols-12 rounded-lg mb-2 py-2 cursor-pointer"
             :class="{
               'bg-white text-black': chat.chatId !== selectedId,
               'bg-icon text-white': chat.chatId === selectedId,
@@ -76,12 +61,12 @@
           />
         </div>
       </div>
-    </div>
-
-    <div class="md:col-span-6 w-full h-full relative">
+    </aside>
+    <main class="md:col-span-6 w-full h-full relative">
       <chat-view v-if="selectedId && chats.find((c) => c.chatId === selectedId)" :selectedId="selectedId" :key="selectedId" @showContacts="showContacts=true"></chat-view>
       <div class="text-center" v-else-if="chats.length >= 1">
-        select a chat on the left
+        No chat has been selected <br>
+        Please select a chat from the left side
       </div>
       <div v-else class="text-center">
         <p>It feels lonely over here :(</p>
@@ -92,10 +77,10 @@
           Add a contact
         </button>
       </div>
-    </div>
-
-    <div
+    </main>
+    <aside
       class="hidden md:block col-span-3 relative h-full w-full overflow-y-auto flex-col"
+      v-if="selectedChat"
     >
       <div class="absolute max-w-full w-full px-4 pb-4" v-if="selectedId">
         <div
@@ -109,7 +94,7 @@
               v-if="!selectedChat.isGroup"
               class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-0 transition-all"
               :class="{
-                'bg-red-500': status && !status.isOnline,
+                'bg-red-500':  status && !status.isOnline,
                 'bg-green-500': status && status.isOnline,
               }"
             ></div>
@@ -123,10 +108,10 @@
         </div>
         <group-management v-if="selectedChat.isGroup" :groupChat="selectedChat" :key="selectedChat.chatId + selectedChat.contacts.length"></group-management>
       </div>
-    </div>
+    </aside>
     <jdialog v-model="showDialog" @close="showDialog = false" noActions>
       <template v-slot:title>
-        <h1>New chat</h1>
+        <h1>Create a new chat</h1>
       </template>
       <add-contact @closeDialog="showDialog = false"> </add-contact>
     </jdialog>
@@ -151,10 +136,12 @@ import config from "../../../public/config/config";
 import axios from "axios";
 import { startFetchStatusLoop } from "@/store/statusStore";
 import {statusList} from "@/store/statusStore";
+import ChatRequestList from "@/views/app/ChatRequestList.vue";
+import {uniqBy} from "lodash";
 
 export default defineComponent({
   name: "Apps",
-  components: { addContact, chatView, jdialog: Dialog, ChatCard, AvatarImg, GroupManagement },
+  components: {ChatRequestList, addContact, chatView, jdialog: Dialog, ChatCard, AvatarImg, GroupManagement },
   setup(_, context) {
     const { chats, chatRequests } = usechatsState();
     const { updateUserInfo } = useAuthActions();
@@ -163,9 +150,6 @@ export default defineComponent({
     const status = computed(() => {
       return statusList[selectedId.value]
     })
-    const {
-      retrieveContacts,
-    } = useContactsActions();
     const { initializeSocket } = useSocketActions();
     const { user } = useAuthState();
 
@@ -194,20 +178,16 @@ export default defineComponent({
       initializeSocket(user.id.toString());
     });
     onBeforeMount(retrievechats);
-    onBeforeMount(() => {
-      retrieveContacts().then(() => {
-        selectedId.value = <string>chats.value[0].chatId;
-      });
-    });
 
     const selectedChat = computed(()=>chats.value.find(chat=> chat.chatId == selectedId.value))
 
     startFetchStatusLoop(user.id);
 
-    const acceptChatRequest = (id) => {
-      const { acceptChat } = usechatsActions();
-      acceptChat(id);
-    };
+    const filteredChatRequests = computed(() => {
+      chatRequests.value = chatRequests.value.filter(cr => !chats.value.find(c => c.chatId === cr.chatId));
+      const filteredChats = chatRequests.value.filter(cr => !chats.value.find(c => c.chatId === cr.chatId));
+      return uniqBy(filteredChats, c => c.chatId);
+    })
 
     return {
       status,
@@ -215,18 +195,15 @@ export default defineComponent({
       selectedChat,
       setSelected,
       chats,
-      chatRequests,
+      filteredChatRequests,
       searchValue,
       filteredChats,
       showDialog,
       showContacts,
       user,
-      acceptChatRequest,
       m,
     };
   },
 });
 </script>
 
-<style scoped>
-</style>
