@@ -63,6 +63,12 @@ export interface FileMessageType extends MessageBodyTypeInterface{
     filename:string
 }
 
+export interface GroupUpdateType extends MessageBodyTypeInterface {
+    type: string,
+    contact: (AnonymousContactInterface|ContactInterface),
+    chat: GroupChatInterface
+}
+
 export interface ChatInterface {
     chatId: IdInterface,
     messages: MessageInterface<MessageBodyTypeInterface>[];

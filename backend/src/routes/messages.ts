@@ -1,9 +1,10 @@
+import { addChat } from './../service/chatService';
 import {getBlocklist, getChatIds, persistChat} from './../service/dataService';
 import {Router} from 'express';
 import Message from "../models/message";
 import {contactRequests} from "../store/contactRequests";
 import {sendEventToConnectedSockets} from "../service/socketService";
-import {ContactRequest, DtIdInterface, MessageBodyTypeInterface, MessageTypes} from "../types";
+import {ContactRequest, DtIdInterface, GroupUpdateType, MessageBodyTypeInterface, MessageTypes} from "../types";
 import Contact from "../models/contact";
 import {editMessage, handleRead, parseMessage} from "../service/messageService";
 import {persistMessage} from "../service/chatService";
@@ -92,6 +93,21 @@ router.put("/", (req, res) => {
         return;
     }
 
+    if (message.type === MessageTypes.GROUP_UPDATE) {
+        //@ts-ignore
+        const groupUpdateMsg:Message<GroupUpdateType> = message
+        if (blockList.includes(<string>groupUpdateMsg.from)) {
+            //@todo what should i return whenblocked
+            res.json({status: "blocked"})
+            return;
+        }
+        const chat  = groupUpdateMsg.body.chat
+        addChat(chat.chatId,<Contact[]>chat.contacts,true,chat.messages,chat.name,true,message.from);
+
+        res.json({status: "success"})
+        return;
+    }
+
     let chat = getChat(chatId)
 
     if (chat.isGroup && chat.adminId == config.userid) {
@@ -100,7 +116,7 @@ router.put("/", (req, res) => {
             sendMessageToApi(c.id, message);
         })
 
-        if (message.type === MessageTypes.GROUP_UPDATE) {
+        if (message.type === <string>MessageTypes.GROUP_UPDATE) {
             handleGroupUpdate(<any>message, chat);
 
             res.json({status: "success"})
@@ -158,7 +174,7 @@ router.put("/", (req, res) => {
     }
 
 
-    if (message.type === MessageTypes.GROUP_UPDATE) {
+    if (message.type === <string>MessageTypes.GROUP_UPDATE) {
         handleGroupUpdate(<any>message, chat);
 
         res.json({status: "success"})

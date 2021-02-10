@@ -92,8 +92,8 @@ export default {
       updateContactsInGroup(props.groupChat.chatId, contact, false);
     };
     const filteredContacts = computed(() => {
-      //@ts-ignore
       return contacts.filter(
+        //@ts-ignore
         (c) => !props.groupChat.contacts.map((x) => x.id).includes(c.id)
       );
     });

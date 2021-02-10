@@ -245,7 +245,7 @@ const readMessage = (chatId, messageId) => {
 
 const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
   const { user } = useAuthState();
-
+  const { chats } = usechatsState();
   const operation = remove? "REMOVEUSER": "ADDUSER"
   console.log(`${operation} ${contact.id} from ${groupId}`)
   const message:Message<GroupUpdate> = {
@@ -254,7 +254,8 @@ const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
     to: groupId,
     body: <GroupUpdate>{
       type: operation,
-      contact
+      contact,
+      chat: chats.value.find(chat => chat.chatId == groupId)
     },
     timeStamp: new Date(),
     type: "GROUP_UPDATE"
