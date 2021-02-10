@@ -8,6 +8,7 @@
       'my-1': !disabled,
     }"
   >
+    <AvatarImg small class="mr-2 self-center" v-if="!isMine && isGroup" :id="message.from"></AvatarImg>
     <div
         class=" relative rounded-lg"
         :class="{
@@ -131,9 +132,11 @@ import {usechatsActions} from "../store/chatStore";
 import {Message, MessageBodyType, QuoteBodyType} from "../types/index";
 import {uuidv4} from "@/common";
 import config from "../../public/config/config";
+import AvatarImg from "@/components/AvatarImg.vue";
 
 export default defineComponent({
   name: "MessageCard",
+  components: {AvatarImg},
   props: {
     message: Object,
     chatId: String,

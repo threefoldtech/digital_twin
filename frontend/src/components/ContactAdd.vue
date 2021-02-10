@@ -71,13 +71,7 @@
             class="grid grid-cols-12 rounded-lg mb-2 py-2"
           >
             <div class="col-span-2 place-items-center grid">
-              <img
-                :src="`https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
-                  contact.id
-                )}.svg`"
-                alt="contact image"
-                class="h-12 bg-icon rounded-full"
-              />
+              <AvatarImg :id="contact.id"  alt="contact image" />
             </div>
             <div class="col-span-8 pl-4 flex flex-col justify-center">
               {{ contact.id }}
@@ -119,10 +113,11 @@ import axios from "axios";
 import config from "../../public/config/config";
 import autoComplete from "./AutoComplete.vue";
 import { uuidv4 } from "@/common";
+import AvatarImg from "@/components/AvatarImg.vue";
 
 export default defineComponent({
   name: "ContactAdd",
-  components: { autoComplete },
+  components: {AvatarImg, autoComplete },
   setup(props, { emit }) {
     const { contacts } = useContactsState();
     let addGroup = ref(false);
@@ -228,7 +223,7 @@ export default defineComponent({
       const { user } = useAuthState();
       possibleUsers.value = r.data.filter((pu) => pu !== user.id);
     });
-      
+
 
     return {
       addGroup,

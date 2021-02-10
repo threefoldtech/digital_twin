@@ -2,27 +2,34 @@
   <img
       :src="src"
       alt="User image"
-      class="h-12 w-12 bg-icon rounded-full"
+      class="bg-icon rounded-full"
+      :class='{
+        "h-12 w-12": !small,
+        "h-8 w-8": small
+      }'
   />
 </template>
 <script lang="ts">
 import {computed} from "vue";
-import {statusList} from "@/store/statusStore";
+import {startFetchStatusLoop, statusList} from "@/store/statusStore";
 
 export default {
   name: 'AvatarImg',
   props: {
-    id: {required: true}
+    id: {required: true},
+    small: {required: false, default: false, type: Boolean}
   },
   setup(props) {
+    // startFetchStatusLoop(props.id)
+
     const status = computed(() => {
       return statusList[props.id]
     })
     const src = computed(() => {
       if (!status.value || !status.value.avatar) {
-        return `https://avatars.dicebear.com/4.5/api/avataaars/${encodeURI(
+        return `https://avatars.dicebear.com/4.5/api/jdenticon/${encodeURI(
             props.id
-        )}.svg`;
+        )}.svg?m=14&b=%23ffffff`;
       }
       return status.value.avatar;
 
