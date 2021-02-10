@@ -48,11 +48,8 @@
           class="grid grid-cols-12 rounded-lg mb-2 py-2"
         >
           <div class="col-span-2 place-items-center grid">
-            <img
-              :src="status[contact.id]"
-              alt="contact image"
-              class="h-12 bg-icon rounded-full"
-            />
+                      <AvatarImg :id="contact.id" />
+
           </div>
           <div class="col-span-8 pl-4 flex flex-col justify-center">
             {{ contact.id }}
