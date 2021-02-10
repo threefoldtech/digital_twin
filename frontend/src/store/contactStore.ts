@@ -47,7 +47,7 @@ const addContact = (username:DtId, location, dontCheck = false) => {
         from: user.id,
         to: username,
         timeStamp: new Date(),
-        type:"STRING"
+        type:"SYSTEM"
     }
     const chatname:String = username
     axios.post(`${config.baseUrl}api/contacts`, {id:username,location,message:addMessage}).then( (res) => {

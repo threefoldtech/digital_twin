@@ -8,7 +8,7 @@
       'my-1': !disabled,
     }"
   >
-    <AvatarImg small class="mr-2 self-center" v-if="!isMine && isGroup" :id="message.from"></AvatarImg>
+    <AvatarImg small class="mr-2 self-center" v-if="!isMine && isGroup && !disabled" :id="message.from"></AvatarImg>
     <div
         class=" relative rounded-lg"
         :class="{
@@ -16,8 +16,9 @@
         'bg-white': !disabled,
         'bg-gray-100': disabled,
         'bg-gray-200': message.type === 'SYSTEM',
+        'bg-blue-400': !disabled && isMine && message.type !== 'SYSTEM',
       }"
-        style="min-width: 5rem;"
+        style="min-width: 5rem; max-width: 60%"
     >
       <pre v-if="config.showdebug">{{ message }}</pre>
       <div v-if="isGroup &&  !isMine && !disabled">
