@@ -11,7 +11,7 @@
 </template>
 <script lang="ts">
 import {computed} from "vue";
-import {statusList} from "@/store/statusStore";
+import {startFetchStatusLoop, statusList} from "@/store/statusStore";
 
 export default {
   name: 'AvatarImg',
@@ -20,6 +20,8 @@ export default {
     small: {required: false, default: false, type: Boolean}
   },
   setup(props) {
+    startFetchStatusLoop(props.id)
+
     const status = computed(() => {
       return statusList[props.id]
     })
