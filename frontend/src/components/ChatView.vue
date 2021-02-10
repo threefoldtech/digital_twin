@@ -49,10 +49,10 @@
               :isGroup="chat.isGroup"
               :isMine="message.from === user.id"
           />
-          <span v-if="reads[message.id]">
-            <span v-if="!chat.isGroup || reads[message.id].length === 1">read by {{ reads[message.id][0] }}</span>
-            <span v-else-if="reads[message.id].length === 2">read by {{reads[message.id][0]}} and {{ reads[message.id][1] }}</span>
-            <span v-else>read by {{reads[message.id][0]}}, {{ reads[message.id][1] }} and {{reads[message.id].length -2}} others</span>
+          <span class="font-thin" v-if="reads[message.id]">
+            <template v-if="!chat.isGroup || reads[message.id].length === 1">read by {{ reads[message.id][0] }}</template>
+            <template v-else-if="reads[message.id].length === 2">read by {{reads[message.id][0]}} and {{ reads[message.id][1] }}</template>
+            <template v-else>read by {{reads[message.id][0]}}, {{ reads[message.id][1] }} and {{reads[message.id].length -2}} others</template>
           </span>
 
         </template>
@@ -202,7 +202,7 @@ export default defineComponent({
       each( chat.value.read, ( val:string, key:string ) => {
         console.log( key, val );
         if (key === user.id){
-          return;
+          // return;
         }
         preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key]
       } );
