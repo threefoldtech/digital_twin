@@ -4,21 +4,21 @@
   <div class="md:p4 md:m-4 md:rounded-3xl flex flex-col bg-white grid grid-cols-12">
     <div class="btns md:col-span-4 col-span-full md:grid grid-cols-4 md:bg-transparent bg-gray-200" :class="{'hidden': collapsed, 'grid': !collapsed}">
       <button @click="toggleGif"><h2>GIF</h2></button>
-      <button class="px-2 py-8" @click.stop="selectFile">
+      <button class="px-2 md:py-8 py-2" @click.stop="selectFile">
         <i class="fas fa-paperclip text-gray-500 transform" style="--tw-rotate: -225deg;"></i>
       </button>
       <input class="hidden" type="file" id="fileinput" ref="fileinput" @change="changeFile"/>
-      <button class="px-2 py-8" @click.stop="startRecording" v-if="!stopRecording">
+      <button class="px-2 md:py-8 py-2" @click.stop="startRecording" v-if="!stopRecording">
         <i class="fas fa-microphone text-gray-500"></i>
       </button>
-      <button class="px-2 py-8" @click.stop="stopRecording" v-else>
+      <button class="px-2 md:py-8 py-2" @click.stop="stopRecording" v-else>
         <i class="fas fa-circle text-red-600"></i>
       </button>
       <emoji-picker
           ref="emojipicker"
           :class="{hidden: !showEmoji}"
           style="position: absolute; bottom: 140px; z-index: 10000"></emoji-picker>
-      <button class="px-2 py-8" @click.stop="toggleEmoji" v-if="!file">
+      <button class="px-2 md:py-8 py-2" @click.stop="toggleEmoji" v-if="!file">
         😃
       </button>
     </div>
@@ -41,7 +41,7 @@
       </form>
       <div class="file-message md:col-span-10 col-span-8 w-full h-full pl-4 bg-blue-100" v-if="file">
         <span> {{ file.name }}</span>
-        <button class="px-2 py-8" @click.stop="removeFile">
+        <button class="px-2 md:py-8 py-2" @click.stop="removeFile">
           <i class="fas fa-minus-circle text-gray-500"></i>
         </button>
       </div>

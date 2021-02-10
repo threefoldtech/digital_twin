@@ -16,7 +16,7 @@
           </button>
           <h1>Chats</h1>
         </div>
-        <div class="flex items-center mb-2">
+        <div class="flex items-center mb-2 px-2 md:px-0">
           <button class="h-10 rounded-full" @click="showDialog = true">
             <i class="fas fa-plus"></i><span> New Chat </span>
           </button>
@@ -30,16 +30,16 @@
           </h2>
           <ChatRequestList :chat-requests="filteredChatRequests"/>
         </div>
-        <div class="relative full">
+        <div class="relative full md:px-0 px-4">
           <div
-            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+            class="absolute inset-y-0 left-0 md:pl-3 pl-7 flex items-center pointer-events-none"
           >
             <i class="text-gray-500 fas fa-search"></i>
           </div>
           <input
             type="text"
             placeholder="Search..."
-            class="w-full pl-12 py-3 sm:text-sm rounded-full bg-white"
+            class="w-full pl-12 py-3 sm:text-sm  rounded-full md:bg-white bg-gray-200"
             v-model="searchValue"
           />
         </div>
@@ -65,8 +65,15 @@
     <main class="md:col-span-6 w-full h-full relative">
       <chat-view v-if="selectedId && chats.find((c) => c.chatId === selectedId)" :selectedId="selectedId" :key="selectedId" @showContacts="showContacts=true"></chat-view>
       <div class="text-center" v-else-if="chats.length >= 1">
-        No chat has been selected <br>
-        Please select a chat from the left side
+        No chat has been selected <br class="md:block hidden">
+        <span class="md:block hidden">Please select a chat from the left side</span>
+        <br>
+        <button
+            @click="showContacts = true"
+            class="mt-2 bg-gray-200 border-2 rounded-full px-4"
+        >
+          Click to Show Chat
+        </button>
       </div>
       <div v-else class="text-center">
         <p>It feels lonely over here :(</p>

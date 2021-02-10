@@ -8,7 +8,7 @@
     </div>
     <div class="grid grid-cols-3 place-items-center bg-black">
       <img
-          class="h-40"
+          class="h-40 object-contain"
           v-for="gif in gifs"
           :src="gif"
           :key="gif"
