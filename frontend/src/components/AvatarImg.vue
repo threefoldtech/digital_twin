@@ -2,7 +2,11 @@
   <img
       :src="src"
       alt="User image"
-      class="h-12 w-12 bg-icon rounded-full"
+      class="bg-icon rounded-full"
+      :class='{
+        "h-12 w-12": !small,
+        "h-8 w-8": small
+      }'
   />
 </template>
 <script lang="ts">
@@ -12,7 +16,8 @@ import {statusList} from "@/store/statusStore";
 export default {
   name: 'AvatarImg',
   props: {
-    id: {required: true}
+    id: {required: true},
+    small: {required: false, default: false, type: Boolean}
   },
   setup(props) {
     const status = computed(() => {
