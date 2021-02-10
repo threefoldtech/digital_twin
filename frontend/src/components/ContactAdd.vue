@@ -47,7 +47,9 @@
     <form @submit.prevent="groupAdd" class="w-full" v-if="isActive('group')">
       <div class="flex place-items-center">
         <label class="mr-2" for="username">Group name: </label>
-        <span class="text-red-600" v-if="error != ''"> {{groupnameAddError}} </span>
+        <span class="text-red-600" v-if="error != ''">
+          {{ groupnameAddError }}
+        </span>
 
         <input
           v-model="groupnameAdd"
@@ -110,12 +112,13 @@
 <script lang="ts">
 import { selectedId, usechatsActions, usechatsState } from "@/store/chatStore";
 import { defineComponent, ref, computed, nextTick } from "vue";
-import { useContactsState } from "../store/contactStore";
+import { useContactsActions, useContactsState } from "../store/contactStore";
 import { useAuthState } from "../store/authStore";
-import { Contact } from "../types/index";
+import { Chat, Contact, Message } from "../types/index";
 import axios from "axios";
 import config from "../../public/config/config";
 import autoComplete from "./AutoComplete.vue";
+import { uuidv4 } from "@/common";
 
 export default defineComponent({
   name: "ContactAdd",
@@ -124,26 +127,32 @@ export default defineComponent({
     const { contacts } = useContactsState();
     let addGroup = ref(false);
     let usernameAdd = ref("");
-    let usernameAddError = ref("")
+    let usernameAddError = ref("");
     let groupnameAdd = ref("");
-    let groupnameAddError = ref("")
+    let groupnameAddError = ref("");
     let usernameInGroupAdd = ref("");
     let usersInGroup = ref([]);
-    let possibleUsers = ref<string[]>(["tobias"]);
+    let possibleUsers = ref<string[]>();
     let contactAddError = ref("");
 
     const contactAdd = () => {
       try {
         let userId = usernameAdd.value;
-        if (!possibleUsers.value.find(pu => pu === userId)){
-          usernameAddError.value = "Not able to find threebot of this user"
+        if (!possibleUsers.value.find((pu) => pu === userId)) {
+          usernameAddError.value = "Not able to find threebot of this user";
           return;
         }
-        const {chats} = usechatsState()
-        if (chats.value.filter(chat => !chat.isGroup).find(chat => <string>chat.chatId == userId)){
-          usernameAddError.value = "Already added this user"
+        const { chats } = usechatsState();
+        if (
+          chats.value
+            .filter((chat) => !chat.isGroup)
+            .find((chat) => <string>chat.chatId == userId)
+        ) {
+          usernameAddError.value = "Already added this user";
           return;
         }
+       const {addContact} = useContactsActions()
+        addContact(userId, location.value)
         console.log(userId);
         usernameAdd.value = "";
         contactAddError.value = "";
@@ -177,8 +186,8 @@ export default defineComponent({
       const { addGroupchat } = usechatsActions();
       const { user } = useAuthState();
       const { chats } = usechatsState();
-      if(groupnameAdd.value == ""){
-        return
+      if (groupnameAdd.value == "") {
+        return;
       }
       usersInGroup.value.push(user.id);
       const contacts: Contact[] = usersInGroup.value.map((id) => {
@@ -216,8 +225,8 @@ export default defineComponent({
 
     // @todo: config
     axios.get(`${config.spawnerUrl}api/v1/list`, {}).then((r) => {
-      const {user} = useAuthState();
-      possibleUsers.value = r.data.filter(pu => pu !== user.id);
+      const { user } = useAuthState();
+      possibleUsers.value = r.data.filter((pu) => pu !== user.id);
     });
 
     return {
@@ -243,7 +252,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-a.active{
+a.active {
   background: #e5e7eb;
 }
 </style>

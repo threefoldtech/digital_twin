@@ -36,23 +36,23 @@ import { Message, PersonChat, DtId } from "../types/index"
 //     return isAvailable
 // }
 
-// const addContact = (username:DtId, location, dontCheck = false) => {
-//     // if(!dontCheck && !contactIsHealthy(username)){
-//     //     throw "Peer is not healthy"
-//     // }
-//     const {user} = useAuthState()
-//     const addMessage:Message<String> = {
-//         id: uuidv4(),
-//         body: `Request has been sent to ${username}`,
-//         from: user.id,
-//         to: username,
-//         timeStamp: new Date(),
-//         type:"STRING"
-//     }
-//     const chatname:String = username
-//     axios.post(`${config.baseUrl}api/contacts`, {id:username,location,message:addMessage}).then( (res) => {
-//     })
-// }
+const addContact = (username:DtId, location, dontCheck = false) => {
+    // if(!dontCheck && !contactIsHealthy(username)){
+    //     throw "Peer is not healthy"
+    // }
+    const {user} = useAuthState()
+    const addMessage:Message<String> = {
+        id: uuidv4(),
+        body: `Request has been sent to ${username}`,
+        from: user.id,
+        to: username,
+        timeStamp: new Date(),
+        type:"STRING"
+    }
+    const chatname:String = username
+    axios.post(`${config.baseUrl}api/contacts`, {id:username,location,message:addMessage}).then( (res) => {
+    })
+}
 
 const calculateContacts = () => {
     const { chats }  = usechatsState()
@@ -72,7 +72,7 @@ export const useContactsActions = () => {
     return {
         // retrieveContacts,
         // setLastMessage,
-        // addContact
+        addContact
     }
 }
 
