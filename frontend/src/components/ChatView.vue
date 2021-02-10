@@ -209,7 +209,12 @@ export default defineComponent({
       } );
       return preReads
     })
-
+    //@TODO fix this
+    // @ts-ignore
+    watch(chat.value.messages, ()=>{
+      console.log("inwatch")
+      scrollToBottom()
+    })
 
     const viewAnchor = ref(null)
     return {

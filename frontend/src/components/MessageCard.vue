@@ -124,7 +124,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, nextTick, ref} from "vue";
+import {defineComponent, nextTick, ref, watch} from "vue";
 import {useAuthState} from "../store/authStore";
 import moment from "moment";
 import {usechatsActions} from "../store/chatStore";
