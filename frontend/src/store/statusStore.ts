@@ -2,16 +2,14 @@ import axios from "axios";
 import { ref } from "vue";
 import { reactive } from "@vue/reactivity";
 import {useAuthState} from "@/store/authStore";
+import {calculateBaseUrl} from "../services/urlService"
 
 export const statusList = reactive<Object>({});
 export const watchingUsers = [];
 
 const fetchStatus = async digitalTwinId => {
-  let url =
-    window.location.origin === "http://localhost:8080"
-      ? "http://localhost:3000/api/user/getStatus"
-      : `https://${digitalTwinId}.digitaltwin.jimbertesting.be/api/user/getStatus`;
-  // let url = `http://localhost:3000/api/user/getStatus`;
+  const baseLocation = calculateBaseUrl(digitalTwinId)
+  let url = `${baseLocation}/api/user/getStatus`;
   const response = await axios.get(url);
   let status = response.data;
   statusList[digitalTwinId] = status;

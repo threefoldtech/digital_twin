@@ -135,6 +135,7 @@ import {Message, MessageBodyType, QuoteBodyType} from "../types/index";
 import {uuidv4} from "@/common";
 import config from "../../public/config/config";
 import AvatarImg from "@/components/AvatarImg.vue";
+import { calculateBaseUrl } from "@/services/urlService";
 
 export default defineComponent({
   name: "MessageCard",
@@ -240,17 +241,13 @@ export default defineComponent({
       read();
     }
 
-
-    const fileUrl = props.message.body?.filename ?
-        `https://${props.message.from.replace(
+    const fromId = props.message.from.replace(
             'localhost:8080',
             'localhost:3000'
-        )}.digitaltwin.jimbertesting.be/api/files/${props.message.to}/${
-            props.message.body.filename
-        }`.replace(
-            'https://localhost:3000.digitaltwin.jimbertesting.be/',
-            'http://localhost:3000/'
-        ) : false
+    )
+    const baseurl = calculateBaseUrl(fromId)
+    const fileUrl = props.message.body?.filename ? `${baseurl}/api/files/${props.message.to}/${props.message.body.filename}` : false
+
 
     return {
       showActions,
