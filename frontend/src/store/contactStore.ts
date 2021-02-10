@@ -57,7 +57,8 @@ const addContact = (username:DtId, location, dontCheck = false) => {
 const calculateContacts = () => {
     const { chats }  = usechatsState()
     const { user } = useAuthState()
-    return chats.value.filter(chat => !chat.isGroup && chat.acceptedChat).map(chat => chat.contacts.find(contact => contact.id !== user.id))
+    const contacts = chats.value.filter(chat => !chat.isGroup && chat.acceptedChat).map(chat => chat.contacts.find(contact => contact.id !== user.id))
+    return contacts
 }
 
 

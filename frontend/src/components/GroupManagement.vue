@@ -92,7 +92,7 @@ export default {
     }
     const filteredContacts = computed(()=>{
       //@ts-ignore
-      return contacts.value.filter(c => !props.groupChat.contacts.map(x=>x.id).includes(c.id) )
+      return contacts.filter(c => !props.groupChat.contacts.map(x=>x.id).includes(c.id) )
     })
 
     return {

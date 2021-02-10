@@ -132,7 +132,7 @@ export default defineComponent({
     let groupnameAddError = ref("");
     let usernameInGroupAdd = ref("");
     let usersInGroup = ref([]);
-    let possibleUsers = ref<string[]>();
+    let possibleUsers = ref<string[]>([]);
     let contactAddError = ref("");
 
     const contactAdd = () => {
@@ -228,6 +228,7 @@ export default defineComponent({
       const { user } = useAuthState();
       possibleUsers.value = r.data.filter((pu) => pu !== user.id);
     });
+      
 
     return {
       addGroup,
