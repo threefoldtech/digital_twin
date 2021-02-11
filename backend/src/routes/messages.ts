@@ -93,7 +93,8 @@ router.put("/", (req, res) => {
         return;
     }
 
-    if (message.type === MessageTypes.GROUP_UPDATE) {
+    if (message.type === MessageTypes.GROUP_UPDATE && message.from !== config.userid) {
+        console.log("received a groupUpdate")
         //@ts-ignore
         const groupUpdateMsg:Message<GroupUpdateType> = message
         if (blockList.includes(<string>groupUpdateMsg.from)) {

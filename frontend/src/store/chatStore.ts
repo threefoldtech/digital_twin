@@ -171,7 +171,10 @@ const sendMessage = (chatId, message, type: string = "STRING") => {
 const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
   const { sendSocketMessage } = useSocketActions();
   // console.log(chatId, message);
-  addMessage(chatId, message);
+  // @TODO when doing add message on groupupdate results in  max call stack exeeded
+  if(message.type !=="GROUP_UPDATE"){
+    addMessage(chatId, message);
+  }
   let isEdit = false;
   if (message.type === "EDIT" || message.type === "DELETE") {
     isEdit = true;
@@ -250,6 +253,7 @@ const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
   const { chats } = usechatsState();
   const operation = remove? "REMOVEUSER": "ADDUSER"
   console.log(`${operation} ${contact.id} from ${groupId}`)
+  const chat = chats.value.find(chat => chat.chatId == groupId)
   const message:Message<GroupUpdate> = {
     id: uuidv4(),
     from: user.id,
@@ -257,7 +261,16 @@ const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
     body: <GroupUpdate>{
       type: operation,
       contact,
-      chat: chats.value.find(chat => chat.chatId == groupId)
+      chat: <Chat>{
+        acceptedChat: chat.acceptedChat,
+        adminId: chat.adminId,
+        chatId: chat.chatId,
+        contacts: chat.contacts,
+        isGroup: chat.isGroup,
+        messages: chat.messages,
+        name: chat.name,
+        read: chat.read
+      }
     },
     timeStamp: new Date(),
     type: "GROUP_UPDATE"
