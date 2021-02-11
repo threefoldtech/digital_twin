@@ -50,15 +50,21 @@
               :isMine="message.from === user.id"
           />
           <span class="font-thin" v-if="reads[message.id]">
-            <template v-if="!chat.isGroup || reads[message.id].length === 1">read by {{ reads[message.id][0] }}</template>
-            <template v-else-if="reads[message.id].length === 2">read by {{reads[message.id][0]}} and {{ reads[message.id][1] }}</template>
-            <template v-else>read by {{reads[message.id][0]}}, {{ reads[message.id][1] }} and {{reads[message.id].length -2}} others</template>
+            <template v-if="!chat.isGroup || reads[message.id].length === 1">read by {{
+                reads[message.id][0]
+              }}</template>
+            <template v-else-if="reads[message.id].length === 2">read by {{ reads[message.id][0] }} and {{
+                reads[message.id][1]
+              }}</template>
+            <template v-else>read by {{ reads[message.id][0] }}, {{
+                reads[message.id][1]
+              }} and {{ reads[message.id].length - 2 }} others</template>
           </span>
 
         </template>
 
         <div id="viewAnchor" ref="viewAnchor" style="
-    height: 20vh;
+    height: 40vh;
     position: absolute;
     bottom: 0;
     width: 50%;
@@ -95,6 +101,7 @@ import {popupCenter} from "@/services/popupService";
 import * as crypto from "crypto-js";
 import AvatarImg from "@/components/AvatarImg.vue";
 import {sendBlockChat, sendRemoveChat} from "@/store/socketStore";
+import {useIntersectionObserver} from "@/lib/intersectionObserver";
 
 
 export default defineComponent({
@@ -198,25 +205,32 @@ export default defineComponent({
       return time.diff(previousMessage.timeStamp, "m") > 5;
     }
 
-    const reads = computed(()=>{
+    const reads = computed(() => {
       const preReads = {}
-      each( chat.value.read, ( val:string, key:string ) => {
-        console.log( key, val );
-        if (key === user.id){
+      each(chat.value.read, (val: string, key: string) => {
+        console.log(key, val);
+        if (key === user.id) {
           return;
         }
         preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key]
-      } );
+      });
       return preReads
-    })
-    //@TODO fix this
-    // @ts-ignore
-    watch(chat.value.messages, ()=>{
-      console.log("inwatch")
-      scrollToBottom()
     })
 
     const viewAnchor = ref(null)
+
+    const { isIntersecting, intersectionRatio} = useIntersectionObserver(viewAnchor);
+
+
+    //@TODO fix this
+    // @ts-ignore
+    watch(chat.value.messages, () => {
+      if (!isIntersecting.value) {
+        return
+      }
+      scrollToBottom()
+    })
+
     return {
       chats,
       chat,
