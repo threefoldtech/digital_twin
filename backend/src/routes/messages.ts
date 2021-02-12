@@ -1,4 +1,3 @@
-import { addChat } from './../service/chatService';
 import {getBlocklist, getChatIds, persistChat} from './../service/dataService';
 import {Router} from 'express';
 import Message from "../models/message";
@@ -7,7 +6,7 @@ import {sendEventToConnectedSockets} from "../service/socketService";
 import {ContactRequest, DtIdInterface, GroupUpdateType, MessageBodyTypeInterface, MessageTypes} from "../types";
 import Contact from "../models/contact";
 import {editMessage, handleRead, parseMessage} from "../service/messageService";
-import {persistMessage} from "../service/chatService";
+import {persistMessage, syncNewChatWithAdmin} from "../service/chatService";
 import {getChat} from "../service/dataService";
 import {config} from "../config/config";
 import {getLocationForId, sendMessageToApi} from "../service/apiService";
@@ -93,25 +92,30 @@ router.put("/", (req, res) => {
         return;
     }
 
-    if (message.type === MessageTypes.GROUP_UPDATE && message.from !== config.userid) {
+    if (message.type === MessageTypes.GROUP_UPDATE) {
         console.log("received a groupUpdate")
         //@ts-ignore
         const groupUpdateMsg:Message<GroupUpdateType> = message
-        if (blockList.includes(<string>groupUpdateMsg.from)) {
-            //@todo what should i return whenblocked
-            res.json({status: "blocked"})
+        if(groupUpdateMsg.body.type === "ADDUSER" && groupUpdateMsg.body.contact.id===config.userid){
+            console.log("I have been added to a group!")
+            syncNewChatWithAdmin( groupUpdateMsg.from, <string>groupUpdateMsg.to)
+            res.json({status: "Successfully added chat"})
             return;
         }
-        const chat  = groupUpdateMsg.body.chat
-        addChat(chat.chatId,<Contact[]>chat.contacts,true,chat.messages,chat.name,true,message.from);
-
-        res.json({status: "success"})
-        return;
     }
 
-    let chat = getChat(chatId)
+    let chat
+    try{
+        chat =  getChat(chatId)
+    }
+    catch(e){
+        console.log(e)
+        res.status(403).json("Sorry but I'm not aware of this chat id")
+        return
+    }
 
     if (chat.isGroup && chat.adminId == config.userid) {
+        console.log("working in a group where i am admin")
         chat.contacts.filter(c => c.id !== config.userid).forEach(c => {
             console.log(`group sendMessage to ${c.id}`)
             sendMessageToApi(c.id, message);
@@ -119,6 +123,8 @@ router.put("/", (req, res) => {
 
         if (message.type === <string>MessageTypes.GROUP_UPDATE) {
             handleGroupUpdate(<any>message, chat);
+            //@ts-ignore
+            sendMessageToApi(message.body.contact.id, message);
 
             res.json({status: "success"})
             return;
@@ -191,5 +197,18 @@ router.put("/", (req, res) => {
 
     res.sendStatus(200);
 });
+
+router.get("/:chatId", (req,res) => {
+    try{
+        const chat = getChat(req.params.chatId)
+        if (chat.adminId!== config.userid){
+            res.sendStatus(403)
+            return
+        }
+        res.json(chat)
+    }catch(e){
+        res.sendStatus(403)
+    }
+})
 
 export default router

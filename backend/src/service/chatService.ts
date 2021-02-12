@@ -7,6 +7,7 @@ import {getChatIds, persistChat, getChat} from "./dataService";
 import messages from "../routes/messages";
 import {parseMessage} from "./messageService";
 import {sendEventToConnectedSockets} from "./socketService";
+import { getChatfromAdmin } from "./apiService";
 
 export const persistMessage = (
     chatId: IdInterface,
@@ -27,10 +28,16 @@ export const addChat = (
     adminId: DtIdInterface
 ) => {
     const chat = new Chat(chatId, contacts, isGroupchat, message, name, acceptedChat, adminId, {})
+    persistChat( chat );
     sendEventToConnectedSockets('new_chat', chat)
-    persistChat(chat );
     return chat
 };
+
+export const syncNewChatWithAdmin = (adminId:DtIdInterface, chatId:string) => {
+        const chat:Chat = <Chat>getChatfromAdmin(adminId, chatId)
+        console.log("retreived chat", chat)
+        persistChat(chat)
+}
 
 export const getMessagesFromId = (chatId: IdInterface) =>
     true
