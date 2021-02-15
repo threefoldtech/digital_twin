@@ -26,12 +26,12 @@
       </div>
       <div
           v-if="showActions"
-          class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-icon text-white px-2"
+          class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-icon text-white px-2 z-10"
       >
         <button
             class="mx-0"
             v-if="
-               isMine && (message.type == 'EDIT' || message.type == 'STRING') && !disabled
+               isMine && (message.type === 'EDIT' || message.type === 'STRING') && !disabled
             "
             @click="setEditMessage"
         >
