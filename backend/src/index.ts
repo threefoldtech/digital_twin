@@ -6,6 +6,8 @@ import cors, {CorsOptions} from "cors"
 import session from "express-session";
 import {startSocketIo} from "./service/socketService"
 import routes from "./routes";
+import morgan from "morgan";
+import {logger, httpLogger} from "./logger";
 
 const corsOptions: CorsOptions = {
     origin: '*',
@@ -17,6 +19,15 @@ const httpServer: http.Server = http.createServer(app)
 
 
 startSocketIo(httpServer)
+
+app.use(morgan('short', {
+    stream: {
+        write: (text: string) => {
+            httpLogger.http(text)
+        }
+    }
+}))
+
 app.use(cors(corsOptions))
 
 app.enable('trust proxy');
@@ -42,5 +53,5 @@ app.use(fileupload({
 app.use('/api/', routes)
 
 httpServer.listen(3000, "localhost", () => {
-    console.log("go to http://localhost:3000");
+    logger.info("go to http://localhost:3000");
 });
