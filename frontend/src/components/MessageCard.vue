@@ -2,7 +2,7 @@
   <div
       @mouseover="showActions = true"
       @mouseleave="showActions = false"
-      class="flex"
+      class="flex break-words"
       :class="{
       'justify-end': isMine,
       'my-1': !disabled,
@@ -42,7 +42,7 @@
         </button>
         <button
             class="mx-0"
-            v-if="isMine && message.type !== 'DELETE' && !disabled && ! message.type ==='SYSTEM'"
+            v-if="isMine && message.type !== 'DELETE' && !disabled && !message.type ==='SYSTEM'"
             @click="sendUpdateMessage(true)"
         >
           <i class="fas fa-trash"></i>

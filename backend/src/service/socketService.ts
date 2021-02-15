@@ -57,7 +57,7 @@ export const startSocketIo = (httpServer: http.Server) => {
             let location = getLocationForId(<string>chat.adminId);
 
             if (newMessage.type === MessageTypes.READ) {
-                handleRead(<Message<string>>newMessage);
+                handleRead(<Message<StringMessageTypeInterface>>newMessage);
                 sendMessageToApi(location, newMessage)
                 return;
             }

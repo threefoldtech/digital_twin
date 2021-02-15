@@ -19,7 +19,7 @@
     </div>
     <div class="md:col-span-10 col-span-9 pl-2">
       <p class="flex place-content-between">
-        <span class="font-bold">
+        <span class="font-bold break-normal overflow-ellipsis overflow-hidden ">
           {{ chat.name }}
         </span>
         <span class="font-thin" v-if="chat.isGroup"> group</span>

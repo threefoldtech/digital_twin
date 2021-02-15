@@ -4,7 +4,14 @@ import {Router} from 'express';
 import Message from "../models/message";
 import {contactRequests} from "../store/contactRequests";
 import {sendEventToConnectedSockets} from "../service/socketService";
-import {ContactRequest, DtIdInterface, GroupUpdateType, MessageBodyTypeInterface, MessageTypes} from "../types";
+import {
+    ContactRequest,
+    DtIdInterface,
+    GroupUpdateType,
+    MessageBodyTypeInterface,
+    MessageTypes,
+    StringMessageTypeInterface
+} from "../types";
 import Contact from "../models/contact";
 import {editMessage, handleRead, parseMessage} from "../service/messageService";
 import {persistMessage} from "../service/chatService";
@@ -22,13 +29,15 @@ function handleContactRequest(message: Message<ContactRequest>) {
     const otherContact = new Contact(<string>message.from, getLocationForId(<string>message.from))
     //@TODO fix this location with config
     const myself = new Contact(<string>config.userid, getLocationForId(<string>config.userid))
-    const requestMsg: Message<String> = {
+    const requestMsg: Message<StringMessageTypeInterface> = {
         from: message.from,
         to: message.to,
         body: `You've received a new message request from ${message.from}`,
         id: uuidv4(),
         type: MessageTypes.STRING,
-        timeStamp: new Date()
+        timeStamp: new Date(),
+        replys: [],
+        subject: null,
     }
     const newchat = new Chat(
         message.from,
@@ -128,7 +137,7 @@ router.put("/", (req, res) => {
         sendEventToConnectedSockets("message", message)
 
         if (message.type === MessageTypes.READ) {
-            handleRead(message as Message<string>);
+            handleRead(message as Message<StringMessageTypeInterface>);
 
             res.json({status: "success"})
             return;
@@ -168,7 +177,7 @@ router.put("/", (req, res) => {
 
 
     if (message.type === MessageTypes.READ) {
-        handleRead(message as Message<string>);
+        handleRead(message as Message<StringMessageTypeInterface>);
 
         res.json({status: "success"})
         return;

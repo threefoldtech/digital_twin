@@ -43,7 +43,9 @@ router.post("/", (req, res) => {
         },
         "from": config.userid,
         "type": MessageTypes.CONTACT_REQUEST,
-        "timeStamp": new Date()
+        "timeStamp": new Date(),
+        replys: [],
+        subject: null,
     }
     console.log("sending to ",url)
     sendMessageToApi(contact.location,data)

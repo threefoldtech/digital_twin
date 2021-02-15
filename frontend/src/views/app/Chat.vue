@@ -106,12 +106,12 @@
               }"
             ></div>
           </div>
-          <h2 class="my-3">
+          <h2 class="my-3 break-words w-full overflow-ellipsis overflow-hidden">
             {{selectedChat.name}}
           </h2>
-          <p>
+          <h4 class="break-words w-full h-20 overflow-y-auto font-bold text-center px-4">
             {{status?.status}}
-          </p>
+          </h4>
         </div>
         <group-management v-if="selectedChat.isGroup" :groupChat="selectedChat" :key="selectedChat.chatId + selectedChat.contacts.length"></group-management>
       </div>
