@@ -91,7 +91,7 @@
     >
       <div class="absolute max-w-full w-full px-4 pb-4" v-if="selectedId">
         <div
-          class="bg-white p-2 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1"
+          class="bg-white p-2 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1 md:px-4"
         >
           <div
             class="place-items-center grid relative"
@@ -106,10 +106,10 @@
               }"
             ></div>
           </div>
-          <h2 class="my-3 break-words w-full overflow-ellipsis overflow-hidden">
+          <h2 class="my-3  break-words w-full overflow-y-auto max-h-28">
             {{selectedChat.name}}
           </h2>
-          <h4 class="break-words w-full h-20 overflow-y-auto font-bold text-center px-4">
+          <h4 class="break-words w-full h-20 overflow-y-auto font-bold text-center">
             {{status?.status}}
           </h4>
         </div>

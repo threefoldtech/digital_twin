@@ -6,8 +6,9 @@
     <div
       v-for="contact in groupChat.contacts"
       :key="contact.id + groupChat.contacts.length"
+      class="w-full"
     >
-      <div class="chatcard relative grid grid-cols-12 rounded-lg mb-2 py-2">
+      <div class="chatcard relative grid grid-cols-12 rounded-lg mb-2 py-2 ">
         <div class="md:col-span-2 col-span-2 place-items-center grid relative">
           <AvatarImg small :id="contact.id" />
           <div
@@ -20,7 +21,7 @@
         </div>
         <div class="md:col-span-8 col-span-8 pl-2">
           <p class="flex place-content-between">
-            <span class="font-bold">
+            <span class="font-bold overflow-hidden overflow-ellipsis">
               {{ contact.id }}
             </span>
           </p>
@@ -52,7 +53,7 @@
           <div class="col-span-2 place-items-center grid">
             <AvatarImg small :id="contact.id" />
           </div>
-          <div class="col-span-8 pl-4 flex flex-col justify-center">
+          <div class="col-span-8 pl-4 flex-col justify-center overflow-hidden overflow-ellipsis w-full">
             {{ contact.id }}
           </div>
           <div class="col-span-2 place-items-center grid">
