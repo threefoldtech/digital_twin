@@ -115,7 +115,6 @@ router.put("/", (req, res) => {
     }
 
     if (chat.isGroup && chat.adminId == config.userid) {
-        console.log("working in a group where i am admin")
         chat.contacts.filter(c => c.id !== config.userid).forEach(c => {
             console.log(`group sendMessage to ${c.id}`)
             sendMessageToApi(c.id, message);

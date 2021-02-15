@@ -1,4 +1,4 @@
-import {ChatInterface, IdInterface} from "./../types/index";
+import {IdInterface} from "./../types/index";
 import axios from "axios";
 import Message from "../models/message";
 import {MessageBodyTypeInterface} from "../types";
@@ -11,8 +11,7 @@ export const sendMessageToApi = async (
 ) => {
     const url = `${getDigitalTwinUrl(location)}/api/messages`;
     try {
-        const message = JSON.stringify(newMessage)
-        await axios.put(url, message)
+        await axios.put(url, newMessage)
     } catch (e) {
         console.error(`couldn't send message ${url}`)
     }
@@ -33,17 +32,15 @@ export const getLocationForId= (id:string) => {
     return `${(id.replace('-chat', ''))}-chat`
 }
 
-export const getChatfromAdmin = (adminId:IdInterface, chatId:string):Chat => {
+export const getChatfromAdmin = async (adminId:IdInterface, chatId:string) => {
     const location = getLocationForId(<string>adminId)
     const url = `${getDigitalTwinUrl(location)}/api/messages/${chatId}`
     try {
         console.log("getting chat from ", url)
-        axios.get(url).then((chat) => {
-            console.log("received chat", chat.data)
-            return parseChat(chat.data)
-        }).catch((e)=>{
-            console.log("failed")
-        })
+        const chat =  await axios.get(url)
+        const parsedChat = parseChat(chat.data)
+        console.log(parsedChat)
+        return parsedChat
     }
     catch { 
         console.log("failed to get chat from admin")
