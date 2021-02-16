@@ -313,7 +313,7 @@ export default defineComponent({
       const {readMessage} = usechatsActions();
       readMessage(props.chatId, props.message.id);
     };
-    if (!props.isreadbyme) {
+    if (!props.isreadbyme && !props.isReply && !props.disabled) {
       read();
     }
 
