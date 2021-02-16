@@ -37,9 +37,6 @@ import { Message, PersonChat, DtId } from "../types/index"
 // }
 
 const addContact = (username:DtId, location, dontCheck = false) => {
-    // if(!dontCheck && !contactIsHealthy(username)){
-    //     throw "Peer is not healthy"
-    // }
     const {user} = useAuthState()
     const addMessage:Message<String> = {
         id: uuidv4(),

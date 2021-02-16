@@ -235,17 +235,6 @@ const sendFile = async (chatId, name, parsedFile) => {
     subject: null
   };
   sendSocketMessage(chatId, msgToSend);
-  // const msgToShow:Message<Object> = {
-  //     id,
-  //     body: {
-  //         filename: name
-  //     },
-  //     from: user.id,
-  //     to: chatId,
-  //     timeStamp: new Date(),
-  //     type: "FILE"
-  // }
-  // addMessage(chatId, msgToShow)
 };
 
 const setLastMessage = (chatId: string, message: Message<String>) => {
@@ -288,26 +277,15 @@ const readMessage = (chatId, messageId) => {
 const updateContactsInGroup = (groupId, contact: Contact, remove: boolean) => {
   const { user } = useAuthState();
   const { chats } = usechatsState();
-  const operation = remove ? "REMOVEUSER" : "ADDUSER";
-  console.log(`${operation} ${contact.id} from ${groupId}`);
-  const chat = chats.value.find(chat => chat.chatId == groupId);
-  const message: Message<GroupUpdate> = {
+  const operation = remove? "REMOVEUSER": "ADDUSER"
+  const chat = chats.value.find(chat => chat.chatId == groupId)
+  const message:Message<GroupUpdate> = {
     id: uuidv4(),
     from: user.id,
     to: groupId,
     body: <GroupUpdate>{
       type: operation,
-      contact,
-      chat: <Chat>{
-        acceptedChat: chat.acceptedChat,
-        adminId: chat.adminId,
-        chatId: chat.chatId,
-        contacts: chat.contacts,
-        isGroup: chat.isGroup,
-        messages: chat.messages,
-        name: chat.name,
-        read: chat.read
-      }
+      contact
     },
     timeStamp: new Date(),
     type: "GROUP_UPDATE",

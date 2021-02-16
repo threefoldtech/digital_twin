@@ -114,7 +114,7 @@ export default defineComponent({
     const sendNewAvatar = async () => {
       const { sendSocketAvatar } = useSocketActions();
       const buffer = await file.value.arrayBuffer();
-      sendSocketAvatar(buffer).then(b => alert('refresh for new avatar'));
+      sendSocketAvatar(buffer).then(b => location.reload());
       showDialog.value = false;
     };
 
