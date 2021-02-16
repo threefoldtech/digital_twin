@@ -18,6 +18,7 @@ export const persistMessage = (
     if (!message.subject) {
         chat.messages.push(message);
         persistChat(chat)
+        sendEventToConnectedSockets("message", message)
         return
     }
 
