@@ -1,5 +1,5 @@
 import { reactive } from "@vue/reactivity";
-import {ref, toRefs} from "vue";
+import { ref, toRefs } from "vue";
 import axios from "axios";
 import moment from "moment";
 import {
@@ -8,15 +8,17 @@ import {
   Message,
   GroupChat,
   MessageBodyType,
-  PersonChat, DtId, GroupUpdate
+  PersonChat,
+  DtId,
+  GroupUpdate
 } from "../types";
 import { useSocketActions } from "./socketStore";
 import { useAuthState } from "./authStore";
 import { useContactsActions, useContactsState } from "./contactStore";
 import config from "../../public/config/config";
 import { uuidv4 } from "@/common";
-import {startFetchStatusLoop} from "@/store/statusStore";
-import {uniqBy} from "lodash";
+import { startFetchStatusLoop } from "@/store/statusStore";
+import { uniqBy } from "lodash";
 
 const state = reactive<chatstate>({
   chats: [],
@@ -41,7 +43,6 @@ const retrievechats = async () => {
 };
 
 const addChat = (chat: Chat) => {
-
   if (!chat.isGroup){
     startFetchStatusLoop(chat.chatId)
   }
@@ -56,12 +57,9 @@ const addChat = (chat: Chat) => {
 };
 
 export const removeChat = (chatId) => {
-  console.log('remove')
-  state.chats = state.chats.filter(c => c.chatId !== chatId)
-  console.log(state.chats)
+  state.chats = state.chats.filter((c) => c.chatId !== chatId)
   sortChats();
   selectedId.value = <string>state.chats.find(()=>true)?.chatId
-
 };
 
 const addGroupchat = (name: string, contacts: Contact[]) => {
@@ -96,12 +94,12 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
 };
 
 const acceptChat = id => {
-  axios.post(`${config.baseUrl}api/chats?id=${id}`).then(res => {
-    const index = state.chatRequests.findIndex(c => c.chatId == id);
-    state.chatRequests[index].acceptedChat = true
+  axios.post(`${config.baseUrl}api/chats?id=${id}`).then((res) => {
+    const index = state.chatRequests.findIndex((c) => c.chatId == id);
+    state.chatRequests[index].acceptedChat = true;
     addChat(state.chatRequests[index]);
-    const {user} = useAuthState();
-    sendMessage(id,`${user.id} accepted invitation`, 'SYSTEM' )
+    const { user } = useAuthState();
+    sendMessage(id, `${user.id} accepted invitation`, "SYSTEM");
     state.chatRequests.splice(index, 1);
   });
 };
@@ -118,7 +116,7 @@ const addMessage = (chatId, message) => {
 
     const newRead = chat.messages.find(m => m.id === message.body);
     const oldRead = chat.messages.find(
-      m => m.id === chat.read[<string>message.from]
+      (m) => m.id === chat.read[<string>message.from]
     );
     if (
       oldRead &&
@@ -133,7 +131,7 @@ const addMessage = (chatId, message) => {
     return;
   }
 
-  if(message.type === "REMOVEUSER"||message.type === "ADDUSER"){
+  if(message.type === "REMOVEUSER" || message.type === "ADDUSER"){
     //@todo
     return
   }
@@ -172,7 +170,7 @@ const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
   const { sendSocketMessage } = useSocketActions();
   // console.log(chatId, message);
   // @TODO when doing add message on groupupdate results in  max call stack exeeded
-  if(message.type !=="GROUP_UPDATE"){
+  if(message.type !== "GROUP_UPDATE"){
     addMessage(chatId, message);
   }
   let isEdit = false;
@@ -183,23 +181,36 @@ const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
   sendSocketMessage(chatId, message, isEdit);
 };
 
-const sendFile = async (chatId, name, parsedFile) => {
-  const { sendSocketMessage } = useSocketActions();
+const sendFile = async (chatId, selectedFile, isBlob = false) => {
   const { user } = useAuthState();
+  const id = uuidv4();
+  var formData = new FormData();
+  if(!isBlob){
+    formData.append("file", selectedFile);
+  } else{
+    formData.append("file", selectedFile, `recording-${Date.now()}.WebM`)
+  }
 
-  let id = uuidv4();
   const msgToSend: Message<Object> = {
     id,
-    body: {
-      name,
-      parsedFile
-    },
+    body: "Uploading file in progress ...",
     from: user.id,
     to: chatId,
     timeStamp: new Date(),
-    type: "FILE_UPLOAD"
+    type: "STRING"
   };
-  sendSocketMessage(chatId, msgToSend);
+  addMessage(chatId, msgToSend)
+
+  try{
+    const result = await axios.post(`${config.baseUrl}api/files/${chatId}/${id}`, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  } catch(e){
+    // @TODO display error
+    console.log(e)
+  }
 };
 
 const setLastMessage = (chatId: string, message: Message<String>) => {
@@ -240,7 +251,7 @@ const readMessage = (chatId, messageId) => {
 const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
   const { user } = useAuthState();
   const { chats } = usechatsState();
-  const operation = remove? "REMOVEUSER": "ADDUSER"
+  const operation = remove? "REMOVEUSER" : "ADDUSER";
   const chat = chats.value.find(chat => chat.chatId == groupId)
   const message:Message<GroupUpdate> = {
     id: uuidv4(),
