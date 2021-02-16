@@ -106,7 +106,7 @@
               }"
             ></div>
           </div>
-          <h2 class="my-3  break-words w-full overflow-y-auto max-h-28">
+          <h2 class="my-3  break-words text-center w-full overflow-y-auto max-h-28">
             {{selectedChat.name}}
           </h2>
           <h4 class="break-words w-full h-20 overflow-y-auto font-bold text-center">
