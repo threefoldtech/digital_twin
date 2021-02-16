@@ -5,9 +5,11 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 
+console.log(`commit hash: ${process.env.VUE_APP_GIT_HASH}`)
+
 export default defineComponent({
   name: "App",
-  
+
 });
 </script>
 
