@@ -75,6 +75,22 @@
           accept="image/*"
           @change="changeFile"
         />
+
+        <div>
+          <h2>Blocked Users</h2>
+          <ul class="max-h-28 overflow-y-auto">
+            <template v-for="blockedUser in blockedUsers">
+              <li>
+                {{blockedUser}}
+                <button class="px-4 py-2 text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:border-blue-700 active:bg-blue-700 ease-in-out duration-150 cursor-pointer uppercase" @click="unblockUser(blockedUser)">unblock</button>
+              </li>
+            </template>
+
+            <li v-if="blockedUsers.length === 0 && blockedUsersLoading">... </li>
+            <li v-if="blockedUsers.length === 0 && !blockedUsersLoading"> No blocked users</li>
+          </ul>
+
+        </div>
       </div>
     </jdialog>
   </div>
@@ -86,6 +102,8 @@ import { useAuthState } from "../store/authStore";
 import { useSocketActions } from "../store/socketStore";
 import Dialog from "./Dialog.vue";
 import AvatarImg from "@/components/AvatarImg.vue";
+import axios from "axios";
+import config from "../../public/config/config";
 
 export default defineComponent({
   name: "Topbar",
@@ -130,6 +148,19 @@ export default defineComponent({
       isEditingStatus.value = false;
     };
 
+    const blockedUsers= ref([])
+    const blockedUsersLoading = ref(true)
+    // @todo: config
+    axios.get(`${config.baseUrl}api/blocked/`, {}).then((response) => {
+      blockedUsers.value = response.data;
+      blockedUsersLoading.value = false;
+    });
+
+    const unblockUser = async (user) => {
+      await axios.delete(`${config.baseUrl}api/blocked/${user}/`)
+      showDialog.value = false;
+    }
+
     return {
       user,
       showEditPic,
@@ -145,6 +176,9 @@ export default defineComponent({
       userStatus,
       setEditStatus,
       isEditingStatus,
+      blockedUsers,
+      blockedUsersLoading,
+      unblockUser,
     };
   },
 });
