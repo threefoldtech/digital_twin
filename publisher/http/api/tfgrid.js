@@ -79,9 +79,10 @@ router.get('/entities/:id', function(req, res) {
 })
 
 router.delete('/entities/:id', function(req, res) {
-    tfclient.deleteEntity(req.params.id).then((content) => {
-        res.json(content);
-    }, (err) => {
+    tfclient.deleteEntity(parseInt(req.params.id), (content) => {
+        events(content, req);
+
+    }).catch(err => {
         res.status(422).json({ message: `${err}` });
     })
 })
@@ -122,9 +123,10 @@ router.get('/twins/:id', function(req, res) {
 })
 
 router.delete('/twins/:id', function(req, res) {
-    tfclient.deleteTwin(req.params.id).then((content) => {
-        res.json(content);
-    }, (err) => {
+    tfclient.deleteTwin(parseInt(req.params.id), (content) => {
+        events(content, req);
+
+    }).catch(err => {
         res.status(422).json({ message: `${err}` });
     })
 })
@@ -177,9 +179,10 @@ router.post('/farms', function(req, res) {
 })
 
 router.delete('/farms/:id', function(req, res) {
-    tfclient.deleteFarm(req.params.id).then((content) => {
-        res.json(content);
-    }, (err) => {
+    tfclient.deleteFarm(parseInt(req.params.id), (content) => {
+        events(content, req);
+
+    }).catch(err => {
         res.status(422).json({ message: `${err}` });
     })
 })
@@ -239,9 +242,10 @@ router.post('/nodes', function(req, res) {
 })
 
 router.delete('/nodes/:id', function(req, res) {
-    tfclient.deleteNode(req.params.id, (content) => {
-        res.json(content);
-    }, (err) => {
+    tfclient.deleteNode(parseInt(req.params.id), (content) => {
+        events(content, req);
+
+    }).catch(err => {
         res.status(422).json({ message: `${err}` });
     })
 })
