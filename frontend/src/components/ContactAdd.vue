@@ -47,16 +47,18 @@
     <form @submit.prevent="groupAdd" class="w-full" v-if="isActive('group')">
       <div class="flex place-items-center">
         <label class="mr-2" for="username">Group name: </label>
-        <span class="text-red-600" v-if="error != ''">
-          {{ groupnameAddError }}
-        </span>
-
-        <input
-          v-model="groupnameAdd"
-          id="username"
-          class="mb-2"
-          placeholder="Group name"
-        />
+        <div class="w-full">
+          <input
+            v-model="groupnameAdd"
+            id="username"
+            class="mb-2"
+            placeholder="Group name"
+          />
+          <br>
+          <span class="text-red-600" v-if="groupnameAddError != ''">
+            {{ groupnameAddError }}
+          </span>
+        </div>
       </div>
       <div
         class="flex flex-col max-h-52 relative overflow-auto my-2 bg-gray-100 px-4 py-2 rounded-xl"
@@ -175,6 +177,8 @@ export default defineComponent({
 
     const setActive = (menuItem) => {
       activeItem.value = menuItem;
+      groupnameAddError.value = ""
+      usernameAddError.value = ""
     };
 
     const groupAdd = () => {
@@ -182,6 +186,11 @@ export default defineComponent({
       const { user } = useAuthState();
       const { chats } = usechatsState();
       if (groupnameAdd.value == "") {
+        groupnameAddError.value = "Please enter agroup name"
+        return;
+      }
+      if (groupnameAdd.value.length>20) {
+        groupnameAddError.value = "The name can't contain more than 20 characters"
         return;
       }
       usersInGroup.value.push(user.id);
