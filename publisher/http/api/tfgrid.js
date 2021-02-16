@@ -44,22 +44,38 @@ function events(content, res) {
     }
 }
 
+function fields_validate(required, body) {
+    for(var i in required) {
+        if(!(required[i] in body))
+            return required[i]
+    }
+
+    return true
+}
+
+function json_error(res, msg) {
+    console.log(msg);
+    return res.status(422).json({ success: false, message: msg });
+}
+
 //
 // entities
 //
 
 router.post('/entities', function(req, res) {
-    let name = "Hello";
-    let country = 0;
-    let city = 0;
+    let required = ['name', 'country', 'city'];
+
+    if((value = fields_validate(required, req.body)) !== true)
+        return json_error(res, "Required field: " + value);
+
+    let name = req.body['name']
+    let country = req.body['country'];
+    let city = req.body['city'];
 
     tfclient.createEntity(name, country, city, (content) => {
         events(content, res);
 
-    }).catch(err => {
-        console.log(err)
-        res.status(422).json({ message: `${err}` });
-    })
+    }).catch(err => { json_error(res, err) })
 })
 
 router.get('/entities', function(req, res) {
@@ -82,9 +98,7 @@ router.delete('/entities/:id', function(req, res) {
     tfclient.deleteEntity(parseInt(req.params.id), (content) => {
         events(content, req);
 
-    }).catch(err => {
-        res.status(422).json({ message: `${err}` });
-    })
+    }).catch(err => { json_error(res, err) })
 })
 
 router.put('/entities/:id', function(req, res) {
@@ -100,10 +114,7 @@ router.post('/twins', function(req, res) {
     tfclient.createTwin((content) => {
         events(content, res);
 
-    }).catch(err => {
-        console.log(err)
-        res.status(422).json({ message: `${err}` });
-    })
+    }).catch(err => { json_error(res, err) })
 })
 
 router.get('/twins', function(req, res) {
@@ -126,13 +137,16 @@ router.delete('/twins/:id', function(req, res) {
     tfclient.deleteTwin(parseInt(req.params.id), (content) => {
         events(content, req);
 
-    }).catch(err => {
-        res.status(422).json({ message: `${err}` });
-    })
+    }).catch(err => { json_error(req, err) })
 })
 
-// TODO: addTwinEntity
-// TODO: deleteTwinEntity
+router.post('/twins/:id/entities', function(req, res) {
+
+})
+
+router.delete('/twins/:id/entities/:id', function(req, res) {
+
+})
 
 //
 // farms
@@ -155,36 +169,41 @@ router.get('/farms/:id', function(req, res) {
 })
 
 router.post('/farms', function(req, res) {
-    var name = "New Farm";
+    let required = ['name', 'entity', 'twin', 'country', 'city', 'policy'];
+
+    if((value = fields_validate(required, req.body)) !== true)
+        throw "Required field: " + value;
+
+    var name = req.body['name'];
+    var entityid = req.body['entity'];
+    var twinid = req.body['twin'];
+    var country = req.body['country'];
+    var city = req.body['city'];
+    var policy = req.body['policy'];
 
     certificationType = tfclient.api.createType('CertificationType', 0)
     const farm = {
         id: 0,
         name: name,
-        entityID: 1,
-        twinID: 1,
-        pricingPolicyID: 0,
+        entityID: entityid,
+        twinID: twinid,
+        pricingPolicyID: policy,
         certificationType: certificationType,
-        countryID: 0,
-        cityID: 0
+        countryID: country,
+        cityID: city
     }
 
     tfclient.createFarm(farm, (content) => {
         events(content, res);
 
-    }).catch(err => {
-        console.log(err)
-        res.status(422).json({ message: `${err}` });
-    })
+    }).catch(err => { json_error(res, err) })
 })
 
 router.delete('/farms/:id', function(req, res) {
     tfclient.deleteFarm(parseInt(req.params.id), (content) => {
         events(content, req);
 
-    }).catch(err => {
-        res.status(422).json({ message: `${err}` });
-    })
+    }).catch(err => { json_error(res, err) })
 })
 
 
@@ -235,19 +254,14 @@ router.post('/nodes', function(req, res) {
     tfclient.createNode(node, (content) => {
         events(content, res);
 
-    }).catch(err => {
-        console.log(err)
-        res.status(422).json({ message: `${err}` });
-    })
+    }).catch(err => { json_error(res, err) })
 })
 
 router.delete('/nodes/:id', function(req, res) {
     tfclient.deleteNode(parseInt(req.params.id), (content) => {
         events(content, req);
 
-    }).catch(err => {
-        res.status(422).json({ message: `${err}` });
-    })
+    }).catch(err => { json_error(res, err) })
 })
 
 router.get('/account/price', function(req, res) {
