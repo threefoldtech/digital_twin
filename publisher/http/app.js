@@ -4,6 +4,7 @@ const mustacheExpress = require('mustache-express');
 const cors = require('cors');
 const drive = require('./api/drive')
 const clusters = require('./api/clusters')
+const tfgrid = require('./api/tfgrid')
 const sites = require('./web/sites')
 
 
@@ -17,5 +18,6 @@ app.use(cors());
 app.use(sites);
 app.use(drive);
 app.use(clusters);
+app.use(tfgrid);
 
 module.exports = app
