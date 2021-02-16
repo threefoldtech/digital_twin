@@ -6,7 +6,7 @@ import {contacts} from "../store/contacts";
 import {connections} from "../store/connections";
 import * as http from "http";
 import {editMessage, handleRead, parseMessage} from "./messageService";
-import {MessageBodyTypeInterface, MessageOperations, MessageTypes} from "../types";
+import {MessageBodyTypeInterface, MessageOperations, MessageTypes, StringMessageTypeInterface} from "../types";
 import {saveFile, saveAvatar, deleteChat, getBlocklist, persistBlocklist} from "./dataService"
 import {getLocationForId, sendMessageToApi} from './apiService';
 import {user} from "../store/user"
@@ -57,7 +57,7 @@ export const startSocketIo = (httpServer: http.Server) => {
             let location = getLocationForId(<string>chat.adminId);
 
             if (newMessage.type === MessageTypes.READ) {
-                handleRead(<Message<string>>newMessage);
+                handleRead(<Message<StringMessageTypeInterface>>newMessage);
                 sendMessageToApi(location, newMessage)
                 return;
             }

@@ -8,7 +8,7 @@
         <AvatarImg :id="chat.chatId"></AvatarImg>
       </div>
       <div class="col-span-6 py-4 pl-2">
-        <p class="font-bold font">{{ chat.name }}</p>
+        <p class="font-bold font overflow-hidden overflow-ellipsis">{{ chat.name }}</p>
         <p class="font-thin" v-if="!chat.isGroup">{{
             statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline"
           }}</p>
@@ -129,17 +129,12 @@ export default defineComponent({
 
       const reads = Object.values(read)
 
-      console.log(reads)
-
       return findLastIndex(chat.value.messages, (message) => reads.includes(<string>message.id))
     })
 
     const lastReadByMe = computed(() => {
-      console.log(chat.value)
       return findLastIndex(chat.value.messages, (message) => chat.value.read[<string>user.id] === message.id)
     })
-
-    console.log("chats in chatview", chats);
 
     const isMine = (message) => {
       return message.from == user.id;

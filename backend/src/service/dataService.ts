@@ -31,6 +31,12 @@ export const getUserdata = () => {
 const sortChat = (chat: Chat) => {
     const messages = uniqBy(chat.messages, m => m.id)
 
+    messages.map(m => {
+        const replys = uniqBy(m.replys, r => r.id)
+        replys.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime())
+        m.replys = replys;
+    })
+
     messages.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime())
 
     chat.messages = messages;

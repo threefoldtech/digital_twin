@@ -48,14 +48,19 @@ export interface MessageInterface <T>{
     body: T,
     type: MessageTypes,
     timeStamp: Date,
+    subject: IdInterface | null
+    replys: MessageInterface<MessageBodyTypeInterface>[]
 }
 
 export interface MessageBodyTypeInterface {
 
 }
-// export interface String  extends MessageBodyTypeInterface {
 
-// }
+export interface StringMessageTypeInterface extends MessageBodyTypeInterface{
+
+}
+
+
 export interface ContactRequest extends MessageBodyTypeInterface, ContactInterface{
 
 }

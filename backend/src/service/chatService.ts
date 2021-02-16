@@ -7,6 +7,7 @@ import {getChatIds, persistChat, getChat} from "./dataService";
 import messages from "../routes/messages";
 import {parseMessage} from "./messageService";
 import {sendEventToConnectedSockets} from "./socketService";
+import {logger} from "../logger";
 import { getChatfromAdmin } from "./apiService";
 
 export const persistMessage = (
@@ -14,8 +15,20 @@ export const persistMessage = (
     message: MessageInterface<MessageBodyTypeInterface>
 ) => {
     const chat = getChat(chatId);
-    chat.messages.push(message);
+    if (!message.subject) {
+        chat.messages.push(message);
+        persistChat(chat)
+        return
+    }
+
+    const subjectMessageIndex = chat.messages.findIndex(m => m.id === message.subject)
+    const subjectMessage = chat.messages[subjectMessageIndex]
+    subjectMessage.replys = [...subjectMessage.replys, message]
+    chat.messages[subjectMessageIndex] = subjectMessage
+
+    // logger.info(subjectMessage)
     persistChat(chat)
+    sendEventToConnectedSockets('message', chat.messages[subjectMessageIndex])
 };
 
 export const addChat = (
@@ -45,11 +58,11 @@ export const getMessagesFromId = (chatId: IdInterface) =>
 export const setChatToAccepted = (chatId: IdInterface) =>
     true
 
-    //@TODO filter for acceptedchatss
+//@TODO filter for acceptedchatss
 export const getAcceptedChats = () => {
     return getChatIds()
         .map((chatid) => getChat(chatid))
-        // .filter((chat) => chat.acceptedChat);
+    // .filter((chat) => chat.acceptedChat);
 };
 
 // @TODO will need to use this later
