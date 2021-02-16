@@ -97,13 +97,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
-import { useAuthState } from "../store/authStore";
-import { useSocketActions } from "../store/socketStore";
+import {defineComponent, ref} from "vue";
+import {useAuthState} from "../store/authStore";
+import {useSocketActions} from "../store/socketStore";
 import Dialog from "./Dialog.vue";
 import AvatarImg from "@/components/AvatarImg.vue";
-import axios from "axios";
-import config from "../../public/config/config";
+import {deleteBlockedEntry, getBlockList} from "@/store/blockStore";
 
 export default defineComponent({
   name: "Topbar",
@@ -151,13 +150,13 @@ export default defineComponent({
     const blockedUsers= ref([])
     const blockedUsersLoading = ref(true)
     // @todo: config
-    axios.get(`${config.baseUrl}api/blocked/`, {}).then((response) => {
-      blockedUsers.value = response.data;
+    getBlockList().then(blocklist => {
+      blockedUsers.value = blocklist;
       blockedUsersLoading.value = false;
     });
 
     const unblockUser = async (user) => {
-      await axios.delete(`${config.baseUrl}api/blocked/${user}/`)
+      await deleteBlockedEntry(user);
       showDialog.value = false;
     }
 
