@@ -107,7 +107,7 @@ router.get('/clusters', function(req, res) {
     });
 })
 
-router.get('/cluster/:id', function(req, res) {
+router.get('/clusters/:id', function(req, res) {
     let fullpath = path.join(clusterspath, req.params.id + ".json");
     const apath = path.resolve(fullpath);
 
@@ -121,7 +121,7 @@ router.get('/cluster/:id', function(req, res) {
     });
 });
 
-router.delete('/cluster/:id', function(req, res) {
+router.delete('/clusters/:id', function(req, res) {
     let fullpath = path.join(clusterspath, req.params.id + ".json");
     const apath = path.resolve(fullpath);
 
@@ -135,7 +135,7 @@ router.delete('/cluster/:id', function(req, res) {
     });
 });
 
-router.put('/cluster/:id', function(req, res) {
+router.put('/clusters/:id', function(req, res) {
     let fullpath = path.join(clusterspath, req.params.id + ".json");
     const apath = path.resolve(fullpath);
 
