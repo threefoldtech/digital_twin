@@ -56,7 +56,7 @@ export interface MessageBodyTypeInterface {
 
 }
 
-export interface StringMessageTypeInterface {
+export interface StringMessageTypeInterface extends MessageBodyTypeInterface{
 
 }
 

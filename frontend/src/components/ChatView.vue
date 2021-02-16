@@ -129,17 +129,12 @@ export default defineComponent({
 
       const reads = Object.values(read)
 
-      console.log(reads)
-
       return findLastIndex(chat.value.messages, (message) => reads.includes(<string>message.id))
     })
 
     const lastReadByMe = computed(() => {
-      console.log(chat.value)
       return findLastIndex(chat.value.messages, (message) => chat.value.read[<string>user.id] === message.id)
     })
-
-    console.log("chats in chatview", chats);
 
     const isMine = (message) => {
       return message.from == user.id;

@@ -195,8 +195,6 @@ router.put("/", (req, res) => {
     console.log(`received new message from ${message.from}`);
     //
     persistMessage(chat.chatId, message);
-    //
-    sendEventToConnectedSockets("message", message)
 
     res.sendStatus(200);
 });

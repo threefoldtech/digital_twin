@@ -12,7 +12,6 @@
     <div
         class=" relative rounded-lg"
         :class="{
-        'p-2': !disabled,
         'bg-white': !disabled,
         'bg-gray-100': disabled,
         'bg-gray-200': message.type === 'SYSTEM',
@@ -20,35 +19,41 @@
       }"
         style="min-width: 5rem; max-width: 60%"
     >
-      <pre v-if="config.showdebug">{{ message }}</pre>
-      <div v-if="isGroup &&  !isMine && !disabled">
-        <b>{{ message.from }}</b>
-      </div>
-      <div
-          v-if="showActions"
-          class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-icon text-white px-2 z-10"
-      >
-        <button
-            class="mx-0"
-            v-if="
+      <div :class="{
+        'p-2': !disabled,
+        }">
+        <pre v-if="config.showdebug">{{ message }}</pre>
+        <div v-if="isGroup &&  !isMine && !disabled">
+          <b>{{ message.from }}</b>
+        </div>
+        <div
+            v-if="showActions && !isReply"
+            class="btn-group absolute -bottom-2 right-0 text-xs rounded-full bg-icon text-white px-2 z-10"
+        >
+          <button
+              class="mx-0"
+              v-if="
                isMine && (message.type === 'EDIT' || message.type === 'STRING') && !disabled
             "
-            @click="setEditMessage"
-        >
-          <i class="fas fa-pen"></i>
-        </button>
-        <button class="mx-0" @click="setQuoteMessage" v-if="!disabled">
-          <i class="fas fa-reply-all"></i>
-        </button>
-        <button
-            class="mx-0"
-            v-if="isMine && message.type !== 'DELETE' && !disabled && !message.type ==='SYSTEM'"
-            @click="sendUpdateMessage(true)"
-        >
-          <i class="fas fa-trash"></i>
-        </button>
-      </div>
-      <span v-if="message.type === 'FILE'">
+              @click="setEditMessage"
+          >
+            <i class="fas fa-pen"></i>
+          </button>
+          <button class="mx-0" @click="setQuoteMessage" v-if="!disabled">
+            <i class="fas fa-quote-left"></i>
+          </button>
+          <button class="mx-0" @click="setReplyMessage" v-if="!disabled">
+            <i class="fas fa-reply-all"></i>
+          </button>
+          <button
+              class="mx-0"
+              v-if="isMine && message.type !== 'DELETE' && !disabled && !message.type ==='SYSTEM'"
+              @click="sendUpdateMessage(true)"
+          >
+            <i class="fas fa-trash"></i>
+          </button>
+        </div>
+        <span v-if="message.type === 'FILE'">
         <audio
             controls
             class="max-w-full"
@@ -68,60 +73,93 @@
         >{{ message.body.filename }}</a
         >
       </span>
-      <div v-else-if="message.type === 'GIF'">
-        <img :src="message.body"/>
-      </div>
-      <div v-else-if="message.type === 'SYSTEM'">
-       <span>{{ message.body }}</span>
-      </div>
-      <div v-else-if="message.type === 'GROUP_UPDATE'">
+        <div v-else-if="message.type === 'GIF'">
+          <img :src="message.body"/>
+        </div>
+        <div v-else-if="message.type === 'SYSTEM'">
+          <span>{{ message.body }}</span>
+        </div>
+        <div v-else-if="message.type === 'GROUP_UPDATE'">
         <span v-if="message.body.type === 'REMOVEUSER'">
           <b>{{ message.body.contact.id }}</b> removed from the group.
         </span>
-        <span v-else-if="message.body.type === 'ADDUSER'">
+          <span v-else-if="message.body.type === 'ADDUSER'">
           <b>{{ message.body.contact.id }}</b> added to the group.
         </span>
-      </div>
-      <div v-else-if="message.type === 'QUOTE'">
-        <div class="bg-gray-100 py-1 px-1" v-if="showQuoted">
-          <b>{{ message.body.quotedMessage.from }} said: </b> <br/>
-          <MessageCard
-              :message="message.body.quotedMessage"
-              :chat-id="chatId"
-              disabled
-              isGroup="false"
-              :showQuoted="false"
-          />
         </div>
-        {{ message.body.message }}
-      </div>
-      <div v-else>
-        {{ message.body }}
-      </div>
-      <div v-if="quoteMessage" class="flex">
-        <input class="col-span-6" stype="text" v-model="quoteMessageValue"/>
-        <button class="px-2 py-8" @click="sendQuoteMessage(false)">
-          <i class="fas fa-paper-plane"></i>
-        </button>
-      </div>
-      <div v-if="editMessage" class="flex">
-        <input class="col-span-6" stype="text" v-model="editMessageValue"/>
-        <button class="px-2 py-8" @click="sendUpdateMessage(false)">
-          <i class="fas fa-paper-plane"></i>
-        </button>
-      </div>
-      <p
-          class="font-thin"
-          :class="{
+        <div v-else-if="message.type === 'QUOTE'">
+          <div class="bg-gray-100 py-1 px-1" v-if="showQuoted">
+            <b>{{ message.body.quotedMessage.from }} said: </b> <br/>
+            <MessageCard
+                :message="message.body.quotedMessage"
+                :chat-id="chatId"
+                disabled
+                isGroup="false"
+                :showQuoted="false"
+            />
+          </div>
+          {{ message.body.message }}
+        </div>
+        <div v-else>
+          {{ message.body }}
+        </div>
+
+
+        <p
+            class="font-thin"
+            :class="{
           'text-right': isMine,
         }"
-      >
-        <span v-if="message.type == 'EDIT'"> edited </span>
-        <span v-if="message.type == 'DELETE'"> deleted  </span>
+        >
+          <span v-if="message.type === 'EDIT'"> edited </span>
+          <span v-if="message.type === 'DELETE'"> deleted  </span>
 
-<!--        <small class="font-thin text-right" v-if="isread">is read</small>-->
-        <!--        {{ m(message.timeStamp).fromNow() }}-->
-      </p>
+          <!--        <small class="font-thin text-right" v-if="isread">is read</small>-->
+          <!--        {{ m(message.timeStamp).fromNow() }}-->
+        </p>
+      </div>
+      <div
+          v-if="!disabled && message.replys && message.replys.length >= 1"
+          class="bg-white p-2"
+          :class='{
+            "rounded-b-lg": !replyMessage && !editMessage && !quoteMessage
+          }'
+      >
+        <MessageCard v-for="reply in message.replys" :message="reply" is-group :is-mine="reply.from === user.id"
+                     :chat-id="chatId" isReply/>
+      </div>
+
+      <div class="text-actions bg-gray-200 p-2 rounded-b-lg" v-if="quoteMessage || editMessage || replyMessage">
+        <button @click="quoteMessage, editMessage, replyMessage = false">
+          <i class="fas fa-times"></i>
+
+        </button>
+        <template v-if="quoteMessage">
+          <form @submit.prevent="sendQuoteMessage(false)" class="flex">
+            <input class="col-span-6" type="text" v-model="quoteMessageValue"/>
+            <button class="px-2 py-4" @click="sendQuoteMessage(false)">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+        </template>
+        <template v-if="editMessage">
+          <form @submit.prevent="sendUpdateMessage(false)" class="flex">
+
+            <input class="col-span-6" type="text" v-model="editMessageValue"/>
+            <button class="px-2 py-4" @click="sendUpdateMessage(false)">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+        </template>
+        <template v-if="replyMessage">
+          <form @submit.prevent="sendReplyMessage" class="flex">
+            <input class="col-span-6" type="text" v-model="replyMessageValue"/>
+            <button class="px-2 py-4" @click="sendReplyMessage">
+              <i class="fas fa-paper-plane"></i>
+            </button>
+          </form>
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -131,11 +169,11 @@ import {defineComponent, nextTick, ref, watch} from "vue";
 import {useAuthState} from "../store/authStore";
 import moment from "moment";
 import {usechatsActions} from "../store/chatStore";
-import {Message, MessageBodyType, QuoteBodyType} from "../types/index";
+import {Message, MessageBodyType, QuoteBodyType, StringMessageType} from "../types/index";
 import {uuidv4} from "@/common";
 import config from "../../public/config/config";
 import AvatarImg from "@/components/AvatarImg.vue";
-import { calculateBaseUrl } from "@/services/urlService";
+import {calculateBaseUrl} from "@/services/urlService";
 
 export default defineComponent({
   name: "MessageCard",
@@ -144,6 +182,10 @@ export default defineComponent({
     message: Object,
     chatId: String,
     disabled: {
+      type: Boolean,
+      default: false,
+    },
+    isReply: {
       type: Boolean,
       default: false,
     },
@@ -189,23 +231,54 @@ export default defineComponent({
         const {sendMessageObject} = usechatsActions();
         const oldmessage = props.message;
         console.log(props.message);
-        const updatedMessage: Message<String> = {
+        const updatedMessage: Message<StringMessageType> = {
           id: oldmessage.id,
           from: oldmessage.from,
           to: oldmessage.to,
           body: isDelete ? "Message has been deleted" : editMessageValue.value,
           timeStamp: oldmessage.timeStamp,
           type: isDelete ? "DELETE" : "EDIT",
+          replys: [],
+          subject: null,
         };
         sendMessageObject(props.chatId, updatedMessage);
         console.log(props.chatId);
         console.log(props.message);
+        quoteMessageValue.value = "";
       }
       props.message.value = editMessageValue.value;
     };
     const setQuoteMessage = () => {
       quoteMessage.value = true;
     };
+
+    const replyMessage = ref(false);
+    const replyMessageValue = ref("");
+    const setReplyMessage = () => {
+      replyMessage.value = true;
+    };
+
+    const sendReplyMessage = () => {
+      console.log("reply");
+      if (replyMessageValue.value === "") {
+        return;
+      }
+      replyMessage.value = false;
+      const {user} = useAuthState();
+      const newMessage: Message<StringMessageType> = {
+        id: uuidv4(),
+        from: user.id,
+        to: props.chatId,
+        body: <StringMessageType>replyMessageValue.value,
+        timeStamp: new Date(),
+        type: "STRING",
+        replys: [],
+        subject: props.message.id,
+      };
+      sendMessageObject(props.chatId, newMessage);
+      replyMessageValue.value = ""
+    };
+
     const sendQuoteMessage = () => {
       console.log("quote");
       if (quoteMessageValue.value !== "") {
@@ -227,8 +300,11 @@ export default defineComponent({
           },
           timeStamp: new Date(),
           type: "QUOTE",
+          replys: [],
+          subject: null,
         };
         sendMessageObject(props.chatId, newMessage);
+        quoteMessageValue.value = "";
       }
       props.message.value = editMessageValue.value;
     };
@@ -242,12 +318,13 @@ export default defineComponent({
     }
 
     const fromId = props.message.from.replace(
-            'localhost:8080',
-            'localhost:3000'
+        'localhost:8080',
+        'localhost:3000'
     )
     const baseurl = calculateBaseUrl(fromId)
     const fileUrl = props.message.body?.filename ? `${baseurl}/api/files/${props.message.to}/${props.message.body.filename}` : false
 
+    const {user} = useAuthState();
 
     return {
       showActions,
@@ -265,7 +342,12 @@ export default defineComponent({
       read,
       fileUrl,
       isGroup: props.isGroup,
-      showQuoted: props.showQuoted
+      showQuoted: props.showQuoted,
+      replyMessage,
+      setReplyMessage,
+      replyMessageValue,
+      sendReplyMessage,
+      user
     };
   },
 });

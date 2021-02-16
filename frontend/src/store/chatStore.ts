@@ -1,5 +1,5 @@
 import { reactive } from "@vue/reactivity";
-import {ref, toRefs} from "vue";
+import { ref, toRefs } from "vue";
 import axios from "axios";
 import moment from "moment";
 import {
@@ -8,15 +8,17 @@ import {
   Message,
   GroupChat,
   MessageBodyType,
-  PersonChat, DtId, GroupUpdate
+  PersonChat,
+  DtId,
+  GroupUpdate
 } from "../types";
 import { useSocketActions } from "./socketStore";
 import { useAuthState } from "./authStore";
 import { useContactsActions, useContactsState } from "./contactStore";
 import config from "../../public/config/config";
 import { uuidv4 } from "@/common";
-import {startFetchStatusLoop} from "@/store/statusStore";
-import {uniqBy} from "lodash";
+import { startFetchStatusLoop } from "@/store/statusStore";
+import { uniqBy } from "lodash";
 
 const state = reactive<chatstate>({
   chats: [],
@@ -41,13 +43,12 @@ const retrievechats = async () => {
 };
 
 const addChat = (chat: Chat) => {
-
-  if (!chat.isGroup){
-    startFetchStatusLoop(chat.chatId)
+  if (!chat.isGroup) {
+    startFetchStatusLoop(chat.chatId);
   }
 
   if (chat.acceptedChat) {
-    state.chats.push(chat)
+    state.chats.push(chat);
     state.chats = uniqBy(state.chats, c => c.chatId);
   } else {
     state.chatRequests.push(chat);
@@ -55,13 +56,12 @@ const addChat = (chat: Chat) => {
   sortChats();
 };
 
-export const removeChat = (chatId) => {
-  console.log('remove')
-  state.chats = state.chats.filter(c => c.chatId !== chatId)
-  console.log(state.chats)
+export const removeChat = chatId => {
+  console.log("remove");
+  state.chats = state.chats.filter(c => c.chatId !== chatId);
+  console.log(state.chats);
   sortChats();
-  selectedId.value = <string>state.chats.find(()=>true)?.chatId
-
+  selectedId.value = <string>state.chats.find(() => true)?.chatId;
 };
 
 const addGroupchat = (name: string, contacts: Contact[]) => {
@@ -77,7 +77,9 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
         body: `${user.id} has created and invited you to ${name}`,
         timeStamp: new Date(),
         id: uuidv4(),
-        type: "SYSTEM"
+        type: "SYSTEM",
+        replys: [],
+        subject: null
       }
     ],
     name: name,
@@ -98,28 +100,45 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
 const acceptChat = id => {
   axios.post(`${config.baseUrl}api/chats?id=${id}`).then(res => {
     const index = state.chatRequests.findIndex(c => c.chatId == id);
-    state.chatRequests[index].acceptedChat = true
+    state.chatRequests[index].acceptedChat = true;
     addChat(state.chatRequests[index]);
-    const {user} = useAuthState();
-    sendMessage(id,`${user.id} accepted invitation`, 'SYSTEM' )
+    const { user } = useAuthState();
+    sendMessage(id, `${user.id} accepted invitation`, "SYSTEM");
     state.chatRequests.splice(index, 1);
   });
 };
 
-const updateChat = (chat:Chat) => {
-  const index = state.chats.findIndex(c => c.chatId == chat.chatId)
-  removeChat(chat.chatId)
-  addChat(chat)
+const updateChat = (chat: Chat) => {
+  const index = state.chats.findIndex(c => c.chatId == chat.chatId);
+  removeChat(chat.chatId);
+  addChat(chat);
+};
+
+function getMessage(chat: Chat, id) {
+  let message = chat.messages.find(m => m.id === id);
+
+  if (!message) {
+    chat.messages.find(m => {
+      const found = m.replys.find(r => r.id === id);
+      if (!found) {
+        return false;
+      }
+
+      message = found;
+      return true;
+    });
+  }
+
+  return message;
 }
 
 const addMessage = (chatId, message) => {
   if (message.type === "READ") {
     const chat: Chat = state.chats.find(chat => chat.chatId == chatId);
 
-    const newRead = chat.messages.find(m => m.id === message.body);
-    const oldRead = chat.messages.find(
-      m => m.id === chat.read[<string>message.from]
-    );
+    const newRead = getMessage(chat, message.body);
+    const oldRead = getMessage(chat, <string>message.from);
+
     if (
       oldRead &&
       new Date(newRead.timeStamp).getTime() >
@@ -133,15 +152,27 @@ const addMessage = (chatId, message) => {
     return;
   }
 
-  if(message.type === "REMOVEUSER"||message.type === "ADDUSER"){
+  if (message.type === "REMOVEUSER" || message.type === "ADDUSER") {
     //@todo
-    return
+    return;
   }
 
   // console.log("in addmessage chatid", chatId);
   // console.log("in addmessage message", message);
 
   const chat: Chat = state.chats.find(chat => chat.chatId == chatId);
+
+  if (message.subject) {
+    const subjectMessageIndex = chat.messages.findIndex(
+      m => m.id === message.subject
+    );
+    const subjectMessage = chat.messages[subjectMessageIndex];
+    subjectMessage.replys = [...subjectMessage.replys, message];
+    chat.messages[subjectMessageIndex] = subjectMessage;
+    setLastMessage(chatId, message);
+    return;
+  }
+
   const index = chat.messages.findIndex(mes => mes.id == message.id);
   if (index !== -1) {
     console.log("edit chat");
@@ -162,7 +193,9 @@ const sendMessage = (chatId, message, type: string = "STRING") => {
     from: user.id,
     to: chatId,
     timeStamp: new Date(),
-    type: type
+    type: type,
+    replys: [],
+    subject: null
   };
   addMessage(chatId, msg);
   sendSocketMessage(chatId, msg);
@@ -172,7 +205,7 @@ const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
   const { sendSocketMessage } = useSocketActions();
   // console.log(chatId, message);
   // @TODO when doing add message on groupupdate results in  max call stack exeeded
-  if(message.type !=="GROUP_UPDATE"){
+  if (message.type === "EDIT" || message.type === "DELETE") {
     addMessage(chatId, message);
   }
   let isEdit = false;
@@ -197,7 +230,9 @@ const sendFile = async (chatId, name, parsedFile) => {
     from: user.id,
     to: chatId,
     timeStamp: new Date(),
-    type: "FILE_UPLOAD"
+    type: "FILE_UPLOAD",
+    replys: [],
+    subject: null
   };
   sendSocketMessage(chatId, msgToSend);
   // const msgToShow:Message<Object> = {
@@ -243,18 +278,20 @@ const readMessage = (chatId, messageId) => {
     to: chatId,
     body: messageId,
     timeStamp: new Date(),
-    type: "READ"
+    type: "READ",
+    replys: [],
+    subject: null
   };
   sendMessageObject(chatId, newMessage);
 };
 
-const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
+const updateContactsInGroup = (groupId, contact: Contact, remove: boolean) => {
   const { user } = useAuthState();
   const { chats } = usechatsState();
-  const operation = remove? "REMOVEUSER": "ADDUSER"
-  console.log(`${operation} ${contact.id} from ${groupId}`)
-  const chat = chats.value.find(chat => chat.chatId == groupId)
-  const message:Message<GroupUpdate> = {
+  const operation = remove ? "REMOVEUSER" : "ADDUSER";
+  console.log(`${operation} ${contact.id} from ${groupId}`);
+  const chat = chats.value.find(chat => chat.chatId == groupId);
+  const message: Message<GroupUpdate> = {
     id: uuidv4(),
     from: user.id,
     to: groupId,
@@ -273,12 +310,13 @@ const updateContactsInGroup = (groupId, contact:Contact, remove:boolean) => {
       }
     },
     timeStamp: new Date(),
-    type: "GROUP_UPDATE"
-  }
-  console.log(message)
-  sendMessageObject(groupId,message)
-}
-
+    type: "GROUP_UPDATE",
+    replys: [],
+    subject: null
+  };
+  console.log(message);
+  sendMessageObject(groupId, message);
+};
 
 export const usechatsState = () => {
   return {
@@ -315,10 +353,8 @@ export const handleRead = (message: Message<string>) => {
   const { chats } = usechatsState();
   const chat = chats.value.find(c => c.chatId == chatId);
 
-  const newRead = chat.messages.find(m => m.id === message.body);
-  const oldRead = chat.messages.find(
-    m => m.id === chat.read[<string>message.from]
-  );
+  const newRead = getMessage(chat, message.body);
+  const oldRead = getMessage(chat, <string>message.from);
 
   if (
     oldRead &&
@@ -327,7 +363,6 @@ export const handleRead = (message: Message<string>) => {
   ) {
     return;
   }
-
 
   chat.read[<string>message.from] = message.body;
 };

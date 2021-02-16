@@ -25,9 +25,16 @@ export interface Message <T>{
     body: T,
     timeStamp: Date,
     type: String,
+    subject: Id | null
+    replys: Message<MessageBodyType>[]
 }
 
-export interface MessageBodyType extends String{
+export interface MessageBodyType{
+
+}
+
+
+export interface StringMessageType extends String, MessageBodyType{
 
 }
 
