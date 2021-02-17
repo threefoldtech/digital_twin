@@ -51,7 +51,7 @@
           />
           <div class="font-thin text-right" v-if="reads[message.id]">
             <div class="flex justify-end" v-for="(value, key) in reads[message.id].slice(0,3)" :key="key">
-              <AvatarImg small :id="reads[message.id][0]"></AvatarImg>
+              <AvatarImg xsmall :id="reads[message.id][0]"></AvatarImg>
             </div>
             <span v-if="reads[message.id].length > 3"> and {{ reads[message.id].length - 3 }} others </span>
           </div>

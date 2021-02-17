@@ -5,8 +5,9 @@
       class="bg-icon rounded-full"
       :title="id"
       :class='{
-        "h-12 w-12": !small,
-        "h-8 w-8": small
+        "h-12 w-12": !small && !xsmall,
+        "h-8 w-8": small,
+        "h-6 w-6": xsmall
       }'
   />
 </template>
@@ -18,7 +19,8 @@ export default {
   name: 'AvatarImg',
   props: {
     id: {required: true},
-    small: {required: false, default: false, type: Boolean}
+    small: {required: false, default: false, type: Boolean},
+    xsmall: {required: false, default: false, type: Boolean}
   },
   setup(props) {
     // startFetchStatusLoop(props.id)
