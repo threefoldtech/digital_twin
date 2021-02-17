@@ -1,12 +1,17 @@
 {
   "name": "digitaltwin",
+  "version": "1.0.0",
   "main": "server.js",
+  "description": "Digital Twin",
+  "author": "",
+  "license": "ISC",
   "bin": "server.js",
   "dependencies": {
     "chalk": "^4.1.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-async-handler": "^1.1.4",
+    "greenlock-express": "^4.0.3",
     "hyperdrive": "^10.19.1",
     "hyperspace": "^3.18.1",
     "mustache-express": "^1.3.0",
