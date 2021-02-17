@@ -18,13 +18,16 @@ async function main(){
     var port = config.http.port;
 
     const {_, cleanup } = await init();
-    
+
     process.on('SIGINT', () => {
         cleanup()
         server.close(() => {
             console.log(chalk.green(`✓ (HTTP Server) http://${host}:${port}`));
             console.log(chalk.red(`\t✓ closed`));
         })
+
+        // FIXME: call disconnect on polkadot
+        setTimeout(function() { process.exit(0); }, 500);
     })
 
     const server = app.listen(port, host, () => {
