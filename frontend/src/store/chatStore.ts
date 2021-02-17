@@ -243,7 +243,8 @@ const sendFile = async (chatId, selectedFile, isBlob = false) => {
       },
     });
   } catch(e){
-    // @TODO display error
+    msgToSend.body = `Failed to send file: ${e.message}`
+    addMessage(chatId,msgToSend)
     console.log(e)
   }
 };

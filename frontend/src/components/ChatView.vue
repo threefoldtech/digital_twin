@@ -75,6 +75,22 @@
 
     <ChatInput class="chatInput" :selectedid="chat.chatId" v-on:messageSend="scrollToBottom(true)"/>
   </div>
+    <jdialog v-model="showDialog" @close="showDialog = false" noActions class="max-w-10">
+      <template v-slot:title class="center">
+        <h1 class="text-center">Blocking</h1>
+      </template>
+      <div>
+        Do you really want to block <b> {{chat.name}} </b>?
+      </div>
+      <div class="grid grid-cols-2 mt-2">
+        <button @click="doBlockChat" class="bg-red-500 p-2 text-white font-bold">
+          YES
+        </button>
+        <button @click="showDialog = false" class="p-2">
+          NO
+        </button>
+      </div>
+    </jdialog>
 </template>
 
 <script lang="ts">
@@ -102,11 +118,12 @@ import * as crypto from "crypto-js";
 import AvatarImg from "@/components/AvatarImg.vue";
 import {sendBlockChat, sendRemoveChat} from "@/store/socketStore";
 import {useIntersectionObserver} from "@/lib/intersectionObserver";
+import Dialog from "./Dialog.vue";
 
 
 export default defineComponent({
   name: "ChatView",
-  components: {AvatarImg, ChatInput, MessageCard},
+  components: {AvatarImg, ChatInput, MessageCard, jdialog: Dialog},
   props: {
     selectedId: String,
   },
@@ -118,6 +135,7 @@ export default defineComponent({
     const m = (val) => moment(val);
     const messageBox = ref(null);
     const file = ref();
+    let showDialog = ref(false);
 
     const propRefs = toRefs(props);
 
@@ -189,11 +207,15 @@ export default defineComponent({
     }
 
     const blockChat = () => {
-      // @ts-ignore
-      const confirmed = confirm(`do you really want to block ${chat?.name}?`);
-      if (confirmed == true) {
-        sendBlockChat(chat.value.chatId)
-      }
+      showDialog.value = true
+      // const confirmed = confirm(`do you really want to block ${chat.value.name}?`);
+      // if (confirmed == true) {
+        // sendBlockChat(chat.value.chatId)
+      // }
+    }
+    const doBlockChat = () => {
+      showDialog.value = false
+      sendBlockChat(chat.value.chatId)
     }
 
     const showDivider = (message, index) => {
@@ -246,10 +268,12 @@ export default defineComponent({
       lastReadByMe,
       deleteChat,
       blockChat,
+      doBlockChat,
       user,
       viewAnchor,
       showDivider,
       reads,
+      showDialog,
       ...propRefs,
     };
   },
