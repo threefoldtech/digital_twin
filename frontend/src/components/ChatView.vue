@@ -184,7 +184,7 @@ export default defineComponent({
 
     const blockChat = () => {
       // @ts-ignore
-      const confirmed = confirm(`do you really want do block ${chat?.name}?`);
+      const confirmed = confirm(`do you really want to block ${chat?.name}?`);
       if (confirmed == true) {
         sendBlockChat(chat.value.chatId)
       }

@@ -186,7 +186,7 @@ export default defineComponent({
       const { user } = useAuthState();
       const { chats } = usechatsState();
       if (groupnameAdd.value == "") {
-        groupnameAddError.value = "Please enter agroup name"
+        groupnameAddError.value = "Please enter a group name"
         return;
       }
       if (groupnameAdd.value.length>20) {
