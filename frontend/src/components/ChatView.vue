@@ -41,13 +41,13 @@
                     </span>
           </div>
           <MessageCard
-
               :isread="i <= lastRead"
               :isreadbyme="i <= lastReadByMe"
               :message="message"
               :chatId="chat.chatId"
               :isGroup="chat.isGroup"
               :isMine="message.from === user.id"
+              v-on:scroll="scrollToBottom"
           />
           <span class="font-thin" v-if="reads[message.id]">
             <template v-if="!chat.isGroup || reads[message.id].length === 1">read by {{
@@ -73,7 +73,7 @@
       </div>
     </div>
 
-    <ChatInput class="chatInput" :selectedid="chat.chatId" v-on:messageSend="scrollToBottom"/>
+    <ChatInput class="chatInput" :selectedid="chat.chatId" v-on:messageSend="scrollToBottom(true)"/>
   </div>
 </template>
 
@@ -147,12 +147,13 @@ export default defineComponent({
     };
 
     // @todo: fix so that properly scrools to bottom
-    const scrollToBottom = () => {
-      nextTick(
-          () => {
-            messageBox.value.scrollTop = messageBox.value.scrollHeight;
-          }
-      )
+    const scrollToBottom = (force = false) => {
+      console.log('scroll')
+      if (!force && !isIntersecting.value) {
+        return
+      }
+
+      messageBox.value.scrollTop = messageBox.value.scrollHeight;
     };
 
     const message = ref("");
@@ -162,7 +163,12 @@ export default defineComponent({
     });
 
     onMounted(() => {
-      scrollToBottom()
+
+      nextTick(
+          () => {
+            scrollToBottom(true)
+          }
+      )
     });
 
     const popupMeeting = () => {
@@ -220,9 +226,7 @@ export default defineComponent({
     //@TODO fix this
     // @ts-ignore
     watch(chat.value.messages, () => {
-      if (!isIntersecting.value) {
-        return
-      }
+
       scrollToBottom()
     })
 

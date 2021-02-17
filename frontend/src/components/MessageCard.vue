@@ -59,11 +59,13 @@
             class="max-w-full"
             v-if="message.body.filename.indexOf('.WebM') !== -1"
             :src="fileUrl"
+            @load="$emit('scroll')"
         ></audio>
 
         <img
-            v-if="message.body.filename.indexOf('.gif') !== -1"
+            v-if="isImage(message.body.filename)"
             :src="fileUrl"
+            @load="$emit('scroll')"
         />
         <br/>
         <a
@@ -74,7 +76,7 @@
         >
       </span>
         <div v-else-if="message.type === 'GIF'">
-          <img :src="message.body"/>
+          <img :src="message.body" @load="$emit('scroll')"/>
         </div>
         <div v-else-if="message.type === 'SYSTEM'">
           <span>{{ message.body }}</span>
@@ -326,6 +328,14 @@ export default defineComponent({
 
     const {user} = useAuthState();
 
+
+    const isImage = (filename) => {
+      return filename.indexOf('.gif') !== -1
+          || filename.indexOf('.png') !== -1
+          || filename.indexOf('.jpg') !== -1
+          || filename.indexOf('.jpeg') !== -1
+    }
+
     return {
       showActions,
       isMine: props.isMine,
@@ -347,9 +357,10 @@ export default defineComponent({
       setReplyMessage,
       replyMessageValue,
       sendReplyMessage,
-      user
+      user,
+      isImage
     };
-  },
+  }
 });
 </script>
 
