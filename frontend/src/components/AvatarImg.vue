@@ -3,6 +3,7 @@
       :src="src"
       alt="User image"
       class="bg-icon rounded-full"
+      :title="id"
       :class='{
         "h-12 w-12": !small,
         "h-8 w-8": small
