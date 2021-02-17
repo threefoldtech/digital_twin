@@ -9,6 +9,7 @@
   "dependencies": {
     "chalk": "^4.1.0",
     "cors": "^2.8.5",
+    "dns2": "^1.4.2",
     "express": "^4.17.1",
     "express-async-handler": "^1.1.4",
     "greenlock-express": "^4.0.3",

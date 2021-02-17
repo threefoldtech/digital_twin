@@ -4,6 +4,23 @@ const chalk = require('chalk');
 const config = require('./config')
 const app = require('./http/app.js')
 const process = require('process');
+const dns = require('dns2');
+const { Packet } = dns;
+
+const dnsserver = dns.createUDPServer((request, send, rinfo) => {
+    const response = Packet.createResponseFromRequest(request);
+    const [ question ] = request.questions;
+    const { name } = question;
+    response.answers.push({
+      name,
+      type: Packet.TYPE.A,
+      class: Packet.CLASS.IN,
+      ttl: 300,
+      address: '8.8.8.8'
+    });
+    send(response);
+  });
+
 
 async function init(){
     const drive = require('./drive.js');
@@ -27,7 +44,11 @@ async function main(){
         })
     })
 
-    
+    dnsserver.on('request', (request, response, rinfo) => {
+        console.log(request.header.id, request.questions[0]);
+      });
+    dnsserver.listen(5333);
+    console.log(chalk.green(`✓ (DNS Server) 5333`));
     require('greenlock-express')
     .init({
         packageRoot: __dirname,
