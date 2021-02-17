@@ -52,6 +52,12 @@ export interface MessageInterface <T>{
     replys: MessageInterface<MessageBodyTypeInterface>[]
 }
 
+export enum ChatType {
+    PERSON = "PERSON",
+    GROUP = "GROUP",
+    FORUM = "FORUM",
+}
+
 export interface MessageBodyTypeInterface {
 
 }
@@ -80,6 +86,7 @@ export interface ChatInterface {
         [key: string]: string
     }
     name: string;
+    type: ChatType
 }
 export interface PersonChatInterface extends ChatInterface{
     chatId: DtIdInterface;

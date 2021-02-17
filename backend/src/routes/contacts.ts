@@ -1,5 +1,5 @@
 import {getDigitalTwinUrl, getLocationForId, sendMessageToApi} from './../service/apiService';
-import { ContactRequest, DtIdInterface, MessageInterface, MessageOperations, MessageTypes } from './../types/index';
+import { ChatType, ContactRequest, DtIdInterface, MessageInterface, MessageOperations, MessageTypes } from './../types/index';
 import { parseMessage } from './../service/messageService';
 import {Router} from 'express';
 import {appCallback, getAppLoginUrl} from "../service/authService";
@@ -30,7 +30,7 @@ router.post("/", (req, res) => {
 
     const message:MessageInterface<MessageBodyTypeInterface> = parseMessage(con.message)
     console.log(`creating chat`)
-    const chat = addChat(contact.id,[contact, new Contact(config.userid, getLocationForId(config.userid))],false, [message] ,contact.id, true, contact.id)
+    const chat = addChat(contact.id,[contact, new Contact(config.userid, getLocationForId(config.userid))],false, [message] ,contact.id, true, contact.id, ChatType.PERSON)
 
 
     const url = `/api/messages`

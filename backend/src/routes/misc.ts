@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import {MessageTypes} from "../types";
+import {ChatType, MessageTypes} from "../types";
 import Chat from "../models/chat";
 import {uuidv4} from "../common";
 import {config} from "../config/config";
@@ -18,7 +18,7 @@ router.get('/possibleMessages', async (req, res) => {
 router.get('/test', async (req, res) => {
     let id = uuidv4();
     getChat(id)
-    const chat = new Chat(id, [], false, [], "test", false, config.userid, {})
+    const chat = new Chat(id, [], false, [], "test", false, config.userid, ChatType.PERSON ,{})
 
     persistChat(chat)
     res.json({success: true})

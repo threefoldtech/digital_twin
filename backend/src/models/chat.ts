@@ -1,3 +1,4 @@
+import { ChatType } from './../types/index';
 import Contact from "./contact"
 import Message from "./message"
 import {ChatInterface, DtIdInterface, MessageBodyTypeInterface} from "../types";
@@ -12,8 +13,9 @@ export default class Chat implements ChatInterface{
     acceptedChat: boolean;
     adminId: DtIdInterface;
     read: { [key: string]: string; } = {};
+    type: ChatType
 
-    constructor(chatId:String, contacts: Contact[], isGroup: boolean, messages: Message<MessageBodyTypeInterface>[],name:string, acceptedChat:boolean, adminId: DtIdInterface, read: { [key: string]: string; } = {}) {
+    constructor(chatId:String, contacts: Contact[], isGroup: boolean, messages: Message<MessageBodyTypeInterface>[],name:string, acceptedChat:boolean, adminId: DtIdInterface, type: ChatType, read: { [key: string]: string; } = {}) {
       this.chatId = chatId;
       this.contacts = contacts;
       this.isGroup = isGroup;
@@ -21,7 +23,8 @@ export default class Chat implements ChatInterface{
       this.name = name;
       this.acceptedChat = acceptedChat;
       this.adminId = adminId;
-      this.read = read
+      this.read = read;
+      this.type = type;
     }
 
 

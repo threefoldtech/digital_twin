@@ -1,4 +1,4 @@
-import {DtIdInterface, MessageInterface} from "./../types/index";
+import {ChatType, DtIdInterface, MessageInterface} from "./../types/index";
 import Chat from "../models/chat";
 import Message from "../models/message";
 import {IdInterface, MessageBodyTypeInterface} from "../types";
@@ -39,9 +39,10 @@ export const addChat = (
     message: MessageInterface<MessageBodyTypeInterface>[],
     name: string,
     acceptedChat: boolean,
-    adminId: DtIdInterface
+    adminId: DtIdInterface,
+    type: ChatType
 ) => {
-    const chat = new Chat(chatId, contacts, isGroupchat, message, name, acceptedChat, adminId, {})
+    const chat = new Chat(chatId, contacts, isGroupchat, message, name, acceptedChat, adminId, type ,{})
     persistChat( chat );
     sendEventToConnectedSockets('new_chat', chat)
     return chat
@@ -80,5 +81,5 @@ export const getChatById = (id: IdInterface) => {
 
 export const parseChat = (chat: any) => {
     const messages = chat.messages.map((m: any) => parseMessage(m))
-    return new Chat(chat.chatId, chat.contacts, chat.isGroup, messages, chat.name, chat.acceptedChat, chat.adminId, chat.read)
+    return new Chat(chat.chatId, chat.contacts, chat.isGroup, messages, chat.name, chat.acceptedChat, chat.adminId, chat.type, chat.read)
 }

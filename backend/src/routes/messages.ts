@@ -1,3 +1,4 @@
+import { ChatType } from './../types/index';
 import {getBlocklist, getChatIds, persistChat} from './../service/dataService';
 import {Router} from 'express';
 import Message from "../models/message";
@@ -45,7 +46,9 @@ function handleContactRequest(message: Message<ContactRequest>) {
         [requestMsg],
         <string>message.from,
         false,
-        message.from
+        message.from,
+        ChatType.PERSON
+
     )
     sendEventToConnectedSockets("connectionRequest", newchat)
     persistChat(newchat)
