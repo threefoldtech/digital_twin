@@ -18,7 +18,9 @@ const tfowner = client_get(url, owner_mnemo);
 
 var express = require('express');
 var router = express.Router();
+var path = require('path');
 var app = express();
+var clusters = require('./clusters.js');
 
 function events(content, res) {
     if(content instanceof Error)
@@ -309,6 +311,10 @@ router.delete('/nodes/:id', function(req, res) {
     }).catch(err => { json_error(res, err) })
 })
 
+//
+// account
+//
+
 router.get('/account/price', function(req, res) {
     tfclient.getPrice().then((content) => {
         res.json(content);
@@ -326,6 +332,10 @@ router.get('/account/balance', function(req, res) {
     })
 })
 
+//
+// signing debug
+//
+
 router.post('/debug/sign', function(req, res) {
     let required = ['entity', 'twin'];
 
@@ -336,6 +346,56 @@ router.post('/debug/sign', function(req, res) {
     let twin = parseInt(req.body['twin']);
 
     tfowner.sign(entity, twin).then((content) => {
+        res.json(content);
+
+    }, (err) => {
+        res.status(422).json({ message: `${err}` });
+    })
+})
+
+
+//
+// clusters
+//
+
+router.get('/clusters', function(req, res) {
+    clusters.list(clusters.rootpath).then((content) => {
+        res.json(content);
+
+    }, (err) => {
+        res.status(422).json({ message: `${err}` });
+    })
+})
+
+router.get('/clusters/:id', function(req, res) {
+    let fullpath = path.join(clusters.rootpath, req.params.id + ".json");
+    const apath = path.resolve(fullpath);
+
+    clusters.get(apath).then((content) => {
+        res.json(content);
+
+    }, (err) => {
+        res.status(422).json({ message: `${err}` });
+    })
+})
+
+router.delete('/clusters/:id', function(req, res) {
+    let fullpath = path.join(clusters.rootpath, req.params.id + ".json");
+    const apath = path.resolve(fullpath);
+
+    clusters.remove(apath).then((content) => {
+        res.json(content);
+
+    }, (err) => {
+        res.status(422).json({ message: `${err}` });
+    })
+})
+
+router.put('/clusters/:id', function(req, res) {
+    let fullpath = path.join(clusters.rootpath, req.params.id + ".json");
+    const apath = path.resolve(fullpath);
+
+    clusters.put(apath, req.body).then((content) => {
         res.json(content);
 
     }, (err) => {

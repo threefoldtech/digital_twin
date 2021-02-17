@@ -5,9 +5,9 @@ var path = require('path');
 var app = express();
 
 const asyncHandler = require('express-async-handler')
-const clusterspath = "/tmp/clusters";
+const rootpath = "/tmp/clusters";
 
-async function clusters_list(cpath) {
+async function list(cpath) {
     const clusters = [];
 
     let files = await fs.readdir(cpath)
@@ -16,7 +16,6 @@ async function clusters_list(cpath) {
     const apath = path.resolve(pathName);
 
     for(let file of files) {
-        /*
         try {
             let content = await fs.readFile(apath + '/' + file)
             let data = JSON.parse(content);
@@ -25,15 +24,14 @@ async function clusters_list(cpath) {
         } catch(err) {
             console.log(`${err}`);
         }
-        */
 
-        clusters.push(file.substring(0, file.lastIndexOf('.')));
+        // clusters.push(file.substring(0, file.lastIndexOf('.')));
     }
 
     return clusters;
 }
 
-async function cluster_get(cpath) {
+async function get(cpath) {
     try {
         await fs.access(cpath, fs.F_OK);
 
@@ -51,7 +49,7 @@ async function cluster_get(cpath) {
     }
 }
 
-async function clusters_delete(cpath) {
+async function remove(cpath) {
     try {
         await fs.access(cpath, fs.F_OK);
 
@@ -69,7 +67,7 @@ async function clusters_delete(cpath) {
     return {"status": "success"}
 }
 
-async function cluster_put(cpath, body) {
+async function put(cpath, body) {
     console.log(body);
 
     if(!('name' in body))
@@ -95,59 +93,4 @@ async function cluster_put(cpath, body) {
 }
 
 
-
-router.get('/clusters', function(req, res) {
-    clusters_list(clusterspath).then((content) => {
-        res.json(content);
-
-    }, (err) => {
-        res.status(422).json({
-            message: `${err}`
-        });
-    });
-})
-
-router.get('/clusters/:id', function(req, res) {
-    let fullpath = path.join(clusterspath, req.params.id + ".json");
-    const apath = path.resolve(fullpath);
-
-    cluster_get(apath).then((content) => {
-        res.json(content);
-
-    }, (err) => {
-        res.status(422).json({
-            message: `${err}`
-        });
-    });
-});
-
-router.delete('/clusters/:id', function(req, res) {
-    let fullpath = path.join(clusterspath, req.params.id + ".json");
-    const apath = path.resolve(fullpath);
-
-    clusters_delete(apath).then((content) => {
-        res.json(content);
-
-    }, (err) => {
-        res.status(422).json({
-            message: `${err}`
-        });
-    });
-});
-
-router.put('/clusters/:id', function(req, res) {
-    let fullpath = path.join(clusterspath, req.params.id + ".json");
-    const apath = path.resolve(fullpath);
-
-    cluster_put(apath, req.body).then((content) => {
-        res.json(content);
-
-    }, (err) => {
-        res.status(422).json({
-            message: `${err}`
-        });
-    });
-});
-
-
-module.exports = router
+module.exports = {rootpath, list, get, remove, put}
