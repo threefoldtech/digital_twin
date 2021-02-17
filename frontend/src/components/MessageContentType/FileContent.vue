@@ -9,7 +9,6 @@
 
 <script lang="ts">
 import {defineComponent} from "vue";
-import {} from "@/services/fileService";
 
 export default defineComponent({
   name: "FileContent",
