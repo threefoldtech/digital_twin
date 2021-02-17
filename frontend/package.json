@@ -14,7 +14,6 @@
     "axios": "^0.21.1",
     "core-js": "^3.6.5",
     "crypto-js": "^4.0.0",
-    "git-describe": "^4.0.4",
     "lodash": "^4.17.20",
     "moment": "^2.29.1",
     "socket.io-client": "^3.1.0",

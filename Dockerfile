@@ -4,9 +4,10 @@ WORKDIR /app
 COPY ./frontend/package.json package.json
 COPY ./frontend/yarn.lock yarn.lock 
 
-RUN yarn install
+RUN yarn
 
 COPY ./frontend .
+RUN ls -al .
 RUN mv ./public/config/production.ts ./public/config/config.ts
 RUN yarn build
 

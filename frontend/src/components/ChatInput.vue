@@ -96,8 +96,7 @@ export default {
         message.value = "";
       }
       if (fileinput.value.files.length > 0) {
-        const parsedFile = await fileinput.value.files[0].arrayBuffer()
-        sendFile(props.selectedid, fileinput.value.files[0].name, parsedFile);
+        sendFile(props.selectedid, fileinput.value.files[0]);
         removeFile()
       }
       emit('messageSend')
@@ -131,9 +130,9 @@ export default {
       stopRecording.value = () => {
         mediaRecorder.addEventListener("stop", async () => {
           const audioBlob = new Blob(audioChunks);
-          const arrayBuffer = await audioBlob.arrayBuffer()
           console.log(props.selectedid)
-          sendFile(props.selectedid, `recording-${Date.now()}.WebM`, arrayBuffer)
+          console.log(audioBlob)
+          sendFile(props.selectedid, audioBlob,true)
           stopRecording.value = null;
         });
 
