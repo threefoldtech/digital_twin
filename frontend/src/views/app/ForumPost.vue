@@ -7,7 +7,6 @@
     </div>
     <main class=" w-3/4 bg-yellow-600" v-if="message">
       {{message}}
-          get in forum/chatid/messageid the complete message to show
     </main>
   </div>
 </template>
