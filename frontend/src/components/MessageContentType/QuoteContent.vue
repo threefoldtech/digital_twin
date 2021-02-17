@@ -1,8 +1,12 @@
 <template>
-  <MessageCard class="bg-gray-200" :message="message.body.quotedMessage"></MessageCard>
+  <div class="bg-gray-300">
+    <MessageContent :message="message.body.quotedMessage"></MessageContent>
+  </div>
+  {{ message.body.quotedMessage.body }}
+  hier
   <br>
-  <span>{{message.body.message}}</span>
-  <pre class="bg-red-300 p-4 break-words">{{message.body}}</pre>
+  <span>{{ message.body.message }}</span>
+  <pre class="bg-red-300 p-4 break-words">{{ message.body }}</pre>
 </template>
 
 <script lang="ts">
@@ -18,9 +22,7 @@ export default defineComponent({
   },
   setup(props) {
 
-    return {
-
-    };
+    return {};
   }
 });
 </script>

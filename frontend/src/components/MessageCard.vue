@@ -1,27 +1,28 @@
 <template>
-  <div class="card-gutter flex">
-    <AvatarImg v-if="true" class="mr-8" :id="message.from"/>
-    <div class="card bg-white rounded-md my-4 overflow-hidden">
-      <header class="flex justify-between px-4 pt-4 text-xs">
+  <div class="card-gutter grid grid-cols-12 my-4">
+    <AvatarImg v-if="!hideAvatar" class="mr-8 col-span-2" :id="message.from"/>
+    <div class="card bg-white rounded-md relative col-start-3 col-end-13">
+      <header class="flex justify-between px-4 pt-2 text-xs">
         <div class="title">
           <div class="name inline-block pr-5 ">
-            {{message.from}}
+            {{ message.from }}
           </div>
           <div class="date inline-block font-thin">
-            {{moment(message.timestamp).fromNow()}}
+            {{ moment(message.timestamp).fromNow() }}
           </div>
         </div>
         <div class="header-actions align-end">
           <button>
-            <i class="fa fa-ellipsis-v"></i>
+            <i class="fa fa-ellipsis-v" style="font-size: 0.6em"></i>
           </button>
         </div>
       </header>
-      <main class="px-4 pb-4">
+      <main class="flex">
         <MessageContent :message="message"></MessageContent>
       </main>
-      <footer class="h-16 bg-gray-200 font-light text-xs flex justify-between p-4">
-        <button>
+      <footer
+          class="actions h-6 bg-gray-200 font-light text-xs flex justify-between px-4 opacity-0 absolute w-full rounded-b-md z-10 -bottom-4">
+        <button class="m-0 opacity-0 cursor-default">
           <i class="fa fa-thumbs-up"></i>
           Like
         </button>
@@ -54,14 +55,24 @@ export default defineComponent({
   components: {MessageContent, AvatarImg},
   props: {
     message: Object,
+    hideAvatar: {
+      type: Boolean,
+      required: false,
+      default: false
+    }
   },
   setup(props) {
 
 
-   return {
-     moment
-   }
+    return {
+      moment
+    }
   }
 });
 </script>
 
+<style lang="css">
+.card:hover footer {
+  opacity:100;
+}
+</style>

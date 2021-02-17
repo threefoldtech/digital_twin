@@ -1,5 +1,7 @@
 <template>
-  {{message.body}}
+  <div class="bg-gray-300">
+    {{message.body}}
+  </div>
 </template>
 
 <script lang="ts">

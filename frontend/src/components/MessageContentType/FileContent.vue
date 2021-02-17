@@ -9,7 +9,8 @@
 
 <script lang="ts">
 import {defineComponent} from "vue";
-import {} from "@/services/fileService";
+import {getFileUrl} from "@/services/urlService";
+
 
 export default defineComponent({
   name: "FileContent",
@@ -17,8 +18,9 @@ export default defineComponent({
     message: {type: Object, required: true},
   },
   setup(props) {
+    const fileUrl = getFileUrl(props.message);
 
-    return {};
+    return {fileUrl};
   }
 });
 </script>

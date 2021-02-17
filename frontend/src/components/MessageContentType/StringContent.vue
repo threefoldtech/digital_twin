@@ -1,5 +1,5 @@
 <template>
-  <span>{{ message.body }}</span>
+  <span class="pb-2 px-4">{{ message.body }}</span>
 </template>
 
 <script lang="ts">
