@@ -4,6 +4,7 @@ import { inject } from "vue";
 import {handleRead, removeChat, usechatsActions} from "./chatStore";
 import { useContactsActions, useContactsState } from "./contactStore";
 import { useAuthState } from "@/store/authStore";
+import { addUserToBlockList} from "@/store/blockStore"
 
 const state = reactive<State>({
   socket: "",
@@ -23,6 +24,7 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on("chat_blocked", (chatId) => {
         removeChat(chatId)
+        addUserToBlockList(chatId)
     });
     state.socket.on("message", (message) => {
         if (message.type === 'READ'){

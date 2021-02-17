@@ -97,12 +97,12 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue";
+import {computed, defineComponent, onBeforeMount, ref} from "vue";
 import {useAuthState} from "../store/authStore";
 import {useSocketActions} from "../store/socketStore";
 import Dialog from "./Dialog.vue";
 import AvatarImg from "@/components/AvatarImg.vue";
-import {deleteBlockedEntry, getBlockList} from "@/store/blockStore";
+import {deleteBlockedEntry, getBlockList, initBlocklist} from "@/store/blockStore";
 
 export default defineComponent({
   name: "Topbar",
@@ -147,13 +147,15 @@ export default defineComponent({
       isEditingStatus.value = false;
     };
 
-    const blockedUsers= ref([])
-    const blockedUsersLoading = ref(true)
+    const blockedUsers = computed(()=>{
+      return getBlockList()
+    })
     // @todo: config
-    getBlockList().then(blocklist => {
-      blockedUsers.value = blocklist;
-      blockedUsersLoading.value = false;
-    });
+
+    onBeforeMount(()=>{
+      initBlocklist()
+    })
+    
 
     const unblockUser = async (user) => {
       await deleteBlockedEntry(user);
@@ -176,7 +178,6 @@ export default defineComponent({
       setEditStatus,
       isEditingStatus,
       blockedUsers,
-      blockedUsersLoading,
       unblockUser,
     };
   },

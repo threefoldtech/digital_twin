@@ -38,6 +38,11 @@ export default defineComponent({
         enabled: true
       },
       {
+        name: "forum",
+        icon: "fas fa-stream",
+        enabled: false
+      },
+      {
         name: "meetings",
         icon: "fas fa-video",
       },
