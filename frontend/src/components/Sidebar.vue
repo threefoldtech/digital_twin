@@ -11,12 +11,14 @@
 "
       >
         <div class="h-20 w-20 rounded-full grid place-items-center mb-1" style="position: relative">
+          <button @click="changePage(app.name)">
           <i :class="`fas ${app.icon} text-2xl`"></i>
-          <h3>
-            {{ app.name }}
-          </h3>
+            <h3>
+              {{ app.name }}
+            </h3>
           <!--          <div class="bar" v-if="!app.enabled" style="width: 100%;height: 4px; background-color:#888; position:absolute; left:0;transform: rotate(-45deg)"></div>-->
 
+          </button>
         </div>
 
       </div>
@@ -40,7 +42,7 @@ export default defineComponent({
       {
         name: "forum",
         icon: "fas fa-stream",
-        enabled: false
+        enabled: true
       },
       {
         name: "meetings",
@@ -55,9 +57,14 @@ export default defineComponent({
 
     const currentRoute = computed(() => router.currentRoute.value);
 
+    const changePage = (page) => {
+      router.push(page)
+    }
+
     return {
       currentRoute,
       apps,
+      changePage
     };
   },
 });

@@ -145,6 +145,7 @@ import { startFetchStatusLoop } from "@/store/statusStore";
 import {statusList} from "@/store/statusStore";
 import ChatRequestList from "@/views/app/ChatRequestList.vue";
 import {uniqBy} from "lodash";
+import { ChatType } from "@/types";
 
 export default defineComponent({
   name: "Apps",
@@ -173,11 +174,11 @@ export default defineComponent({
     };
 
     const filteredChats = computed(() => {
+      const filteredChatstmp = chats.value.filter(chat => chat.type !== ChatType.FORUM)
       if (searchValue.value == "") {
-        return chats.value;
+        return filteredChatstmp;
       }
-      console.log("filtered", chats.value);
-      return chats.value.filter((c) =>
+      return filteredChatstmp.filter((c) =>
         c.name.toLowerCase().includes(searchValue.value.toLowerCase())
       );
     });

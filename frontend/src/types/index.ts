@@ -60,8 +60,16 @@ export interface Chat {
     name: string;
     isGroup:boolean
     adminId: Id;
+    type: ChatType;
 
 }
+
+export enum ChatType {
+    PERSON = "PERSON",
+    GROUP = "GROUP",
+    FORUM = "FORUM",
+}
+
 export interface PersonChat extends Chat{}
 
 export interface GroupChat extends Chat{}

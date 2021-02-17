@@ -5,7 +5,9 @@ import {
 } from 'vue-router';
 import Home from '@/views/Home.vue';
 import AppLayout from '@/layout/AppLayout.vue';
+import ForumLayout from '@/layout/ForumLayout.vue';
 import Chat from '@/views/app/Chat.vue';
+import Forum from '@/views/app/Forum.vue';
 import Callback from "@/views/Callback.vue";
 import Unauthorised from "@/views/Unauthorised.vue";
 
@@ -32,8 +34,32 @@ const routes: Array<RouteRecordRaw> = [
         children: [
             {
                 path: '',
-                name: 'Chat',
+                name: 'app',
                 component: Chat,
+            }
+        ]
+    },
+    {
+        path: '/chat',
+        name: 'chat',
+        component: AppLayout,
+        children: [
+            {
+                path: '',
+                name: 'chat',
+                component: Chat,
+            }
+        ]
+    },
+    {
+        path: '/forum',
+        name: 'forum',
+        component: ForumLayout,
+        children: [
+            {
+                path: '',
+                name: 'forum',
+                component: Forum,
             }
         ]
     },
