@@ -86,3 +86,18 @@ const test: Id = ""
 export interface Workspace extends GroupChat{
     subGroups: GroupChat[]
 }
+
+export enum MessageTypes {
+    STRING = "STRING",
+    SYSTEM = "SYSTEM",
+    GIF = "GIF",
+    MESSAGE = "MESSAGE",
+    FILE = "FILE",
+    FILE_UPLOAD = "FILE_UPLOAD",
+    EDIT = "EDIT",
+    READ = "READ",
+    CONTACT_REQUEST = "CONTACT_REQUEST",
+    DELETE = "DELETE",
+    GROUP_UPDATE = "GROUP_UPDATE",
+    QUOTE = "QUOTE",
+}
