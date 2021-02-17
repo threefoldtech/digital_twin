@@ -1,4 +1,4 @@
-import { ChatType } from './../types/index';
+import { ChatType, MessageBodyTypeInterface } from './../types/index';
 import {getBlocklist, getChatIds, persistChat} from './../service/dataService';
 import {Router} from 'express';
 import Message from "../models/message";
@@ -217,6 +217,25 @@ router.get("/:chatId", (req,res) => {
         res.json(chat)
     }catch(e){
         res.sendStatus(403)
+    }
+})
+
+router.get("/:chatId/:messageId", (req,res) => {
+    try{
+        const chat = getChat(req.params.chatId)
+        if (chat.adminId!== config.userid){
+            res.sendStatus(403)
+            return
+        }
+        const message = chat.messages.find(message => message.id == req.params.messageId)
+
+        if(message) {
+            res.json(message)
+            return
+        }
+        res.sendStatus(404)
+    }catch(e){
+        res.sendStatus(404)
     }
 })
 
