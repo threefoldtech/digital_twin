@@ -17,7 +17,7 @@ router.post('/drive', asyncHandler(async (req, res) => {
             return res.status(419).json('duplicated');
         }
         const key = await drive.create(body.name)
-        return res.json({"key": key})    
+        return res.json({"key": key})
     }catch(e){
         console.log(e)
         return res.status(400).json('wrong body payload');
@@ -31,18 +31,18 @@ router.post('/drive', asyncHandler(async (req, res) => {
 router.get('/drive/:id/*', asyncHandler(async (req, res) => {
     var driveObj = await drive.get(req.params.id)
     var filepath = req.url.replace(`/drive/${req.params.id}`, "").trim()
-   
+
     if (filepath === undefined){
         filepath = "/"
     }
 
     var entry = null
 
-    
+
 
     try {
         entry = await driveObj.promises.stat(filepath)
-        
+
     } catch (e) {
         return res.status(404).json('');
     }

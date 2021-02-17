@@ -102,7 +102,7 @@ router.delete('/entities/:id', function(req, res) {
 })
 
 router.put('/entities/:id', function(req, res) {
-    //
+    // TODO: update entity
 });
 
 
@@ -141,11 +141,15 @@ router.delete('/twins/:id', function(req, res) {
 })
 
 router.post('/twins/:id/entities', function(req, res) {
-
+    // tfclient.addTwinEntity(twinID, entityID, signature, callback)
+    // TODO: add twin entity (signature)
 })
 
-router.delete('/twins/:id/entities/:id', function(req, res) {
+router.delete('/twins/:tid/entities/:eid', function(req, res) {
+    tfclient.removeTwinEntity(parseInt(req.params.tid), parseInt(req.params.eid), (content) => {
+        events(content, req);
 
+    }).catch(err => { json_error(req, err) })
 })
 
 //
@@ -172,7 +176,7 @@ router.post('/farms', function(req, res) {
     let required = ['name', 'entity', 'twin', 'country', 'city', 'policy'];
 
     if((value = fields_validate(required, req.body)) !== true)
-        throw "Required field: " + value;
+        return json_error(res, "Required field: " + value);
 
     var name = req.body['name'];
     var entityid = req.body['entity'];
@@ -183,15 +187,16 @@ router.post('/farms', function(req, res) {
 
     certificationType = tfclient.api.createType('CertificationType', 0)
     const farm = {
-        id: 0,
         name: name,
-        entityID: entityid,
-        twinID: twinid,
+        entity_id: entityid,
+        twin_id: twinid,
         pricingPolicyID: policy,
         certificationType: certificationType,
-        countryID: country,
-        cityID: city
+        country_id: country,
+        city_id: city
     }
+
+    console.log(farm);
 
     tfclient.createFarm(farm, (content) => {
         events(content, res);
