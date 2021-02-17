@@ -17,6 +17,7 @@
               :chatId="selectedForum.chatId"
               isGroup=false
               isMine=false
+              @click="goToMessage(message.id)"
           />
     </main>
   </div>
@@ -48,6 +49,7 @@ import ChatRequestList from "@/views/app/ChatRequestList.vue";
 import { uniqBy } from "lodash";
 import { ChatType } from "@/types";
 import MessageCard from "@/components/MessageCard.vue";
+import {useRouter} from "vue-router";
 
 export default defineComponent({
   name: "Apps",
@@ -78,12 +80,23 @@ export default defineComponent({
     const selectedForum = computed(() =>{
       return chats.value.find(c => c.chatId == selectedForumId.value)
     })
+    const router = useRouter();
+    const goToMessage = (messageId) => {
+      router.push({
+        name:"forumPost",
+        query: {
+            chatId:<string>selectedForum.value.chatId,
+            messageId:messageId
+        },
+      })
+    }
 
     return {
       status,
       filteredForums,
       selectedForumId,
       selectedForum,
+      goToMessage,
       m,
     };
   },

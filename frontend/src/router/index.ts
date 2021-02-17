@@ -8,6 +8,7 @@ import AppLayout from '@/layout/AppLayout.vue';
 import ForumLayout from '@/layout/ForumLayout.vue';
 import Chat from '@/views/app/Chat.vue';
 import Forum from '@/views/app/Forum.vue';
+import ForumPost from '@/views/app/ForumPost.vue';
 import Callback from "@/views/Callback.vue";
 import Unauthorised from "@/views/Unauthorised.vue";
 
@@ -60,6 +61,18 @@ const routes: Array<RouteRecordRaw> = [
                 path: '',
                 name: 'forum',
                 component: Forum,
+            }
+        ]
+    },
+    {
+        path: '/forumPost',
+        name: 'forumPost',
+        component: ForumLayout,
+        children: [
+            {
+                path: '',
+                name: 'forumPost',
+                component: ForumPost,
             }
         ]
     },
