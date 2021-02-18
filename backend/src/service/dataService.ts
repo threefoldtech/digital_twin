@@ -83,8 +83,8 @@ export const saveFile = (chatId: IdInterface, fileName: string, fileBuffer: Buff
     return path
 }
 
-export const saveAvatar = (fileBuffer: Buffer) => {
-    const path = `${config.baseDir}user/avatar`
+export const saveAvatar = (fileBuffer: Buffer,id:string) => {
+    const path = `${config.baseDir}user/avatar-${id}`
     fs.writeFileSync(path, fileBuffer)
 }
 

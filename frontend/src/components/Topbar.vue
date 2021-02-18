@@ -103,7 +103,9 @@ import {useSocketActions} from "../store/socketStore";
 import Dialog from "./Dialog.vue";
 import AvatarImg from "@/components/AvatarImg.vue";
 import {deleteBlockedEntry, getBlockList, initBlocklist} from "@/store/blockStore";
-
+import {setNewavater} from "@/store/userStore"
+import {fetchStatus} from "@/store/statusStore"
+     
 export default defineComponent({
   name: "Topbar",
   components: { AvatarImg, jdialog: Dialog },
@@ -129,9 +131,8 @@ export default defineComponent({
     };
 
     const sendNewAvatar = async () => {
-      const { sendSocketAvatar } = useSocketActions();
-      const buffer = await file.value.arrayBuffer();
-      sendSocketAvatar(buffer).then(b => location.reload());
+      const newUrl = await setNewavater(file.value);
+      await fetchStatus(user.id)
       showDialog.value = false;
     };
 

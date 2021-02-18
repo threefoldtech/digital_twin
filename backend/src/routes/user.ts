@@ -1,6 +1,11 @@
+import { logger } from './../logger';
 import {Router} from 'express';
 import {user} from "../store/user"
 import {connections} from "../store/connections"
+import { UploadedFile } from 'express-fileupload';
+import { saveAvatar } from '../service/dataService';
+import { uuidv4 } from '../common';
+import { config } from '../config/config';
 
 const router = Router();
 
@@ -16,10 +21,24 @@ router.get('/getStatus', async(req, res) => {
     res.json(data);
 })
 
-router.get('/avatar', async(req, res) => {
-    const path = `/appdata/user/avatar`
-
+router.get('/avatar/:avatarId', async(req, res) => {
+    let path = `/appdata/user/avatar`
+    if(req.params.avatarId){
+        path += '-'+ req.params.avatarId
+    }
     res.download(path);
+})
+
+router.post('/avatar',async(req,resp)=>{
+    const fileToSave = <UploadedFile>req.files.file
+    const avatarId= uuidv4()
+    saveAvatar(fileToSave.data,avatarId)
+    let url = `https://${config.appId}/api/user/avatar/${avatarId}`
+    if(config.userid == "localhost:3000"){
+        url = `http://${config.userid}/api/user/avatar/${avatarId}`
+    }
+    user.updateAvatar(url)
+    resp.status(200).json(url)
 })
 
 export default router
