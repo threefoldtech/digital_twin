@@ -2,7 +2,11 @@
     "http" : {
         "host": "localhost",
         "port" : 3000,
-        "protocol": "http"
+        "httpsPort": 443
+    },
+
+    "dns":{
+        "port": 5352
     },
 
     "hyperdrive" : {
@@ -11,5 +15,8 @@
 
     "filesystem" : {
         "path" : "~/.publisher/publish/"
-    }
+    },
+
+    "development": true
+
 }

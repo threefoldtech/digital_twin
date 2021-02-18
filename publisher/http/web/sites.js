@@ -8,7 +8,7 @@ var drive = require('../../drive.js')
 
 async function iswiki(drive, alias){
     try {
-        await drive.promises.stat(`/info_${alias}`)
+        await drive.promises.stat(`/wiki_${alias}`)
         return true
     }catch(e){
        return false
@@ -59,7 +59,7 @@ async function handleWebsiteFile(req, res, driveObj){
 }
 
 async function handleWikiFile(req, res, driveObj){
-    var wikiname = `info_${req.params.sitename}`
+    var wikiname = `wiki_${req.params.sitename}`
     var encoding = 'utf-8'
     var filename = req.url.replace(`/${req.params.id}/${req.params.sitename}/`, "")
    
@@ -73,7 +73,7 @@ async function handleWikiFile(req, res, driveObj){
         }
 
         filename = splitted[2]
-        wikiname = `info_${splitted[1]}`
+        wikiname = `wiki_${splitted[1]}`
     }else if (filename.startsWith("html__")){
 		var splitted = filename.split("__")
 
@@ -82,7 +82,7 @@ async function handleWikiFile(req, res, driveObj){
         }
 
 		
-        wikiname =`info_${splitted[1]}`
+        wikiname =`wiki_${splitted[1]}`
         splitted.shift()
         splitted.shift()
         filename = splitted.join("__")
@@ -137,8 +137,8 @@ router.get('/:id', asyncHandler(async (req, res) => {
             if(file.startsWith("www")){
                 var alias = file.replace("www_", "")
                 sites.push({"name": alias, "url": `/${req.params.id}/${alias}`})
-            }else if(file.startsWith("info_")){
-                var alias = file.replace("info_", "")
+            }else if(file.startsWith("wiki_")){
+                var alias = file.replace("wiki_", "")
                 wikis.push({"name": alias, "url": `/${req.params.id}/${alias}`, "err" :`/${req.params.id}/wikis/${alias}/errors`})
             }
         })
@@ -158,7 +158,7 @@ router.get('/:id/:sitename', asyncHandler(async (req, res) => {
     var driveObj = await drive.get(req.params.id)
     
     if (await iswiki(driveObj, req.params.sitename)){
-        prefix = "info"
+        prefix = "wiki"
     }
     var filepath = `/${prefix}_${req.params.sitename}/index.html`
     var entry = null
@@ -206,7 +206,7 @@ router.get('/:id/wikis/:sitename/errors', asyncHandler(async (req, res) => {
     var driveObj = await drive.get(req.params.id)
     var wikiname = req.params.sitename
     
-    filepath = `info_${wikiname}/errors.json`
+    filepath = `wiki_${wikiname}/errors.json`
     var entry = null
     try {
         entry = await driveObj.promises.stat(filepath)
@@ -242,7 +242,7 @@ router.get('/:id/:sitename/*', asyncHandler(async (req, res) => {
     var driveObj = await drive.get(req.params.id)
     
     if (await iswiki(driveObj, req.params.sitename)){
-        prefix = "info"
+        prefix = "wiki"
     }
     if (prefix == "www"){
         return handleWebsiteFile(req, res, driveObj)
@@ -255,7 +255,7 @@ router.get('/:id/:sitename/*', asyncHandler(async (req, res) => {
 // wiki files only
 router.get('/:id/:sitename/img/:filename', asyncHandler(async (req, res) => {
     var driveObj = await drive.get(req.params.id)
-    var filepath = `/info_${req.params.sitename}/${req.params.filename}`
+    var filepath = `/wiki_${req.params.sitename}/${req.params.filename}`
     var encoding = 'binary'
 
     var entry = null
