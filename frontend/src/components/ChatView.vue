@@ -50,10 +50,10 @@
               v-on:scroll="scrollToBottom"
           />
           <div class="font-thin text-right align-middle" v-if="reads[message.id]">
-            <div class="inline-block justify-end" v-for="(value, key) in reads[message.id].slice(0,3)" :key="key">
+            <div class="inline-block justify-end align-bottom" v-for="(value, key) in reads[message.id].slice(0,3)" :key="key">
               <AvatarImg xsmall :id="value"></AvatarImg>
             </div>
-            <span v-if="reads[message.id].length > 3"> and {{ reads[message.id].length - 3 }} others </span>
+            <span v-if="reads[message.id].length > 3"> + {{ reads[message.id].length - 3 }} </span>
           </div>
 
         </template>
