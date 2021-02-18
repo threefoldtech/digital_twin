@@ -54,13 +54,14 @@
           </button>
         </div>
         <span v-if="message.type === 'FILE'">
-        <audio
-            controls
-            class="max-w-full"
-            v-if="message.body.filename.indexOf('.WebM') !== -1"
-            :src="fileUrl"
-            @load="$emit('scroll')"
-        ></audio>
+          <template v-if="fileUrl">
+            <audio
+                controls
+                class="max-w-full"
+                v-if="message.body.filename.indexOf('.WebM') !== -1"
+                :src="fileUrl"
+                @load="$emit('scroll')"
+            ></audio>
 
         <img
             v-if="isImage(message.body.filename)"
@@ -74,6 +75,11 @@
             download
         >{{ message.body.filename }}</a
         >
+          </template>
+          <template v-else>
+             loading ...
+          </template>
+
       </span>
         <div v-else-if="message.type === 'GIF'">
           <img :src="message.body" @load="$emit('scroll')"/>
@@ -171,7 +177,7 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, nextTick, ref, watch} from "vue";
+import {computed, defineComponent, nextTick, ref, watch} from "vue";
 import {useAuthState} from "../store/authStore";
 import moment from "moment";
 import {usechatsActions} from "../store/chatStore";
@@ -328,7 +334,14 @@ export default defineComponent({
         'localhost:3000'
     )
     const baseurl = calculateBaseUrl(fromId)
-    const fileUrl = props.message.body?.filename ? `${baseurl}/api/files/${props.message.to}/${props.message.body.filename}` : false
+    const fileUrl = computed( () => {
+      console.log(props.message.body.filename)
+      if (props.message.type !== 'FILE') {
+        return false
+      }
+
+      return `${baseurl}/api/files/${props.message.to}/${props.message.body.filename}`
+    })
 
     const {user} = useAuthState();
 

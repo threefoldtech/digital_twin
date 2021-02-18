@@ -29,7 +29,7 @@
     </div>
     <div class="flex-grow row-span-4 relative overflow-y-auto" ref="messageBox">
       <div class="absolute w-full px-4">
-        <template v-for="(message, i) in chat.messages" :key="i">
+        <template v-for="(message, i) in chat.messages" :key="`${message.id}-${message.type}-${message.timeStamp}`">
           <div
               v-if="showDivider(message, i)"
               class="text-center px-4"
