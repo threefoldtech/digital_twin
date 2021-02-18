@@ -7,6 +7,7 @@
       'justify-end': isMine,
       'my-1': !disabled,
     }"
+      ref="messagecard"
   >
     <AvatarImg small class="mr-2 self-center" v-if="!isMine && isGroup && !disabled" :id="message.from"></AvatarImg>
     <div
@@ -54,7 +55,7 @@
           </button>
         </div>
         <span v-if="message.type === 'FILE'">
-          <template v-if="fileUrl">
+          <template v-if="message.body.filename && fileUrl">
             <audio
                 controls
                 class="max-w-full"
@@ -186,6 +187,7 @@ import {uuidv4} from "@/common";
 import config from "../../public/config/config";
 import AvatarImg from "@/components/AvatarImg.vue";
 import {calculateBaseUrl} from "@/services/urlService";
+import {useIntersectionObserver} from "@/lib/intersectionObserver";
 
 export default defineComponent({
   name: "MessageCard",
@@ -223,6 +225,8 @@ export default defineComponent({
     }
   },
   setup(props) {
+    const messagecard = ref(null)
+
     const showActions = ref(false);
     const m = (val) => moment(val);
 
@@ -325,8 +329,21 @@ export default defineComponent({
       const {readMessage} = usechatsActions();
       readMessage(props.chatId, props.message.id);
     };
+
     if (!props.isreadbyme && !props.isReply && !props.disabled) {
-      read();
+      console.log(messagecard.value)
+      const { isIntersecting, unobserve} = useIntersectionObserver(messagecard);
+      watch(isIntersecting, (value =>  {
+        console.log('observing', value)
+        if (!value){
+          return
+        }
+
+        read()
+        unobserve();
+
+      }))
+
     }
 
     const fromId = props.message.from.replace(
@@ -375,6 +392,7 @@ export default defineComponent({
       replyMessageValue,
       sendReplyMessage,
       user,
+      messagecard,
       isImage
     };
   }

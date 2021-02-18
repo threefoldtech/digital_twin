@@ -159,6 +159,11 @@ export default defineComponent({
       return value;
     };
 
+    const viewAnchor = ref(null)
+    // const isIntersecting = ref(false)
+
+    const { isIntersecting, intersectionRatio} = useIntersectionObserver(viewAnchor);
+
     // @todo: fix so that properly scrools to bottom
     const scrollToBottom = (force = false) => {
       console.log('scroll')
@@ -235,9 +240,7 @@ export default defineComponent({
       return preReads
     })
 
-    const viewAnchor = ref(null)
 
-    const { isIntersecting, intersectionRatio} = useIntersectionObserver(viewAnchor);
 
 
     //@TODO fix this
