@@ -228,7 +228,7 @@ export default defineComponent({
       each(chat.value.read, (val: string, key: string) => {
         console.log(key, val);
         if (key === user.id) {
-          // return;
+          return;
         }
         preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key]
       });

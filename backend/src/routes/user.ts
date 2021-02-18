@@ -22,10 +22,10 @@ router.get('/getStatus', async(req, res) => {
 })
 
 router.get('/avatar/:avatarId', async(req, res) => {
-    let path = `/appdata/user/avatar`
-    if(req.params.avatarId){
-        path += '-'+ req.params.avatarId
+    if(!req.params.avatarId){
+        res.sendStatus(403)
     }
+    let path = `/appdata/user/avatar-${req.params.avatarId}`
     res.download(path);
 })
 
