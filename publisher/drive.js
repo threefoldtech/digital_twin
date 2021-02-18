@@ -35,11 +35,18 @@ class LocalDrive{
 async function getDomains(id, drive){
     var dirs = await drive.promises.readdir("/")
     dirs.sort()
+    
+
     var res = await dirs.map( async function(dir) {
-        var domains = {}
         var filepath = path.join("/", dir, ".domains.json")
+        var domains = {}
         try{
             await drive.promises.stat(filepath)
+        }catch(e){
+            console.log(chalk.red(`    ✓ (Drive (${id}) Ignoring path: /${dir} does not contain .domains.json`))
+            return []
+        }
+        try{
             var content = await  drive.promises.readFile(filepath, 'utf8');
             var data = JSON.parse(content)
             for (var i=0; i < data.domains.length; i++){
@@ -50,7 +57,7 @@ async function getDomains(id, drive){
             }
             return domains
         }catch(e){
-            console.log(e)
+            console.log(chalk.red(` ✓ (Drive (${id}) Error reading: ${filepath}`))
         }
     })
 
@@ -120,7 +127,10 @@ async function load(){
             }
         } 
     }
-    cache.domains = domain
+    
+    cache.domains = domains
+    cache.domains["127.0.0.1"] = {"drive": null, "dir": ""}
+    cache.domains["localhost"] = {"drive": null, "dir": ""}
 }
 
 
