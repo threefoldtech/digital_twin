@@ -1,12 +1,14 @@
 <template>
   <div class="flex flex-col justify-between items-center bg-green-400">
     <div class="w-3/4 bg-blue-500">
-      <h1>Forum post</h1>
+      <h1>Forum post {{message?.title}}</h1>
       <div class="overflow-x-auto">
       </div>
     </div>
     <main class=" w-3/4 bg-yellow-600" v-if="message">
-      {{message}}
+      {{ message }}
+      {{ message }}
+      <h1></h1>
     </main>
   </div>
 </template>
@@ -15,7 +17,7 @@
 import axios from "axios";
 import moment from "moment";
 import config from "../../../public/config/config";
-import { defineComponent, onBeforeMount, ref} from "vue";
+import {defineComponent, onBeforeMount, ref} from "vue";
 
 
 export default defineComponent({
