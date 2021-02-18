@@ -131,14 +131,16 @@
                      :chat-id="chatId" isReply/>
       </div>
 
-      <div class="text-actions bg-gray-200 p-2 rounded-b-lg" v-if="quoteMessage || editMessage || replyMessage">
-        <button @click="quoteMessage, editMessage, replyMessage = false">
+      <div class="text-actions bg-gray-200 p-2 rounded-b-lg" v-if="quoteMessage || editMessage || replyMessage"
+      >
+        <button @click="quoteMessage = false ; editMessage = false; replyMessage = false">
           <i class="fas fa-times"></i>
 
         </button>
         <template v-if="quoteMessage">
           <form @submit.prevent="sendQuoteMessage(false)" class="flex">
-            <input class="col-span-6" type="text" v-model="quoteMessageValue" v-focus/>
+            <input class="col-span-6" type="text" v-model="quoteMessageValue" v-focus
+                   @keydown.esc="quoteMessage = false ; editMessage = false; replyMessage = false"/>
             <button class="px-2 py-4" @click="sendQuoteMessage(false)">
               <i class="fas fa-paper-plane"></i>
             </button>
@@ -147,7 +149,8 @@
         <template v-if="editMessage">
           <form @submit.prevent="sendUpdateMessage(false)" class="flex">
 
-            <input class="col-span-6" type="text" v-model="editMessageValue" v-focus/>
+            <input class="col-span-6" type="text" v-model="editMessageValue" v-focus
+                   @keydown.esc="quoteMessage = false ; editMessage = false; replyMessage = false"/>
             <button class="px-2 py-4" @click="sendUpdateMessage(false)">
               <i class="fas fa-paper-plane"></i>
             </button>
@@ -155,7 +158,8 @@
         </template>
         <template v-if="replyMessage">
           <form @submit.prevent="sendReplyMessage" class="flex">
-            <input class="col-span-6" type="text" v-model="replyMessageValue" v-focus/>
+            <input class="col-span-6" type="text" v-model="replyMessageValue" v-focus
+                   @keydown.esc="quoteMessage = false ; editMessage = false; replyMessage = false"/>
             <button class="px-2 py-4" @click="sendReplyMessage">
               <i class="fas fa-paper-plane"></i>
             </button>
