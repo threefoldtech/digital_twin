@@ -12,7 +12,7 @@
     "mustache-express": "^1.3.0",
     "pump": "^3.0.0",
     "sodium-native": "^3.2.1",
-    "tfgrid-api-client": "^0.0.1-beta.19"
+    "tfgrid-api-client": "^0.0.1-beta.21"
   },
   "pkg": {
     "assets": [

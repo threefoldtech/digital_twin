@@ -16,18 +16,47 @@ function client_get(url, mnemonic) {
 const tfclient = client_get(url, bot_mnemo);
 const tfowner = client_get(url, owner_mnemo);
 
-var express = require('express');
-var router = express.Router();
-var path = require('path');
-var app = express();
-var clusters = require('./clusters.js');
+const express = require('express');
+const router = express.Router();
+const path = require('path');
+const app = express();
+const clusters = require('./clusters.js');
 
-function events(content, res) {
+const tferrors = {
+    1: 'StorageOverflow',
+    2: 'CannotCreateNode',
+    3: 'NodeNotExists',
+    4: 'NodeWithPubkeyExists',
+    5: 'CannotDeleteNode',
+    6: 'FarmExists',
+    7: 'FarmNotExists',
+    8: 'CannotCreateFarmWrongTwin',
+    9: 'CannotDeleteFarm',
+    10: 'CannotDeleteFarmWrongTwin',
+    11: 'EntityWithNameExists',
+    12: 'EntityWithPubkeyExists',
+    13: 'EntityNotExists',
+    14: 'EntitySignatureDoesNotMatch',
+    15: 'EntityWithSignatureAlreadyExists',
+    16: 'CannotUpdateEntity',
+    17: 'CannotDeleteEntity',
+    18: 'TwinExists',
+    19: 'TwinNotExists',
+    20: 'CannotCreateTwin',
+    21: 'UnauthorizedToUpdateTwin',
+    22: 'PricingPolicyExists',
+    23: 'CertificationCodeExists',
+    24: 'OffchainSignedTxError',
+    25: 'NoLocalAcctForSigning'
+}
+
+function events(content, res, okcode) {
     if(content instanceof Error)
         return json_error(res, content);
 
     const { events = [], status } = content
     console.log(`Current status is ${status.type}`)
+    let code = okcode;
 
     var result = null;
 
@@ -36,13 +65,48 @@ function events(content, res) {
 
         // Loop through Vec<EventRecord> to display all events
         events.forEach(({ phase, event: { data, method, section } }) => {
-            // res.json(content);
-            console.log(`\t' ${phase}: ${section}.${method}:: ${data}`)
-            if(result == null)
-                result = `${section}.${method} -> ${data}`;
+            console.log(`>> ${phase}: ${section}.${method}:: ${data}`);
+
+            console.log(data);
+
+            // skip if result is already set
+            if(result != null)
+                return;
+
+            // error
+            if(section == "system" && method == "ExtrinsicFailed") {
+                code = 422; // Error code
+
+                let module = data[0].asModule;
+
+                let errid = module['error']['words'][0];
+                let errmsg = "unknown";
+
+                if(errid in tferrors)
+                    errmsg = tferrors[errid];
+
+                // node already exists, not an error
+                if(errmsg == "NodeWithPubkeyExists")
+                    code = 304; // Not Modified
+
+                result = {
+                    success: false,
+                    error: errmsg,
+                    errno: errid,
+                };
+            }
+
+            // success
+            if(section == "tfgridModule") {
+                result = {
+                    success: true,
+                    message: method,
+                    id: data[0]['words'][0],
+                };
+            }
         })
 
-        res.status(422).json({ message: result });
+        res.status(code).json(result);
     }
 }
 
@@ -75,7 +139,7 @@ router.post('/entities', function(req, res) {
     let city = req.body['city'];
 
     tfclient.createEntity(name, country, city, (content) => {
-        events(content, res);
+        events(content, res, 201);
 
     }).catch(err => { json_error(res, err) })
 })
@@ -98,7 +162,7 @@ router.get('/entities/:id', function(req, res) {
 
 router.delete('/entities', function(req, res) {
     tfclient.deleteEntity((content) => {
-        events(content, res);
+        events(content, res, 200);
 
     }).catch(err => { json_error(res, err) })
 })
@@ -114,7 +178,7 @@ router.put('/entities/:id', function(req, res) {
 
 router.post('/twins', function(req, res) {
     tfclient.createTwin(bot_ipv6, (content) => {
-        events(content, res);
+        events(content, res, 201);
 
     }).catch(err => { json_error(res, err) })
 })
@@ -137,7 +201,7 @@ router.get('/twins/:id', function(req, res) {
 
 router.delete('/twins/:id', function(req, res) {
     tfclient.deleteTwin(parseInt(req.params.id), (content) => {
-        events(content, res);
+        events(content, res, 200);
 
     }).catch(err => { json_error(req, err) })
 })
@@ -152,14 +216,14 @@ router.post('/twins/:id/entities', function(req, res) {
     let entity = parseInt(req.body['entity']);
 
     tfclient.addTwinEntity(parseInt(req.params.id), entity, signature, (content) => {
-        events(content, res);
+        events(content, res, 201);
 
     }).catch(err => { json_error(req, err) })
 })
 
 router.delete('/twins/:tid/entities/:eid', function(req, res) {
     tfclient.removeTwinEntity(parseInt(req.params.tid), parseInt(req.params.eid), (content) => {
-        events(content, res);
+        events(content, res, 200);
 
     }).catch(err => { json_error(req, err) })
 })
@@ -211,14 +275,14 @@ router.post('/farms', function(req, res) {
     console.log(farm);
 
     tfclient.createFarm(farm, (content) => {
-        events(content, res);
+        events(content, res, 201);
 
     }).catch(err => { json_error(res, err) })
 })
 
 router.delete('/farms/:id', function(req, res) {
     tfclient.deleteFarm(parseInt(req.params.id), (content) => {
-        events(content, res);
+        events(content, res, 200);
 
     }).catch(err => { json_error(res, err) })
 })
@@ -284,8 +348,8 @@ router.post('/nodes', function(req, res) {
     let resources = tfclient.api.createType('Resources', req.body['capacity'])
 
     let location = tfclient.api.createType('Location', {
-        latitude: String(req.body['location']['latitude']),
-        longitude: String(req.body['location']['longitude']),
+        latitude: req.body['location']['latitude'].toString(),
+        longitude: req.body['location']['longitude'].toString(),
     })
 
     let node = {
@@ -299,14 +363,14 @@ router.post('/nodes', function(req, res) {
     }
 
     tfclient.createNode(node, (content) => {
-        events(content, res);
+        events(content, res, 201);
 
     }).catch(err => { json_error(res, err) })
 })
 
 router.delete('/nodes/:id', function(req, res) {
     tfclient.deleteNode(parseInt(req.params.id), (content) => {
-        events(content, res);
+        events(content, res, 200);
 
     }).catch(err => { json_error(res, err) })
 })
@@ -333,8 +397,25 @@ router.get('/account/balance', function(req, res) {
 })
 
 //
-// signing debug
+// owner signing debug
 //
+
+router.post('/debug/entities', function(req, res) {
+    let required = ['name', 'country', 'city'];
+
+    if((value = fields_validate(required, req.body)) !== true)
+        return json_error(res, "Required field: " + value);
+
+    let name = req.body['name']
+    let country = req.body['country'];
+    let city = req.body['city'];
+
+    tfowner.createEntity(name, country, city, (content) => {
+        events(content, res, 201);
+
+    }).catch(err => { json_error(res, err) })
+})
+
 
 router.post('/debug/sign', function(req, res) {
     let required = ['entity', 'twin'];
@@ -361,7 +442,22 @@ router.post('/debug/sign', function(req, res) {
 router.get('/clusters', function(req, res) {
     clusters.list(clusters.rootpath).then((content) => {
         res.json(content);
+    }, (err) => {
+        res.status(422).json({ message: `${err}` });
+    })
+})
 
+router.post('/clusters', function(req, res) {
+    let required = ['name', 'secret', 'ipv4', 'ipv6']
+
+    if((value = fields_validate(required, req.body)) !== true)
+        return json_error(res, "Required field: " + value);
+
+    let fullpath = path.join(clusters.rootpath, "X" + ".json"); // FIXME
+    const apath = path.resolve(fullpath);
+
+    clusters.put(apath, req.body).then((content) => {
+        res.json(content);
     }, (err) => {
         res.status(422).json({ message: `${err}` });
     })
@@ -373,7 +469,6 @@ router.get('/clusters/:id', function(req, res) {
 
     clusters.get(apath).then((content) => {
         res.json(content);
-
     }, (err) => {
         res.status(422).json({ message: `${err}` });
     })
@@ -385,7 +480,6 @@ router.delete('/clusters/:id', function(req, res) {
 
     clusters.remove(apath).then((content) => {
         res.json(content);
-
     }, (err) => {
         res.status(422).json({ message: `${err}` });
     })
@@ -397,7 +491,6 @@ router.put('/clusters/:id', function(req, res) {
 
     clusters.put(apath, req.body).then((content) => {
         res.json(content);
-
     }, (err) => {
         res.status(422).json({ message: `${err}` });
     })
