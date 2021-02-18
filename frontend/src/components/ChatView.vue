@@ -49,9 +49,9 @@
               :isMine="message.from === user.id"
               v-on:scroll="scrollToBottom"
           />
-          <div class="font-thin text-right" v-if="reads[message.id]">
-            <div class="flex justify-end" v-for="(value, key) in reads[message.id].slice(0,3)" :key="key">
-              <AvatarImg xsmall :id="reads[message.id][0]"></AvatarImg>
+          <div class="font-thin text-right align-middle" v-if="reads[message.id]">
+            <div class="inline-block justify-end" v-for="(value, key) in reads[message.id].slice(0,3)" :key="key">
+              <AvatarImg xsmall :id="value"></AvatarImg>
             </div>
             <span v-if="reads[message.id].length > 3"> and {{ reads[message.id].length - 3 }} others </span>
           </div>
@@ -228,7 +228,7 @@ export default defineComponent({
       each(chat.value.read, (val: string, key: string) => {
         console.log(key, val);
         if (key === user.id) {
-          return;
+          // return;
         }
         preReads[val] = preReads[val] ? [key, ...preReads[val]] : [key]
       });
