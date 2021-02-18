@@ -13,13 +13,6 @@ export const fetchStatus = async digitalTwinId => {
   const response = await axios.get(url);
   let status = response.data;
   statusList[digitalTwinId] = status;
-  const {user} = useAuthState()
-
-  if (user.id === digitalTwinId){
-    user.status = status.status
-    user.image = status.avatar ? status.avatar : user.image
-  }
-
   return status;
 };
 

@@ -4,15 +4,11 @@ import { User } from "../types";
 const authState = reactive<AuthState>({
   user: {
     id: window.location.host.split(".")[0].replace('localhost:8080','localhost:3000'),
-    image: `${window.location.origin}/api/user/avatar`,
+    image: `${window.location.origin}/api/user/avatar/default`,
     email: "testemail",
     status: ""
   }
 });
-
-const updateUserInfo = (image:string)=>{
-    authState.user.image = image
-}
 
 export const useAuthState = () => {
   return {
@@ -22,7 +18,6 @@ export const useAuthState = () => {
 
 export const useAuthActions = () => {
   return {
-    updateUserInfo
   };
 };
 
