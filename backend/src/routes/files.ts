@@ -39,6 +39,7 @@ router.post('/:chatid/:messageid',async(req,resp)=>{
     sendMessageToApi(chat.adminId,message)
     chat.addMessage(message)
     persistChat(chat)
+    resp.sendStatus(200)
 })
 
 export default router
