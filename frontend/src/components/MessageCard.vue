@@ -17,7 +17,7 @@
         'bg-gray-200': message.type === 'SYSTEM',
         'bg-blue-200': !disabled && isMine && message.type !== 'SYSTEM',
       }"
-        style="min-width: 5rem; max-width: 60%"
+        style="min-width: 6rem; max-width: 60%"
     >
       <div :class="{
         'p-2': !disabled,
@@ -47,7 +47,7 @@
           </button>
           <button
               class="mx-0"
-              v-if="isMine && message.type !== 'DELETE' && !disabled && !message.type ==='SYSTEM'"
+              v-if="isMine && message.type !== 'DELETE' && !disabled && message.type !=='SYSTEM'"
               @click="sendUpdateMessage(true)"
           >
             <i class="fas fa-trash"></i>
@@ -138,7 +138,7 @@
         </button>
         <template v-if="quoteMessage">
           <form @submit.prevent="sendQuoteMessage(false)" class="flex">
-            <input class="col-span-6" type="text" v-model="quoteMessageValue"/>
+            <input class="col-span-6" type="text" v-model="quoteMessageValue" v-focus/>
             <button class="px-2 py-4" @click="sendQuoteMessage(false)">
               <i class="fas fa-paper-plane"></i>
             </button>
@@ -147,7 +147,7 @@
         <template v-if="editMessage">
           <form @submit.prevent="sendUpdateMessage(false)" class="flex">
 
-            <input class="col-span-6" type="text" v-model="editMessageValue"/>
+            <input class="col-span-6" type="text" v-model="editMessageValue" v-focus/>
             <button class="px-2 py-4" @click="sendUpdateMessage(false)">
               <i class="fas fa-paper-plane"></i>
             </button>
@@ -155,7 +155,7 @@
         </template>
         <template v-if="replyMessage">
           <form @submit.prevent="sendReplyMessage" class="flex">
-            <input class="col-span-6" type="text" v-model="replyMessageValue"/>
+            <input class="col-span-6" type="text" v-model="replyMessageValue" v-focus/>
             <button class="px-2 py-4" @click="sendReplyMessage">
               <i class="fas fa-paper-plane"></i>
             </button>

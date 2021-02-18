@@ -36,6 +36,7 @@
             class="h-full"
             type="text"
             v-model="message"
+            v-focus
         />
 
       </form>
