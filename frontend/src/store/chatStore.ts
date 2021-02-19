@@ -255,7 +255,7 @@ const setLastMessage = (chatId: string, message: Message<String>) => {
   const chat = state.chats.find(c => c.chatId == chatId);
   if (!chat) return;
 
-  // sortChats()
+  sortChats()
 };
 
 const sortChats = () => {
