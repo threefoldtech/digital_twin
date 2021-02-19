@@ -70,18 +70,6 @@ async function remove(cpath) {
 async function put(cpath, body) {
     console.log(body);
 
-    if(!('name' in body))
-        throw "missing name";
-
-    if(!('psk' in body))
-        throw "missing pre-shared key (psk)";
-
-    if(!('ipv4' in body))
-        throw "missing ipv4 addresses list";
-
-    if(!('ipv6' in body))
-        throw "missing ipv6 addresses list";
-
     try {
         let write = await fs.writeFile(cpath, JSON.stringify(body));
 

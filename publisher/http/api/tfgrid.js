@@ -453,11 +453,15 @@ router.post('/clusters', function(req, res) {
     if((value = fields_validate(required, req.body)) !== true)
         return json_error(res, "Required field: " + value);
 
-    let fullpath = path.join(clusters.rootpath, "X" + ".json"); // FIXME
+    let filename = req.body['name']; // req.body['name'].replace(/^.*[\\\/]/, '');
+    if(!filename.match(/^[0-9a-zA-Z\._-]*$/))
+        return json_error(res, "Invalid cluster name: only alpha, number, period, underscore and dash allowed");
+
+    let fullpath = path.join(clusters.rootpath, filename + ".json");
     const apath = path.resolve(fullpath);
 
     clusters.put(apath, req.body).then((content) => {
-        res.json(content);
+        res.status(201).json(content);
     }, (err) => {
         res.status(422).json({ message: `${err}` });
     })
