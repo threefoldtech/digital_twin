@@ -238,6 +238,7 @@ router.get('/:id/wikis/:sitename/errors', asyncHandler(async (req, res) => {
     }
 }))
 
+/*
 // files
 router.get('/:id/:sitename/*', asyncHandler(async (req, res) => {
     var driveObj = await drive.get(req.params.id)
@@ -272,7 +273,7 @@ router.get('/:id/:sitename/img/:filename', asyncHandler(async (req, res) => {
         return res.status(404).json('');
     }
 }))
-
+*/
 
 
 

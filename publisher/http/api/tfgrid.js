@@ -407,6 +407,14 @@ router.post('/debug/entities', function(req, res) {
 })
 
 
+router.get('/debug/cluster/:name', function(req, res) {
+    clusters.findByName(clusters.rootpath, req.params.name).then((content) => {
+        console.log(content);
+        res.json(content);
+    });
+})
+
+
 router.post('/debug/sign', function(req, res) {
     let required = ['entity', 'twin'];
 

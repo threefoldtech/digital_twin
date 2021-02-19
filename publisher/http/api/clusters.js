@@ -80,5 +80,17 @@ async function put(cpath, body) {
     return {"status": "created"};
 }
 
+async function findByName(cpath, name) {
+    let values = await list(cpath);
 
-module.exports = {rootpath, list, get, remove, put}
+    for(var i in values) {
+        const cluster = values[i];
+
+        if(cluster['name'] == name)
+            return cluster;
+    }
+
+    return null;
+}
+
+module.exports = {rootpath, list, get, remove, put, findByName}
