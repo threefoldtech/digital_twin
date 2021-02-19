@@ -178,6 +178,7 @@ const addMessage = (chatId, message) => {
     return;
   }
   chat.messages.push(message);
+  sortChats()
   console.log("before setLastmessage");
   setLastMessage(chatId, message);
 };
