@@ -147,17 +147,15 @@ router.post('/entities', function(req, res) {
 router.get('/entities', function(req, res) {
     tfclient.listEntities().then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.get('/entities/:id', function(req, res) {
     tfclient.getEntityByID(req.params.id).then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.delete('/entities', function(req, res) {
@@ -186,17 +184,15 @@ router.post('/twins', function(req, res) {
 router.get('/twins', function(req, res) {
     tfclient.listTwins().then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.get('/twins/:id', function(req, res) {
     tfclient.getTwinByID(req.params.id).then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.delete('/twins/:id', function(req, res) {
@@ -235,17 +231,15 @@ router.delete('/twins/:tid/entities/:eid', function(req, res) {
 router.get('/farms', function(req, res) {
     tfclient.listFarms().then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.get('/farms/:id', function(req, res) {
     tfclient.getFarmByID(req.params.id).then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.post('/farms', function(req, res) {
@@ -296,17 +290,15 @@ router.delete('/farms/:id', function(req, res) {
 router.get('/nodes', function(req, res) {
     tfclient.listNodes().then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.get('/nodes/:id', function(req, res) {
     tfclient.getNodeByID(req.params.id).then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.post('/nodes', function(req, res) {
@@ -382,18 +374,16 @@ router.delete('/nodes/:id', function(req, res) {
 router.get('/account/price', function(req, res) {
     tfclient.getPrice().then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 
 router.get('/account/balance', function(req, res) {
     tfclient.getBalance().then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 //
@@ -429,9 +419,7 @@ router.post('/debug/sign', function(req, res) {
     tfowner.sign(entity, twin).then((content) => {
         res.json(content);
 
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+    }, (err) => { json_error(res, err.message); })
 })
 
 
@@ -442,9 +430,8 @@ router.post('/debug/sign', function(req, res) {
 router.get('/clusters', function(req, res) {
     clusters.list(clusters.rootpath).then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.post('/clusters', function(req, res) {
@@ -453,7 +440,7 @@ router.post('/clusters', function(req, res) {
     if((value = fields_validate(required, req.body)) !== true)
         return json_error(res, "Required field: " + value);
 
-    let filename = req.body['name']; // req.body['name'].replace(/^.*[\\\/]/, '');
+    let filename = req.body['name'];
     if(!filename.match(/^[0-9a-zA-Z\._-]*$/))
         return json_error(res, "Invalid cluster name: only alpha, number, period, underscore and dash allowed");
 
@@ -462,9 +449,8 @@ router.post('/clusters', function(req, res) {
 
     clusters.put(apath, req.body).then((content) => {
         res.status(201).json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.get('/clusters/:id', function(req, res) {
@@ -473,9 +459,8 @@ router.get('/clusters/:id', function(req, res) {
 
     clusters.get(apath).then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.delete('/clusters/:id', function(req, res) {
@@ -484,9 +469,8 @@ router.delete('/clusters/:id', function(req, res) {
 
     clusters.remove(apath).then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 router.put('/clusters/:id', function(req, res) {
@@ -495,9 +479,8 @@ router.put('/clusters/:id', function(req, res) {
 
     clusters.put(apath, req.body).then((content) => {
         res.json(content);
-    }, (err) => {
-        res.status(422).json({ message: `${err}` });
-    })
+
+    }, (err) => { json_error(res, err.message); })
 })
 
 
