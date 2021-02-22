@@ -29,7 +29,8 @@
           @click="handleClick(item)"
           class="px-3 py-2 cursor-pointer hover:bg-gray-200 capitalize"
         >
-          {{ item }}
+          <b>{{ item.id }}</b> <br>
+          <span class="truncate">{{item.location}}</span>
         </li>
         <li v-if="!searchResults().length" class="px-3 py-2 text-center">
           No Matching Results
@@ -40,6 +41,7 @@
 </template>
 
 <script lang="ts">
+import { Contact } from "@/types";
 import {defineComponent, ref, computed} from "vue";
 
 export default defineComponent({
@@ -87,10 +89,11 @@ export default defineComponent({
 
     const handleClick = (item) => {
       console.log(chosenOption.value)
-      chosenOption.value = item;
-      searchTerm.value = item;
-      emit("update:modelValue", item);
+      chosenOption.value = item.id;
+      searchTerm.value = item.id;
+      emit("update:modelValue", item.id);
       showOptions.value = false;
+      emit("clicked")
     };
 
     const clickedOutside = () => {
@@ -101,8 +104,8 @@ export default defineComponent({
       }
     };
     const searchResults = () => {
-      return props.data.filter((item:string) => {
-        return item.toLowerCase().includes(searchTerm.value.toLowerCase());
+      return props.data.filter((item:Contact) => {
+        return item.id.toLowerCase().includes(searchTerm.value.toLowerCase());
       });
     };
 

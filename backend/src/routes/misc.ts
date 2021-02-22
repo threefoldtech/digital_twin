@@ -24,4 +24,8 @@ router.get('/test', async (req, res) => {
     res.json({success: true})
 })
 
+router.get('/yggdrasil_address', async (req,res)=> {
+    res.json(config.myLocation)
+})
+
 export default router

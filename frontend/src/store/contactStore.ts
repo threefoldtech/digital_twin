@@ -57,6 +57,7 @@ const calculateContacts = () => {
     const { chats }  = usechatsState()
     const { user } = useAuthState()
     const contacts = chats.value.filter(chat => !chat.isGroup && chat.acceptedChat).map(chat => chat.contacts.find(contact => contact.id !== user.id))
+    console.log(contacts)
     return contacts
 }
 

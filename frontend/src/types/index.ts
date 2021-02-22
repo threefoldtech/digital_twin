@@ -1,4 +1,4 @@
-export interface User extends AnonymousContact {
+export interface User extends Contact {
     image: string,
     email: string,
     status: string

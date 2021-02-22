@@ -6,7 +6,9 @@ const authState = reactive<AuthState>({
     id: window.location.host.split(".")[0].replace('localhost:8080','localhost:3000'),
     image: `${window.location.origin}/api/user/avatar/default`,
     email: "testemail",
-    status: ""
+    status: "",
+    // @TODO implement this
+    location: "@TODO implement this"
   }
 });
 

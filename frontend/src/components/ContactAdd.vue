@@ -27,13 +27,14 @@
           v-model="usernameAdd"
           placeholder="Search for user..."
           :error="usernameAddError"
+          @clicked="handleClicked"
         ></auto-complete>
       </div>
       <div class="flex place-items-center">
         <label class="mr-2" for="location">Location:</label>
         <input
           id="location"
-          disabled="true"
+          v-model="userAddLocation"
           class="mb-2"
           :placeholder="location"
         />
@@ -81,22 +82,22 @@
             <div class="col-span-2 place-items-center grid">
               <button
                 class="h-12 rounded-full"
-                @click="removeUserFromGroup(contact.id)"
-                v-if="userIsInGroup(contact.id)"
+                @click="removeUserFromGroup(contact)"
+                v-if="userIsInGroup(contact)"
               >
                 <i class="fas fa-times"></i>
               </button>
               <button
                 class="h-12 rounded-full"
-                @click="usersInGroup.push(contact.id)"
-                v-if="!userIsInGroup(contact.id)"
+                @click="usersInGroup.push(contact)"
+                v-if="!userIsInGroup(contact)"
               >
                 <i class="fas fa-plus"></i>
               </button>
             </div>
           </div>
         </div>
-      </div>
+      </div>{{usersInGroup}}
       <div class="flex mt-4 justify-end w-full">
         <button @click="$emit('closeDialog')">Cancel</button>
         <button>Add Group</button>
@@ -107,7 +108,7 @@
 
 <script lang="ts">
 import { selectedId, usechatsActions, usechatsState } from "@/store/chatStore";
-import { defineComponent, ref, computed, nextTick } from "vue";
+import { defineComponent, ref, computed, nextTick, watch } from "vue";
 import { useContactsActions, useContactsState } from "../store/contactStore";
 import { useAuthState } from "../store/authStore";
 import { Chat, Contact, Message } from "../types/index";
@@ -124,18 +125,19 @@ export default defineComponent({
     const { contacts } = useContactsState();
     let addGroup = ref(false);
     let usernameAdd = ref("");
+    let userAddLocation = ref("")
     let usernameAddError = ref("");
     let groupnameAdd = ref("");
     let groupnameAddError = ref("");
     let usernameInGroupAdd = ref("");
-    let usersInGroup = ref([]);
-    let possibleUsers = ref<string[]>([]);
+    let usersInGroup = ref<Contact[]>([]);
+    let possibleUsers = ref<Contact[]>([]);
     let contactAddError = ref("");
 
     const contactAdd = () => {
       try {
         let userId = usernameAdd.value;
-        if (!possibleUsers.value.find((pu) => pu === userId)) {
+        if (!possibleUsers.value.find((pu) => pu.id === userId)) {
           usernameAddError.value = "Not able to find DigitalTwin of this user";
           return;
         }
@@ -149,7 +151,7 @@ export default defineComponent({
           return;
         }
        const {addContact} = useContactsActions()
-        addContact(userId, location.value)
+        addContact(userId, userAddLocation.value)
         console.log(userId);
         usernameAdd.value = "";
         contactAddError.value = "";
@@ -166,9 +168,12 @@ export default defineComponent({
       }
     };
 
-    const location = computed(() => {
-      return `${usernameAdd.value}-chat`;
-    });
+    const handleClicked = () => {
+      const posUser = possibleUsers.value.find(pu=> pu.id == usernameAdd.value)
+      if(posUser){
+        userAddLocation.value = posUser.location
+      }
+    }
 
     let activeItem = ref("user");
     const isActive = (menuItem) => {
@@ -193,16 +198,9 @@ export default defineComponent({
         groupnameAddError.value = "The name can't contain more than 20 characters"
         return;
       }
-      usersInGroup.value.push(user.id);
-      const contacts: Contact[] = usersInGroup.value.map((id) => {
-        const contact: Contact = {
-          id,
-          location: `${id}-chat`,
-        };
-        return contact;
-      });
+      usersInGroup.value.push({id:user.id,location:user.location});
 
-      addGroupchat(groupnameAdd.value, contacts);
+      addGroupchat(groupnameAdd.value, usersInGroup.value);
       //@todo: setTimeout is dirty should be removed
       // next tick was not possible reason: chat was not loaded yet
       setTimeout(() => {
@@ -212,25 +210,24 @@ export default defineComponent({
       emit("closeDialog");
     };
 
-    const userIsInGroup = (username) => {
-      const user = usersInGroup.value.find((uname) => uname == username);
+    const userIsInGroup = (contact:Contact) => {
+      const user = usersInGroup.value.find((c) => c.id == contact.id);
       if (user) {
         return true;
       }
       return false;
     };
 
-    const removeUserFromGroup = (username) => {
-      console.log("inremoveuserfromgroup");
-      const index = usersInGroup.value.findIndex((u) => u == username);
-      console.log(index);
+    const removeUserFromGroup = (contact:Contact) => {
+      const index = usersInGroup.value.findIndex((u) => u.id == contact.id);
       usersInGroup.value.splice(index, 1);
     };
 
     // @todo: config
     axios.get(`${config.spawnerUrl}api/v1/list`, {}).then((r) => {
       const { user } = useAuthState();
-      possibleUsers.value = r.data.filter((pu) => pu !== user.id);
+      const posContacts = <Contact[]>r.data
+      possibleUsers.value = posContacts.filter((pu) => pu.id !== user.id);
     });
 
 
@@ -241,7 +238,7 @@ export default defineComponent({
       groupnameAdd,
       groupnameAddError,
       usernameInGroupAdd,
-      location,
+      userAddLocation,
       contactAdd,
       usersInGroup,
       isActive,
@@ -251,6 +248,7 @@ export default defineComponent({
       userIsInGroup,
       removeUserFromGroup,
       possibleUsers,
+      handleClicked
     };
   },
 });
