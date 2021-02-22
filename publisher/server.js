@@ -5,7 +5,7 @@ const config = require('./config')
 const app = require('./http/app.js')
 const process = require('process');
 const dnsserver = require("./servers/dns")
-const cahce = require("./cache")
+const letsencrypt = require('./letsencrypt')
 
 async function init(){
     const drive = require('./drive.js');
@@ -27,7 +27,13 @@ async function main(){
 
     // DNS
 
-    dnsserver.listen(dnsport);
+    if (config.development){
+      dnsserver.listen(dnsport);
+      
+    }else{
+      dnsserver.listen(53);
+    }
+
     console.log(chalk.green(`✓ (DNS Server) : ${dnsport}`));
     
     // HTTP(s) Server
@@ -46,6 +52,10 @@ async function main(){
         console.log(chalk.green(`✓ (HTTP Server) : http://${host}:${port}`));
       })
     }else{
+      
+      // write new config
+      letsencrypt.process()
+
       require('greenlock-express').init({
         packageRoot: __dirname,
         // contact for security and critical bug notices

@@ -14,13 +14,5 @@
     "serverKeyType": "RSA-2048",
     "subscriberEmail": "hamdy.a.farag@gmail.com"
   },
-  "sites": [
-    {
-      "subject": "hamdy.threefold.io",
-      "altnames": [
-        "hamdy.threefold.io"
-      ],
-      "renewAt": 1
-    }
-  ]
+  "sites": []
 }

@@ -94,7 +94,8 @@ async function get(id_or_name){
 async function load(){
     var domains = {}
     var drivedomains = []
-
+    var letsencrypt = []
+    
     db.hyperdrives.map( async function(item) {
         let drive = new HyperDrive(client.corestore(), item.key)
         await drive.promises.ready()
