@@ -7,6 +7,8 @@ const process = require('process');
 const dnsserver = require("./servers/dns")
 const letsencrypt = require('./letsencrypt')
 
+require('./groups') // load groups
+
 async function init(){
     const drive = require('./drive.js');
     const {_, cleanup } = await drive.ensureHyperSpace();
