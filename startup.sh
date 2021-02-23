@@ -13,7 +13,6 @@ exec yggdrasil -useconffile /etc/yggdrasil.conf -logto /var/log/yggdrasil/yggdra
 nginx
 
 cd /backend 
-echo MyYggdrasilAddress=$(yggdrasilctl  -v getSelf | sed -n -e 's/^.*IPv6 address.* //p') >> ~/.bashrc
 pm2 start dist/src/index.js &
 
 

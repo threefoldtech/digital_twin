@@ -1,19 +1,16 @@
-import {getDigitalTwinUrl, getLocationForId, sendMessageToApi} from './../service/apiService';
-import { ContactRequest, DtIdInterface, MessageInterface, MessageOperations, MessageTypes } from './../types/index';
+import { ContactRequest, DtIdInterface, MessageInterface, MessageTypes } from './../types/index';
 import { parseMessage } from './../service/messageService';
 import {Router} from 'express';
-import {appCallback, getAppLoginUrl} from "../service/authService";
 import Contact from "../models/contact";
 import Message from "../models/message";
 import {config} from "../config/config";
-import axios from "axios";
 import {contacts} from "../store/contacts";
-import {contactRequests} from "../store/contactRequests";
+import {sendMessageToApi} from '../service/apiService';
 import {MessageBodyTypeInterface} from "../types";
-import {addChat, getMessagesFromId} from "../service/chatService";
+import {addChat} from "../service/chatService";
 import { uuidv4 } from '../common';
 import {sendEventToConnectedSockets} from "../service/socketService";
-
+import { getMyLocation } from "../service/locationService"
 
 const router = Router();
 
@@ -21,7 +18,7 @@ router.get("/", (req, res) => {
     res.json(contacts);
 });
 
-router.post("/", (req, res) => {
+router.post("/", async (req, res) => {
     const con = req.body;
     const contact = new Contact(con.id, con.location);
 
@@ -30,7 +27,8 @@ router.post("/", (req, res) => {
 
     const message:MessageInterface<MessageBodyTypeInterface> = parseMessage(con.message)
     console.log(`creating chat`)
-    const chat = addChat(contact.id,[contact, new Contact(config.userid, getLocationForId(config.userid))],false, [message] ,contact.id, true, contact.id)
+    const myLocation = await getMyLocation()
+    const chat = addChat(contact.id,[contact, new Contact(config.userid, myLocation )],false, [message] ,contact.id, true, contact.id)
 
 
     const url = `/api/messages`

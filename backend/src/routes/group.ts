@@ -2,7 +2,6 @@ import {Router} from 'express';
 import {parseChat} from "../service/chatService";
 import {persistChat} from "../service/dataService";
 import axios from "axios";
-import {getDigitalTwinUrl} from "../service/apiService";
 import { sendEventToConnectedSockets } from '../service/socketService';
 
 const router = Router();
@@ -24,8 +23,7 @@ router.put('/', async (req, res) => {
     persistChat(chat);
 
     chat.contacts.forEach(async c => {
-        const dtUrl = getDigitalTwinUrl(c.location)
-        const path = `${dtUrl}/api/group/invite`;
+        const path = `${c.location}/api/group/invite`;
         console.log("sending group request to ", path)
         try {
             await axios.put(path, chat)

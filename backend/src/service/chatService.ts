@@ -47,8 +47,8 @@ export const addChat = (
     return chat
 };
 
-export const syncNewChatWithAdmin = async (adminId:DtIdInterface, chatId:string) => {
-        const chat = await getChatfromAdmin(adminId, chatId)
+export const syncNewChatWithAdmin = async (adminLocation:string, chatId:string) => {
+        const chat = await getChatfromAdmin(adminLocation, chatId)
         console.log("retreived chat", chat)
         sendEventToConnectedSockets('new_chat', chat)
         persistChat(chat)

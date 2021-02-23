@@ -4,6 +4,7 @@ import Chat from "../models/chat";
 import {uuidv4} from "../common";
 import {config} from "../config/config";
 import {getChat, persistChat} from "../service/dataService";
+import { getMyLocation } from '../service/locationService';
 
 const router = Router();
 
@@ -25,7 +26,8 @@ router.get('/test', async (req, res) => {
 })
 
 router.get('/yggdrasil_address', async (req,res)=> {
-    res.json(config.myLocation)
+    const myLocation = await getMyLocation()
+    res.json(myLocation)
 })
 
 export default router

@@ -298,7 +298,8 @@ const updateContactsInGroup = (groupId, contact: Contact, remove: boolean) => {
     to: groupId,
     body: <GroupUpdate>{
       type: operation,
-      contact
+      contact,
+      adminLocation:user.location
     },
     timeStamp: new Date(),
     type: "GROUP_UPDATE",

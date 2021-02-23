@@ -47,6 +47,7 @@ export interface GroupUpdate extends MessageBodyType{
     type: string
     contact: Contact
     chat: Chat
+    adminLocation: string
 }
 
 export interface Chat {

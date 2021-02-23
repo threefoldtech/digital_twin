@@ -16,18 +16,19 @@ import {editMessage, handleRead, parseMessage} from "../service/messageService";
 import {persistMessage, syncNewChatWithAdmin} from "../service/chatService";
 import {getChat} from "../service/dataService";
 import {config} from "../config/config";
-import {getLocationForId, sendMessageToApi} from "../service/apiService";
+import {sendMessageToApi} from "../service/apiService";
 import Chat from '../models/chat';
 import {uuidv4} from '../common';
 import {handleGroupUpdate} from "../service/groupService";
+import { getMyLocation } from '../service/locationService';
 
 const router = Router();
 
-function handleContactRequest(message: Message<ContactRequest>) {
+async function handleContactRequest(message: Message<ContactRequest>) {
     contactRequests.push(<Contact><unknown>message.body)
-    const otherContact = new Contact(<string>message.from, getLocationForId(<string>message.from))
-    //@TODO fix this location with config
-    const myself = new Contact(<string>config.userid, getLocationForId(<string>config.userid))
+    const otherContact = new Contact(<string>message.from, message.body.location)
+    const myLocation = await getMyLocation()
+    const myself = new Contact(<string>config.userid, myLocation)
     const requestMsg: Message<StringMessageTypeInterface> = {
         from: message.from,
         to: message.to,
@@ -65,7 +66,7 @@ export const determinChatId = (message: Message<MessageBodyTypeInterface>): DtId
 };
 
 // Should be externally availble
-router.put("/", (req, res) => {
+router.put("/", async (req, res) => {
     // @ TODO check if valid
     const msg = req.body;
     let message: Message<MessageBodyTypeInterface>;
@@ -95,7 +96,7 @@ router.put("/", (req, res) => {
             return;
         }
 
-        handleContactRequest(message as Message<ContactRequest>);
+        await handleContactRequest(message as Message<ContactRequest>);
 
         res.json({status: "success"})
         return;
@@ -107,7 +108,7 @@ router.put("/", (req, res) => {
         const groupUpdateMsg:Message<GroupUpdateType> = message
         if(groupUpdateMsg.body.type === "ADDUSER" && groupUpdateMsg.body.contact.id===config.userid){
             console.log("I have been added to a group!")
-            syncNewChatWithAdmin( groupUpdateMsg.from, <string>groupUpdateMsg.to)
+            syncNewChatWithAdmin( groupUpdateMsg.body.adminLocation, <string>groupUpdateMsg.to)
             res.json({status: "Successfully added chat"})
             return;
         }

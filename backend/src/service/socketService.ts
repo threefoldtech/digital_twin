@@ -8,7 +8,7 @@ import * as http from "http";
 import {editMessage, handleRead, parseMessage} from "./messageService";
 import {MessageBodyTypeInterface, MessageOperations, MessageTypes, StringMessageTypeInterface} from "../types";
 import {saveFile, saveAvatar, deleteChat, getBlocklist, persistBlocklist} from "./dataService"
-import {getLocationForId, sendMessageToApi} from './apiService';
+import {sendMessageToApi} from './apiService';
 import {user} from "../store/user"
 import {determinChatId} from "../routes/messages";
 
@@ -54,7 +54,7 @@ export const startSocketIo = (httpServer: http.Server) => {
                 io.to(connection).emit("message", newMessage);
                 console.log(`send message to socket ${connection}`);
             });
-            let location = getLocationForId(<string>chat.adminId);
+            let location = chat.contacts.find(c => c.id == chat.adminId).location
 
             if (newMessage.type === MessageTypes.READ) {
                 handleRead(<Message<StringMessageTypeInterface>>newMessage);
@@ -83,7 +83,7 @@ export const startSocketIo = (httpServer: http.Server) => {
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(messageData.message)
             editMessage(messageData.chatId, newMessage)
             const chat = getChatById(messageData.chatId)
-            let location1 = getLocationForId(<string>chat.adminId);
+            let location1 = chat.contacts.find(c=> c.id == chat.adminId).location;
             sendMessageToApi(location1, newMessage)
         })
         socket.on('status_update', (data) => {

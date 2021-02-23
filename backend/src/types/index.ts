@@ -71,6 +71,7 @@ export interface FileMessageType extends MessageBodyTypeInterface{
 export interface GroupUpdateType extends MessageBodyTypeInterface {
     type: string,
     contact: (AnonymousContactInterface|ContactInterface)
+    adminLocation: string
 }
 
 export interface ChatInterface {
