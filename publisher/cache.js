@@ -2,6 +2,9 @@ var Drives = {
 
 }
 
+var Domains = []
+
 module.exports = {
-    drives: Drives
+    drives: Drives,
+    domains : Domains
 }

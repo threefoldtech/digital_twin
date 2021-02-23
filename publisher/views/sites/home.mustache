@@ -5,14 +5,24 @@
    </head>
    
    <body>
-      <b>Drives</b>
+      <b>Sites</b>
       <div>
-      {{#drives}}
-         <div class=post>
-            <a href="/{{.}}">{{.}}</a>
+      {{#sites}}
+         <div >
+            <a href="//{{.}}:{{port}}">{{.}}:{{port}}</a>
          </div>
 
-         {{/drives}}
+         {{/sites}}
+      </div>
+
+      <b>Wikis</b>
+      <div>
+      {{#wikis}}
+         <div >
+            <a href="//{{.}}:{{port}}">{{.}}:{{port}}</a>
+         </div>
+
+         {{/wikis}}
       </div>
    </body>
 </html>
