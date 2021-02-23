@@ -1,6 +1,6 @@
 const tfc = require('tfgrid-api-client')
 
-const url = "wss://tfgrid.tri-fold.com";
+const url = "wss://explorer.devnet.grid.tf/ws";
 const owner_mnemo = "airport olympic door inside spider harbor develop square present manage obey toward";
 const bot_mnemo = "maid major gossip speak thank disagree blame museum slide canvas trash submit";
 const bot_ipv6 = "200:b57d:d1f0:aad3:71f3:bf:232:9c4";
@@ -101,7 +101,7 @@ function events(content, res, okcode) {
                 result = {
                     success: true,
                     message: method,
-                    id: data[0]['words'][0],
+                    id: data[1]['words'][0],
                 };
             }
         })
