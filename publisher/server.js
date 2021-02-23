@@ -6,13 +6,15 @@ const app = require('./http/app.js')
 const process = require('process');
 const dnsserver = require("./servers/dns")
 const letsencrypt = require('./letsencrypt')
-
-require('./groups') // load groups
+const groups = require('./groups') // load groups
+const acls = require('./acls')
 
 async function init(){
     const drive = require('./drive.js');
     const {_, cleanup } = await drive.ensureHyperSpace();
     await drive.load();
+    await groups.load();
+    await acls.load();
     return {_, cleanup }
 }
 
@@ -25,7 +27,8 @@ async function main(){
 
     // S
 
-    const {_, cleanup } = await init();
+    const {_, cleanup } = await init().catch((e)=>{console.log(e);process.exit(1)})
+
 
     // DNS
 

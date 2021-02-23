@@ -33,10 +33,8 @@ class Groups{
             return res
         }  
         
-        this.load = function(){
+        this.load = async function(){
             this._groups = JSON.parse(fs.readFileSync(path.join(this.root, ".groups.json")));
-            console.log(this._groups)
-
             for(var item in this._groups){
                 var g = this._groups[item]
                 // make sure subgroups exis
@@ -47,7 +45,7 @@ class Groups{
                     }
                 }
                 // flatten users
-                g._allUsers =  this._flatten(g, this._groups)
+                g._allUsers =  Array.from(this._flatten(g, this._groups))
                 
             }
             return this
@@ -66,6 +64,5 @@ class Groups{
     }
 }
 
-var g = new Groups(config.filesystem.path).load()
-
+var g = new Groups(config.filesystem.path)
 module.exports = g

@@ -17,5 +17,5 @@
         "path" : "~/.publisher/publish/"
     },
 
-    "development": false
+    "development": true
 }
