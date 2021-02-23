@@ -97,13 +97,15 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, ref} from "vue";
+import {computed, defineComponent, onBeforeMount, ref} from "vue";
 import {useAuthState} from "../store/authStore";
 import {useSocketActions} from "../store/socketStore";
 import Dialog from "./Dialog.vue";
 import AvatarImg from "@/components/AvatarImg.vue";
-import {deleteBlockedEntry, getBlockList} from "@/store/blockStore";
-
+import {deleteBlockedEntry, getBlockList, initBlocklist} from "@/store/blockStore";
+import {setNewavater} from "@/store/userStore"
+import {fetchStatus} from "@/store/statusStore"
+     
 export default defineComponent({
   name: "Topbar",
   components: { AvatarImg, jdialog: Dialog },
@@ -129,9 +131,8 @@ export default defineComponent({
     };
 
     const sendNewAvatar = async () => {
-      const { sendSocketAvatar } = useSocketActions();
-      const buffer = await file.value.arrayBuffer();
-      sendSocketAvatar(buffer).then(b => location.reload());
+      const newUrl = await setNewavater(file.value);
+      await fetchStatus(user.id)
       showDialog.value = false;
     };
 
@@ -147,13 +148,15 @@ export default defineComponent({
       isEditingStatus.value = false;
     };
 
-    const blockedUsers= ref([])
-    const blockedUsersLoading = ref(true)
+    const blockedUsers = computed(()=>{
+      return getBlockList()
+    })
     // @todo: config
-    getBlockList().then(blocklist => {
-      blockedUsers.value = blocklist;
-      blockedUsersLoading.value = false;
-    });
+
+    onBeforeMount(()=>{
+      initBlocklist()
+    })
+    
 
     const unblockUser = async (user) => {
       await deleteBlockedEntry(user);
@@ -176,7 +179,6 @@ export default defineComponent({
       setEditStatus,
       isEditingStatus,
       blockedUsers,
-      blockedUsersLoading,
       unblockUser,
     };
   },

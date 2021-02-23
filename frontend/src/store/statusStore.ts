@@ -7,19 +7,12 @@ import {calculateBaseUrl} from "../services/urlService"
 export const statusList = reactive<Object>({});
 export const watchingUsers = [];
 
-const fetchStatus = async digitalTwinId => {
+export const fetchStatus = async digitalTwinId => {
   const baseLocation = calculateBaseUrl(digitalTwinId)
   let url = `${baseLocation}/api/user/getStatus`;
   const response = await axios.get(url);
   let status = response.data;
   statusList[digitalTwinId] = status;
-  const {user} = useAuthState()
-
-  if (user.id === digitalTwinId){
-    user.status = status.status
-    user.image = status.avatar ? status.avatar : user.image
-  }
-
   return status;
 };
 

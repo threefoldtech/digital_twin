@@ -151,7 +151,6 @@ export default defineComponent({
   components: {ChatRequestList, addContact, chatView, jdialog: Dialog, ChatCard, AvatarImg, GroupManagement },
   setup(_, context) {
     const { chats, chatRequests } = usechatsState();
-    const { updateUserInfo } = useAuthActions();
     const { retrievechats } = usechatsActions();
     let selectedId = ref("");
     const status = computed(() => {

@@ -86,13 +86,6 @@ export const startSocketIo = (httpServer: http.Server) => {
             let location1 = getLocationForId(<string>chat.adminId);
             sendMessageToApi(location1, newMessage)
         })
-        socket.on('new_avatar', (data) => {
-            console.log(data)
-            const url = data.url
-            const avatar = data.avatar
-            saveAvatar(avatar)
-            user.updateAvatar(url)
-        });
         socket.on('status_update', (data) => {
             const status = data.status
             user.updateStatus(status)

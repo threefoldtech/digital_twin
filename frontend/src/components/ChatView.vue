@@ -29,7 +29,7 @@
     </div>
     <div class="flex-grow row-span-4 relative overflow-y-auto" ref="messageBox">
       <div class="absolute w-full px-4">
-        <template v-for="(message, i) in chat.messages" :key="i">
+        <template v-for="(message, i) in chat.messages" :key="`${message.id}-${message.type}-${message.timeStamp}`">
           <div
               v-if="showDivider(message, i)"
               class="text-center px-4"
@@ -49,11 +49,11 @@
               :isMine="message.from === user.id"
               v-on:scroll="scrollToBottom"
           />
-          <div class="font-thin text-right" v-if="reads[message.id]">
-            <div class="flex justify-end" v-for="(value, key) in reads[message.id].slice(0,3)" :key="key">
-              <AvatarImg xsmall :id="reads[message.id][0]"></AvatarImg>
+          <div class="font-thin text-right align-middle" v-if="reads[message.id]">
+            <div class="inline-block justify-end align-bottom" v-for="(value, key) in reads[message.id].slice(0,3)" :key="key">
+              <AvatarImg xsmall :id="value"></AvatarImg>
             </div>
-            <span v-if="reads[message.id].length > 3"> and {{ reads[message.id].length - 3 }} others </span>
+            <span v-if="reads[message.id].length > 3"> + {{ reads[message.id].length - 3 }} </span>
           </div>
 
         </template>

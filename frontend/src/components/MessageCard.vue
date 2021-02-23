@@ -43,11 +43,15 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, nextTick, ref, watch} from "vue";
+import {computed, defineComponent, nextTick, ref, watch} from "vue";
+import {useAuthState} from "../store/authStore";
+import moment from "moment";
+import {usechatsActions} from "../store/chatStore";
+import {Message, MessageBodyType, QuoteBodyType, StringMessageType} from "../types/index";
+import {uuidv4} from "@/common";
+import config from "../../public/config/config";
 import AvatarImg from "@/components/AvatarImg.vue";
 import MessageContent from "@/components/MessageContent.vue";
-
-import moment from "moment";
 
 export default defineComponent({
   name: "MessageCard",

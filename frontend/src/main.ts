@@ -10,7 +10,6 @@ import config from "../public/config/config"
 // console.log(Socketio)
 // const a = Socketio.install
 
-
 const clickOutside = {
     beforeMount: (el, binding) => {
         el.clickOutsideEvent = event => {
@@ -37,6 +36,16 @@ const app = createApp(App)
         },
         transports: ['websocket']
     })
-    .mount('#app');
+
+app.directive('focus', {
+    // When the bound element is mounted into the DOM...
+    mounted(el) {
+        // Focus the element
+        el.focus()
+    }
+})
+
+app.mount('#app');
+
 
 export default app

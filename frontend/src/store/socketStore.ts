@@ -4,6 +4,7 @@ import { inject } from "vue";
 import {handleRead, removeChat, usechatsActions} from "./chatStore";
 import { useContactsActions, useContactsState } from "./contactStore";
 import { useAuthState } from "@/store/authStore";
+import { addUserToBlockList} from "@/store/blockStore"
 
 const state = reactive<State>({
   socket: "",
@@ -23,6 +24,7 @@ const initializeSocket = (username: string) => {
     });
     state.socket.on("chat_blocked", (chatId) => {
         removeChat(chatId)
+        addUserToBlockList(chatId)
     });
     state.socket.on("message", (message) => {
         if (message.type === 'READ'){
@@ -68,24 +70,6 @@ const sendSocketMessage = async (
   await state.socket.emit(messageType, data);
 };
 
-// const sendSocketFile = async (chatId:string, message:Message<ArrayBuffer>) => {
-//   console.log('sending ', message)
-//   const data = {
-//     chatId,
-//     message
-//   }
-//   await state.socket.emit("message", data);
-// };
-
-const sendSocketAvatar = async (avatar: ArrayBuffer) => {
-    const url = `${window.location.origin}/api/user/avatar`.replace("http://localhost:8080","http://localhost:3000")
-    const data = {
-        avatar,
-        url
-    }
-    state.socket.emit("new_avatar", data);
-};
-
 export const sendRemoveChat = async (id: Id) => {
     state.socket.emit("remove_chat", id);
 };
@@ -109,7 +93,6 @@ export const useSocketActions = () => {
   return {
     initializeSocket,
     sendSocketMessage,
-    sendSocketAvatar,
     sendSocketUserStatus
   };
 };
