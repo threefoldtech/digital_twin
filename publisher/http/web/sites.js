@@ -14,6 +14,7 @@ async function getRequestInfo(req){
     var driveObj = null
     var status = 200
     var dir = ""
+    var repo = ""
 
     if (req.headers.host){
         var splitted = req.headers.host.split(':')
@@ -33,7 +34,8 @@ async function getRequestInfo(req){
 
     driveObj = await drive.get(domains[host]["drive"])
     dir = domains[host]["dir"]
-
+    repo = domains[host]["repo"]
+    
     return {
         "status" : status,
         "err": err,
@@ -41,7 +43,8 @@ async function getRequestInfo(req){
         "port": port,
         "host": host,
         "drive": driveObj,
-        "dir" : dir
+        "dir" : dir,
+        "repo": repo
     }
 
 }
@@ -255,7 +258,7 @@ router.get('/errors', asyncHandler(async (req, res) => {
 // files
 router.get('/update', asyncHandler(async (req, res) => {
     var info = await getRequestInfo(req)
-    var repo = info.dir.substring(1)
+    var repo = info.repo
 
     if(info.status != 200){
         return res.status(info.status).json({"err": info.err});

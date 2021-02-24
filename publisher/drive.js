@@ -37,26 +37,38 @@ async function getDomains(id, drive){
     dirs = dirs.filter((item) => {if(!item.startsWith(".")){return item}}).sort()
 
     var res = await dirs.map( async function(dir) {
-        var filepath = path.join("/", dir, ".domains.json")
+        var domainfilepath = path.join("/", dir, ".domains.json")
+        var repofilepath = path.join("/", dir, ".repo")
+
         var domains = {}
         try{
-            await drive.promises.stat(filepath)
+            await drive.promises.stat(domainfilepath)
         }catch(e){
             console.log(chalk.red(`    ✓ (Drive (${id}) Ignoring path: /${dir} does not contain .domains.json`))
             return []
         }
+
         try{
-            var content = await  drive.promises.readFile(filepath, 'utf8');
+            await drive.promises.stat(repofilepath)
+        }catch(e){
+            console.log(chalk.red(`    ✓ (Drive (${id}) Ignoring path: /${dir} does not contain .repo`))
+            return []
+        }
+
+        try{
+            var content = await  drive.promises.readFile(domainfilepath, 'utf8');
+            var repo = await  drive.promises.readFile(repofilepath, 'utf8');
             var data = JSON.parse(content)
             for (var i=0; i < data.domains.length; i++){
                 domains[data.domains[i]] = {
                     "drive": id,
-                    "dir": path.join("/", dir)
+                    "dir": path.join("/", dir),
+                    "repo": repo
                 }
             }
             return domains
         }catch(e){
-            console.log(chalk.red(` ✓ (Drive (${id}) Error reading: ${filepath}`))
+            console.log(chalk.red(` ✓ (Drive (${id}) Error reading: ${domainfilepath}`))
         }
     })
 
@@ -129,8 +141,8 @@ async function load(){
     }
     
     cache.domains = domains
-    cache.domains["127.0.0.1"] = {"drive": null, "dir": ""}
-    cache.domains["localhost"] = {"drive": null, "dir": ""}
+    cache.domains["127.0.0.1"] = {"drive": null, "dir": "", "repo": ""}
+    cache.domains["localhost"] = {"drive": null, "dir": "", "repo": ""}
 }
 
 
