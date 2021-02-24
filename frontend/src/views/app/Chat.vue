@@ -30,7 +30,7 @@
           </h2>
           <ChatRequestList :chat-requests="filteredChatRequests"/>
         </div>
-        <div class="relative full md:px-0 px-4">
+        <!-- <div class="relative full md:px-0 px-4">
           <div
             class="absolute inset-y-0 left-0 md:pl-3 pl-7 flex items-center pointer-events-none"
           >
@@ -42,9 +42,9 @@
             class="w-full pl-12 py-3 sm:text-sm  rounded-full md:bg-white bg-gray-200"
             v-model="searchValue"
           />
-        </div>
+        </div> -->
       </div>
-      <div class="relative overflow-y-auto w-full max-h-full h-full mt-4">
+      <!-- <div class="relative overflow-y-auto w-full max-h-full h-full mt-4">
         <div class="absolute w-full px-2 pt-2">
           <ChatCard
             v-for="chat in filteredChats"
@@ -60,11 +60,10 @@
             :chat="chat"
           />
         </div>
-      </div>
+      </div> -->
     </aside>
-    <main class="md:col-span-6 w-full h-full relative">
-      <chat-view v-if="selectedId && chats.find((c) => c.chatId === selectedId)" :selectedId="selectedId" :key="selectedId" @showContacts="showContacts=true"></chat-view>
-      <div class="text-center" v-else-if="chats.length >= 1">
+    <main class="md:col-span-6 grid place-items-center w-full h-full relative">
+      <!-- <div class="text-center " v-else-if="chats.length >= 1">
         No chat has been selected <br class="md:block hidden">
         <span class="md:block hidden">Please select a chat from the left side</span>
         <br>
@@ -74,8 +73,22 @@
         >
           Click to Show Chat
         </button>
+      </div> -->
+      <chat-view :class="selectedId? 'visible':'hidden'" v-if="selectedId && chats.find((c) => c.chatId === selectedId)" :selectedId="selectedId" :key="selectedId" @showContacts="showContacts=true"></chat-view>
+      <div class="relative overflow-y-auto w-full max-h-full h-full mt-4" :class="!selectedId? 'visible':'hidden'" v-if="filteredChats && filteredChats.length">
+        <div class="absolute w-full pt-2">
+          <ChatCard
+            v-for="chat in filteredChats"
+            :key="`${chat.chatId}-${chat.messages.length}-${
+              chat.read[user.id]
+            }`"
+            class="grid grid-cols-12 rounded-lg mb-2 py-2 cursor-pointer"
+            @click="setSelected(chat.chatId)"
+            :chat="chat"
+          />
+        </div>
       </div>
-      <div v-else class="text-center">
+       <div v-else class="text-center">
         <p>It feels lonely over here :(</p>
         <button
           @click="showDialog = true"

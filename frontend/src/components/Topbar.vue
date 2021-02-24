@@ -1,16 +1,21 @@
 <template>
-  <div class="grid grid-cols-3 md:grid-cols-7 h-12 items-center p-4">
-    <img src="/TFN-black.svg" alt="TF-Logo" class="h-full hidden md:block col-end-3" />
-    <img src="/TF-small-black.svg" alt="TF-Logo" class="h-12 md:hidden col-span-1" />
+  <div class="items-center bg-gradient grid grid-cols-12 relative">
+
+    <button class="col-span-2 text-lg text-white">
+      <i class="fas fa-bars"></i>
+    </button>
+    <img src="/TFN.svg" alt="TF-Logo" class="h-5 col-span-5 -ml-2"/>
     <div
-      class="md:col-end-13 col-span-2 text-right text-gray-500 flex items-center justify-end"
+      class="col-end-13 col-span-2 text-right text-gray-500 flex items-center justify-end"
     >
-      <AvatarImg :id="user.id" />
-      <span class="ml-2">{{ user.id }}</span>
-      <button @click="showDialog = true">
-        <i class="fas fa-cog text-gray-500"></i>
-      </button>
+    <button class="text-lg text-white">
+      <i class="fas fa-edit"></i>
+    </button>
+    <button class="text-lg text-white">
+      <i class="fas fa-search"></i>
+    </button>
     </div>
+
     <jdialog v-model="showDialog" @close="showDialog = false" noActions>
       <template v-slot:title>
         <h1>Profile settings</h1>

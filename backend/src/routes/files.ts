@@ -14,7 +14,7 @@ const router = Router();
 
 router.get('/:chatid/:name', async(req, res) => {
     // @TODO fix this security
-    const path = `/appdata/chats/${req.params.chatid}/files/${req.params.name}`
+    const path = `${config.baseDir}/chats/${req.params.chatid}/files/${req.params.name}`
 
     res.download(path);
 })

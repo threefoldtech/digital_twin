@@ -1,8 +1,8 @@
 <template>
-  <div class="card-gutter flex">
-    <AvatarImg v-if="true" class="mr-8" :id="message.from"/>
-    <div class="card bg-white rounded-md my-4 overflow-hidden">
-      <header class="flex justify-between px-4 pt-4 text-xs">
+  <div class="grid grid-cols-12">
+    <AvatarImg class="mr-8 col-span-2" :id="message.from"/>
+    <div class="card col-span-10 bg-white rounded-md mb-4 overflow-hidden">
+      <header class="flex justify-between pl-2 pt-2 text-xs items-center">
         <div class="title">
           <div class="name inline-block pr-5 ">
             {{message.from}}
@@ -20,7 +20,7 @@
       <main class="px-4 pb-4">
         <MessageContent :message="message"></MessageContent>
       </main>
-      <footer class="h-16 bg-gray-200 font-light text-xs flex justify-between p-4">
+      <footer class="hidden h-16 bg-gray-200 font-light text-xs justify-between p-4">
         <button>
           <i class="fa fa-thumbs-up"></i>
           Like
