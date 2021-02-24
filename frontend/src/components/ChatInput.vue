@@ -173,13 +173,8 @@ export default {
       });
     })
     const onPaste = (e:ClipboardEvent) => {
-      const item = e.clipboardData.items[0];
-
-      console.log({files:e.clipboardData.files})
-
-      if (item.type.indexOf("image") === 0) {
-        const blob = item.getAsFile();
-        file.value = blob
+      if (e.clipboardData.files.length > 0) {
+        fileinput.value.files = e.clipboardData.files
       }
     }
 
