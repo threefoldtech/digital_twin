@@ -48,6 +48,8 @@
               :isGroup="chat.isGroup"
               :isMine="message.from === user.id"
               v-on:scroll="scrollToBottom"
+
+              :hideAvatar="hideAvatar(message, i)"
           />
           <div class="font-thin text-right" v-if="reads[message.id]">
             <div class="flex justify-end" v-for="(value, key) in reads[message.id].slice(0,3)" :key="key">
@@ -223,6 +225,19 @@ export default defineComponent({
       return time.diff(previousMessage.timeStamp, "m") > 5;
     }
 
+    const hideAvatar = (message, index) => {
+      const previousMessage = chat.value.messages[index - 1];
+      if (!previousMessage) {
+        return false;
+      }
+
+      if (showDivider(message, index)){
+        return false;
+      }
+
+      return previousMessage.from === previousMessage.from;
+    }
+
     const reads = computed(() => {
       const preReads = {}
       each(chat.value.read, (val: string, key: string) => {
@@ -269,6 +284,7 @@ export default defineComponent({
       showDivider,
       reads,
       showDialog,
+      hideAvatar,
       ...propRefs,
     };
   },
