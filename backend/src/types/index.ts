@@ -4,6 +4,7 @@ import Message from "../models/message";
 export interface UserInterface extends AnonymousContactInterface {
     image: string,
     status: string,
+    lastSeen: number,
 }
 
 export interface AppInterface {
