@@ -16,4 +16,10 @@ function resolveHome(filepath) {
     return filepath;
 }
 
+if(process.env.NODE_ENV == "production"){
+    config.development = false
+}else{
+    config.development = true
+}
+
 module.exports = config

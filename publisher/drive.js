@@ -34,8 +34,7 @@ class LocalDrive{
 
 async function getDomains(id, drive){
     var dirs = await drive.promises.readdir("/")
-    dirs.sort()
-    
+    dirs = dirs.filter((item) => {if(!item.startsWith(".")){return item}}).sort()
 
     var res = await dirs.map( async function(dir) {
         var filepath = path.join("/", dir, ".domains.json")
@@ -95,7 +94,7 @@ async function load(){
     var domains = {}
     var drivedomains = []
     var letsencrypt = []
-    
+
     db.hyperdrives.map( async function(item) {
         let drive = new HyperDrive(client.corestore(), item.key)
         await drive.promises.ready()
@@ -120,7 +119,7 @@ async function load(){
         }
         for (var domain in item){
             if (domain in domains){
-                console.log(chalk.red(`(X Duplicate domain) ${item} ${drivedomains[item]}`))
+                console.log(chalk.red(`(X Duplicate domain) ${domain}`))
             }else{
                 domains[domain] = item[domain]
                 console.log(chalk.blue(`    ✓ (Loaded domain ${domain}`))
