@@ -5,6 +5,7 @@ export default class User implements UserInterface {
   status: string;
   image: string;
   id: string;
+  lastSeen: number;
 
   constructor() {
     try {
@@ -12,6 +13,7 @@ export default class User implements UserInterface {
       this.status = userData.status;
       this.image = userData.image;
       this.id = userData.id
+      this.lastSeen = userData.lastSeen
     } catch (error) {
       this.status = "Exploring the new DigitalTwin";
       this.image = `https://${config.appId}/api/user/avatar/default`;
@@ -20,6 +22,7 @@ export default class User implements UserInterface {
         status: this.status,
         image: this.image,
         id: this.id,
+        lastSeen: this.lastSeen
       });
     }
   }
@@ -36,12 +39,27 @@ export default class User implements UserInterface {
     };
   }
 
+  getLastSeen() {
+    return this.lastSeen;
+  }
+
   updateStatus(newStatus: string) {
     this.status = newStatus;
     persistUserdata({
       status: this.status,
       image: this.image,
       id: this.id,
+      lastSeen: this.lastSeen
+    });
+  }
+
+  updateLastSeen() {
+    this.lastSeen = new Date().getTime()
+    persistUserdata({
+      status: this.status,
+      image: this.image,
+      id: this.id,
+      lastSeen: this.lastSeen,
     });
   }
 
@@ -51,6 +69,7 @@ export default class User implements UserInterface {
       status: this.status,
       image: this.image,
       id: this.id,
+      lastSeen: this.lastSeen
     });
   }
 }

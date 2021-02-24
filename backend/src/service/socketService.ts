@@ -32,6 +32,9 @@ export const startSocketIo = (httpServer: http.Server) => {
         socket.on("disconnect", () => {
             console.log(`${socket.id} disconnected`);
             connections.delete(socket.id);
+            if (connections.getConnections().length === 0) {
+                user.updateLastSeen();
+            }
         });
 
         socket.on("message", (messageData) => {
