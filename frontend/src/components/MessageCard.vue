@@ -110,7 +110,7 @@
           {{ message.body.message }}
         </div>
         <div v-else>
-          {{ message.body }}
+          <div class="text-message" v-html="renderMarkdown(message.body)"></div>
         </div>
 
 
@@ -178,7 +178,7 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, nextTick, ref, watch} from "vue";
+import {computed, defineComponent, ref, watch} from "vue";
 import {useAuthState} from "../store/authStore";
 import moment from "moment";
 import {usechatsActions} from "../store/chatStore";
@@ -188,6 +188,7 @@ import config from "../../public/config/config";
 import AvatarImg from "@/components/AvatarImg.vue";
 import {calculateBaseUrl} from "@/services/urlService";
 import {useIntersectionObserver} from "@/lib/intersectionObserver";
+import {renderMarkdown} from "@/services/markdownService";
 
 export default defineComponent({
   name: "MessageCard",
@@ -332,10 +333,10 @@ export default defineComponent({
 
     if (!props.isreadbyme && !props.isReply && !props.disabled) {
       console.log(messagecard.value)
-      const { isIntersecting, unobserve} = useIntersectionObserver(messagecard);
-      watch(isIntersecting, (value =>  {
+      const {isIntersecting, unobserve} = useIntersectionObserver(messagecard);
+      watch(isIntersecting, (value => {
         console.log('observing', value)
-        if (!value){
+        if (!value) {
           return
         }
 
@@ -351,7 +352,7 @@ export default defineComponent({
         'localhost:3000'
     )
     const baseurl = calculateBaseUrl(fromId)
-    const fileUrl = computed( () => {
+    const fileUrl = computed(() => {
       console.log(props.message.body.filename)
       if (props.message.type !== 'FILE') {
         return false
@@ -369,6 +370,7 @@ export default defineComponent({
           || filename.indexOf('.jpg') !== -1
           || filename.indexOf('.jpeg') !== -1
     }
+
 
     return {
       showActions,
@@ -393,9 +395,17 @@ export default defineComponent({
       sendReplyMessage,
       user,
       messagecard,
-      isImage
+      isImage,
+      renderMarkdown
     };
   }
 });
 </script>
+<style lang="css">
+.text-message * {
+  word-wrap: break-word;
+  max-width: 100%;
+  white-space: pre-wrap;
+}
+</style>
 
