@@ -253,6 +253,51 @@ router.get('/errors', asyncHandler(async (req, res) => {
 }))
 
 // files
+router.get('/update', asyncHandler(async (req, res) => {
+    var info = await getRequestInfo(req)
+    var repo = info.dir.substring(1)
+
+    if(info.status != 200){
+        return res.status(info.status).json({"err": info.err});
+    }
+
+    var spawn = require('child_process').spawn;
+    var prc = spawn('publishtools',  ['pull', '--repo', repo]);
+    
+    //noinspection JSUnresolvedFunction
+    prc.stdout.setEncoding('utf8');
+    prc.stdout.on('data', function (data) {
+        var str = data.toString()
+        var lines = str.split(/(\r?\n)/g);
+        console.log(lines.join(""));
+    });
+
+    prc.on('close', function (code) {
+        console.log('process exit code ' + code);
+    });
+    
+   
+    if (repo.startsWith("www")){
+        prc = spawn('publishtools',  ['build', '--repo', repo]);
+    }else{
+        prc = spawn('publishtools',  ['flatten', '--repo', repo]);
+    }
+    //noinspection JSUnresolvedFunction
+    prc.stdout.setEncoding('utf8');
+    prc.stdout.on('data', function (data) {
+        var str = data.toString()
+        var lines = str.split(/(\r?\n)/g);
+        console.log(lines.join(""));
+    });
+
+    prc.on('close', function (code) {
+        console.log('process exit code ' + code);
+    });
+
+    return res.redirect("/")
+}))
+
+// files
 router.get('/*', asyncHandler(async (req, res) => {
     var info = await getRequestInfo(req)
 
