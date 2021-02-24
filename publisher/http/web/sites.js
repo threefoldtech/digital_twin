@@ -82,32 +82,15 @@ async function handleWikiFile(req, res, info){
     var filename = req.url.substring(1)
     var wikiname = info.dir.substring(1)
     
-    var encoding = 'utf-8'  
-    if (filename.startsWith("file__") || filename.startsWith("page__")){
+    if(filename.includes("__")){
         var splitted = filename.split("__")
-        if (splitted.length != 3){
-            return res.status(404).json('');
-        }
-        if(filename.startsWith("file__")){
-            encoding = 'binary'
-        }
+        filename = splitted[1]
+        wikiname = `wiki_${splitted[0]}`
+    }
 
-        filename = splitted[2]
-        wikiname = `wiki_${splitted[1]}`
-    }else if (filename.startsWith("html__")){
-		var splitted = filename.split("__")
-
-		if (splitted.length < 3){
-            return res.status(404).json('');
-        }
-
-		
-        wikiname =`wiki_${splitted[1]}`
-        splitted.shift()
-        splitted.shift()
-        filename = splitted.join("__")
-
-	}else if (filename == "_sidebar.md"){
+    var encoding = 'utf-8'  
+    
+    if (filename == "_sidebar.md"){
         filename = "sidebar.md"
     }
     
@@ -118,6 +101,8 @@ async function handleWikiFile(req, res, info){
 
     if (filename.endsWith("jpeg") || filename.endsWith("jpg") || filename.endsWith("gif") || filename.endsWith("png")){
         encoding = 'binary'
+    }else if(filename.endsWith("md") ){
+        encoding = 'utf-8'  
     }
 
     filepath = `/${wikiname}/${filename}`

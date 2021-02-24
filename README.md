@@ -10,4 +10,8 @@ In later phases, file management, video group chats, and wiki will be integrated
 
 export HOST_IP={PUBLIC_IP}
 export SECRET={secret}
-export NODE_ENV=PRODUCTION # prouction
+
+
+to run node we need to run 
+
+`NODE_ENV=production node server` as root

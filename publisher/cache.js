@@ -4,7 +4,11 @@ var Drives = {
 
 var Domains = []
 
+var Authorized = {}
+
+
 module.exports = {
     drives: Drives,
-    domains : Domains
+    domains : Domains,
+    authorized: Authorized
 }
