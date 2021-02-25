@@ -1,5 +1,5 @@
 <template>
-  <div class="items-center bg-gradient grid grid-cols-12 relative">
+  <div class="items-center bg-gradient grid grid-cols-12 relative h-16">
 
     <button class="col-span-2 text-lg text-white">
       <i class="fas fa-bars"></i>
