@@ -22,7 +22,7 @@ async function process(){
         }
         var domains = websites[dir]
         if (domains.length > 0){
-            var subject = domains.pop()
+            var subject = domains[0]
             letsencrypt[subject] = {}
             letsencrypt[subject].renewAt = 1
             if (domains.length > 0){
