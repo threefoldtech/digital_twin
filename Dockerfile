@@ -47,7 +47,6 @@ RUN apt-get install -y curl musl-tools nano iputils-ping procps iproute2
 COPY --from=builder /src/yggdrasil    /usr/bin/
 COPY --from=builder /src/yggdrasilctl /usr/bin/
 COPY --from=builder /tmp/dumb-init    /usr/bin/
-COPY ./yggdrasil/yggdrasil.conf /etc/yggdrasil.conf
 RUN mkdir /var/log/yggdrasil
 
 COPY --from=frontend_builder /app/dist /usr/share/nginx/html
