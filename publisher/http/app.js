@@ -33,18 +33,18 @@ app.engine('mustache', mustacheExpress());
 app.set('view engine', 'mustache');
 
 
-// Threebot connect
-app.use(function (req, res, next) {
-    if (!req.url.startsWith('/threebot/setcookie') && req.url != '/threebot/connect' && !req.url.startsWith('/threebot/authorize')){
-        if(!req.session.authorized){
-            res.redirect("/threebot/connect")
-        }else{
-            next()
-        }
-    }else{
-        next()
-    }
-  })
+// // Threebot connect
+// app.use(function (req, res, next) {
+//     if (!req.url.startsWith('/threebot/setcookie') && req.url != '/threebot/connect' && !req.url.startsWith('/threebot/authorize')){
+//         if(!req.session.authorized){
+//             res.redirect("/threebot/connect")
+//         }else{
+//             next()
+//         }
+//     }else{
+//         next()
+//     }
+//   })
 
 app.use(express.json());
 
