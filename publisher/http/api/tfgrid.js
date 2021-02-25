@@ -1,9 +1,8 @@
 const tfc = require('tfgrid-api-client')
 
 const url = "wss://explorer.devnet.grid.tf/ws";
-const owner_mnemo = "airport olympic door inside spider harbor develop square present manage obey toward";
-const bot_mnemo = "maid major gossip speak thank disagree blame museum slide canvas trash submit";
-const bot_ipv6 = "200:b57d:d1f0:aad3:71f3:bf:232:9c4";
+const mnemo = "maid major gossip speak thank disagree blame museum slide canvas trash submit";
+const botipv6 = "200:b57d:d1f0:aad3:71f3:bf:232:9c4";
 
 function client_get(url, mnemonic) {
     const cli = new tfc(url, mnemonic)
@@ -13,8 +12,7 @@ function client_get(url, mnemonic) {
 }
 
 // global tfclient
-const tfclient = client_get(url, bot_mnemo);
-const tfowner = client_get(url, owner_mnemo);
+const tfclient = client_get(url, mnemo);
 
 const express = require('express');
 const router = express.Router();
@@ -175,7 +173,7 @@ router.put('/entities/:id', function(req, res) {
 //
 
 router.post('/twins', function(req, res) {
-    tfclient.createTwin(bot_ipv6, (content) => {
+    tfclient.createTwin(botipv6, (content) => {
         events(content, res, 201);
 
     }).catch(err => { json_error(res, err) })
@@ -415,23 +413,6 @@ router.get('/account/balance', function(req, res) {
 // owner signing debug
 //
 
-router.post('/debug/entities', function(req, res) {
-    let required = ['name', 'country', 'city'];
-
-    if((value = fields_validate(required, req.body)) !== true)
-        return json_error(res, "Required field: " + value);
-
-    let name = req.body['name']
-    let country = req.body['country'];
-    let city = req.body['city'];
-
-    tfowner.createEntity(name, country, city, (content) => {
-        events(content, res, 201);
-
-    }).catch(err => { json_error(res, err) })
-})
-
-
 router.get('/debug/cluster/:name', function(req, res) {
     clusters.findByName(clusters.rootpath, req.params.name).then((content) => {
         console.log(content);
@@ -440,7 +421,11 @@ router.get('/debug/cluster/:name', function(req, res) {
 })
 
 
-router.post('/debug/sign', function(req, res) {
+//
+// crypto verification
+//
+
+router.post('/signature', function(req, res) {
     let required = ['entity', 'twin'];
 
     if((value = fields_validate(required, req.body)) !== true)
@@ -449,7 +434,7 @@ router.post('/debug/sign', function(req, res) {
     let entity = parseInt(req.body['entity']);
     let twin = parseInt(req.body['twin']);
 
-    tfowner.sign(entity, twin).then((content) => {
+    tfclient.sign(entity, twin).then((content) => {
         res.json(content);
 
     }, (err) => { json_error(res, err.message); })
