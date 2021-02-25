@@ -17,6 +17,7 @@ async function getRequestInfo(req){
     var repo = ""
 
     if (req.headers.host){
+        host = req.headers.host
         var splitted = req.headers.host.split(':')
         if (splitted.length > 1){
             port = splitted[1]
@@ -39,7 +40,6 @@ async function getRequestInfo(req){
     return {
         "status" : status,
         "err": err,
-        "drive": drive,
         "port": port,
         "host": host,
         "drive": driveObj,
