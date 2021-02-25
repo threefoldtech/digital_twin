@@ -13,10 +13,12 @@ router.get('/getStatus', async(req, res) => {
     const isOnline = connections.getConnections().length ? true : false
     const status = user.getStatus()
     const avatar = user.getAvatar()
+    const lastSeen = user.getLastSeen()
     const data = {
         status,
         avatar,
-        isOnline
+        isOnline,
+        lastSeen
     }
     res.json(data);
 })

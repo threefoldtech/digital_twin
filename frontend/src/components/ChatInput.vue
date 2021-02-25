@@ -1,7 +1,7 @@
 <template>
 
   <GifSelector v-if="showGif" v-on:sendgif="sendGif" style="z-index: 10000" v-on:close="hideGif"/>
-  <div class="md:p4 md:m-4 md:rounded-3xl flex flex-col bg-white grid grid-cols-12">
+  <div class="md:p4 md:m-4 md:rounded-3xl flex flex-col bg-white grid grid-cols-12" @paste="onPaste">
     <div class="btns md:col-span-4 col-span-full md:grid grid-cols-4 md:bg-transparent bg-gray-200" :class="{'hidden': collapsed, 'grid': !collapsed}">
       <button @click="toggleGif"><h2>GIF</h2></button>
       <button class="px-2 md:py-8 py-2" @click.stop="selectFile">
@@ -92,12 +92,13 @@ export default {
 
 
     const chatsend = async (e) => {
+
       if (message.value != "") {
         sendMessage(props.selectedid, message.value);
         message.value = "";
       }
-      if (fileinput.value.files.length > 0) {
-        sendFile(props.selectedid, fileinput.value.files[0]);
+      if (file.value) {
+        sendFile(props.selectedid, file.value);
         removeFile()
       }
       emit('messageSend')
@@ -171,6 +172,11 @@ export default {
         message.value = `${message.value}${event.detail.unicode}`;
       });
     })
+    const onPaste = (e:ClipboardEvent) => {
+      if (e.clipboardData.files.length > 0) {
+        fileinput.value.files = e.clipboardData.files
+      }
+    }
 
     const collapsed = ref(true)
     return {
@@ -193,6 +199,7 @@ export default {
       sendGif,
       hideGif,
       collapsed,
+      onPaste
     }
   }
 }

@@ -9,9 +9,11 @@
       </div>
       <div class="col-span-6 py-4 pl-2">
         <p class="font-bold font overflow-hidden overflow-ellipsis">{{ chat.name }}</p>
-        <p class="font-thin" v-if="!chat.isGroup">{{
-            statusList[chat.chatId]?.isOnline ? "Is online" : "Is offline"
-          }}</p>
+        <template  v-if="!chat.isGroup">
+          <p v-if="statusList[chat.chatId]?.isOnline" class="font-thin">Is online</p>
+          <p v-else-if="statusList[chat.chatId]?.lastSeen" class="font-thin">Last seen {{m(statusList[chat.chatId]?.lastSeen)}}</p>
+          <p v-else class="font-thin">Is offline</p>
+        </template>
         <p class="font-thin" v-if="chat.isGroup">Group chat</p>
         <!-- <p class="font-thin">
           <span v-if=".isOnline">Is online</span>
@@ -159,6 +161,11 @@ export default defineComponent({
       return value;
     };
 
+    const viewAnchor = ref(null)
+    // const isIntersecting = ref(false)
+
+    const { isIntersecting, intersectionRatio} = useIntersectionObserver(viewAnchor);
+
     // @todo: fix so that properly scrools to bottom
     const scrollToBottom = (force = false) => {
       console.log('scroll')
@@ -235,9 +242,7 @@ export default defineComponent({
       return preReads
     })
 
-    const viewAnchor = ref(null)
 
-    const { isIntersecting, intersectionRatio} = useIntersectionObserver(viewAnchor);
 
 
     //@TODO fix this
