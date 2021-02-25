@@ -65,7 +65,7 @@ const routes: Array<RouteRecordRaw> = [
         ]
     },
     {
-        path: '/forumPost',
+        path: '/forumPost/:chatid/:postid',
         name: 'forumPost',
         component: ForumLayout,
         children: [

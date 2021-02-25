@@ -10,13 +10,15 @@ const state = reactive<State>({
   socket: "",
 });
 
-const initializeSocket = (username: string) => {
+export const initializeSocket = () => {
+    const {user} = useAuthState()
+
     state.socket = inject("socket");
     state.socket.on("connect", () => {
         console.log("connected");
     });
     state.socket.emit("identify", {
-        name: username,
+        name: user.id.toString(),
     });
     state.socket.on("chat_removed", (chatId) => {
         console.log('chat_removed')
@@ -56,7 +58,7 @@ const initializeSocket = (username: string) => {
     });
 };
 
-const sendSocketMessage = async (
+export const sendSocketMessage = async (
   chatId: string,
   message: Message<any>,
   isUpdate = false
@@ -67,6 +69,7 @@ const sendSocketMessage = async (
     message,
   };
   const messageType = isUpdate ? "update_message" : "message";
+  debugger
   await state.socket.emit(messageType, data);
 };
 

@@ -128,7 +128,7 @@ export const parseMessage = (
             return new Message<MessageBodyTypeInterface>(
                 msg.from,
                 msg.to,
-                <String>msg.body,
+                msg.body,
                 new Date(msg.timeStamp),
                 msg.id,
                 msg.type,

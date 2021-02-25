@@ -161,7 +161,6 @@ const addMessage = (chatId, message) => {
   // console.log("in addmessage message", message);
 
   const chat: Chat = state.chats.find(chat => chat.chatId == chatId);
-
   if (message.subject) {
     const subjectMessageIndex = chat.messages.findIndex(
       m => m.id === message.subject
@@ -201,7 +200,7 @@ const sendMessage = (chatId, message, type: string = "STRING") => {
   sendSocketMessage(chatId, msg);
 };
 
-const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
+export const sendMessageObject = (chatId, message: Message<MessageBodyType>) => {
   const { sendSocketMessage } = useSocketActions();
   // console.log(chatId, message);
   // @TODO when doing add message on groupupdate results in  max call stack exeeded

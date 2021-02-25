@@ -33,6 +33,7 @@ export enum MessageTypes {
     DELETE = "DELETE",
     GROUP_UPDATE = "GROUP_UPDATE",
     QUOTE = "QUOTE",
+    FORUMPOST = "FORUMPOST",
 }
 
 

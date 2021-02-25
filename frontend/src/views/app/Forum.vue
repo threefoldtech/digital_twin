@@ -8,24 +8,30 @@
     </div>
     <main v-if="selectedForum" class=" w-3/4 bg-pink-500">
 
-      <MessageCard
-              v-for="(message, i) in selectedForum.messages"
-              :key="i"
-              isread
-              isreadbyme
-              :message="message"
-              :chatId="selectedForum.chatId"
-              isGroup=false
-              isMine=false
-              @click="goToMessage(message.id)"
-          />
+      <template
+          v-for="(message, i) in selectedForum.messages"
+      >
+        <div class="post bg-gray-200 rounded-lg m-4 overflow-hidden" @click="goToMessage(message.id)">
+          <header class="border-b-2 border-blue-300 p-4  bg-pink-300">
+            <h1>{{ message.body.title }}</h1>
+          </header>
+          <main class="p-4">
+            {{message.body.content}}
+          </main>
+          <footer class="p-4 bg-red-300">
+            ACTIONS
+          </footer>
+        </div>
+
+      </template>
+
     </main>
   </div>
 </template>
 
 <script lang="ts">
 import moment from "moment";
-import { useSocketActions } from "../../store/socketStore";
+import {initializeSocket, useSocketActions} from "../../store/socketStore";
 import { defineComponent, ref, computed, onBeforeMount } from "vue";
 import {
   usechatsState,
@@ -76,6 +82,10 @@ export default defineComponent({
       return filteredForumsTmp;
     });
     onBeforeMount(retrievechats);
+    //@TODO fix this
+    onBeforeMount(() => {
+      initializeSocket();
+    });
 
     const selectedForum = computed(() =>{
       return chats.value.find(c => c.chatId == selectedForumId.value)
@@ -84,9 +94,9 @@ export default defineComponent({
     const goToMessage = (messageId) => {
       router.push({
         name:"forumPost",
-        query: {
-            chatId:<string>selectedForum.value.chatId,
-            messageId:messageId
+        params: {
+            chatid:<string>selectedForum.value.chatId,
+            postid:<string>messageId
         },
       })
     }

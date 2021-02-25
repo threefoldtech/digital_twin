@@ -183,7 +183,7 @@ export default defineComponent({
       );
     });
     onBeforeMount(() => {
-      initializeSocket(user.id.toString());
+      initializeSocket();
     });
     onBeforeMount(retrievechats);
 

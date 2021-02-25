@@ -58,7 +58,7 @@ export default defineComponent({
     const currentRoute = computed(() => router.currentRoute.value);
 
     const changePage = (page) => {
-      router.push(page)
+      router.push({name:page})
     }
 
     return {
