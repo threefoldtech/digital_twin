@@ -2,21 +2,22 @@ var url = require('url');
 var express = require('express');
 var router = express.Router();
 var cache = require('../../cache')
+var config = require('../../config')
 
 const asyncHandler = require('express-async-handler')
 
 var threebot = require('@threefoldjimber/threefold_login')
 
+
 router.get('/threebot/connect', asyncHandler(async (req, res) => {
 
     const threeFoldAPIHost = 'https://login.threefold.me/';
     const appId = req.headers.host
-    const seedPhrase = "analyst wrist friend quick person embrace spell bacon congress gorilla price figure mind camp vanish enrich large rhythm space garden arrive doctor poverty special";
     const redirectUrl = '/threebot/authorize';
 
     const login = new threebot.ThreefoldLogin( threeFoldAPIHost,
                                 appId,
-                                seedPhrase,
+                                config.threebot.passPhrase,
                                 redirectUrl );
     await login.init();
     const state = threebot.generateRandomString();
@@ -31,12 +32,11 @@ router.get('/threebot/authorize', asyncHandler(async (req, res) => {
     var state = req.session.state
     const threeFoldAPIHost = 'https://login.threefold.me/';
     const appId = req.headers.host;
-    const seedPhrase = "analyst wrist friend quick person embrace spell bacon congress gorilla price figure mind camp vanish enrich large rhythm space garden arrive doctor poverty special";
     const redirectUrl = '/threebot/authorize';
 
     const login = new threebot.ThreefoldLogin( threeFoldAPIHost,
                                 appId,
-                                seedPhrase,
+                                config.threebot.passPhrase,
                                 redirectUrl );
     
     var uri = req.protocol + '://' + req.get('host') + req.originalUrl;

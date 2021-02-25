@@ -30,15 +30,13 @@ async function main(){
     const {_, cleanup } = await init().catch((e)=>{console.log(e);process.exit(1)})
 
 
-    // DNS
+    // DNS (5352)
 
-    if (config.development){
-      dnsserver.listen(dnsport);
-      
-    }else{
-      dnsserver.listen(53);
+    if (!config.development){
+      dnsport = 53
     }
-
+    
+    dnsserver.listen(dnsport);
     console.log(chalk.green(`✓ (DNS Server) : ${dnsport}`));
     
     // HTTP(s) Server
