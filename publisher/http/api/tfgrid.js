@@ -317,25 +317,55 @@ router.post('/nodes', function(req, res) {
     if((value = fields_validate(required, req.body['location'])) !== true)
         return json_error(res, "Required field: " + value);
 
-    console.log(req.body);
+    let resources = tfclient.api.createType('Resources', req.body['capacity'])
 
-/*
-    {
-  node_id: '3We9p7C3wihY3ZZSP5w4ujEBPVtm685fVW563MVFbnE8',
-  hostname: 'zero-os',
-  farm_id: 2,
-  secret: '',
-  location: {
-    city: 'Unknown',
-    country: 'Belgium',
-    continent: 'Europe',
-    latitude: 51.1,
-    longitude: 3.9833
-  },
-  capacity: { cru: 1, mru: 3, sru: 2500, hru: 0 }
-}
+    let location = tfclient.api.createType('Location', {
+        latitude: req.body['location']['latitude'].toString(),
+        longitude: req.body['location']['longitude'].toString(),
+    })
 
-*/
+    let node = {
+        farm_id: req.body['farm_id'],
+        pub_key: req.body['node_id'],
+        twin_id: 1, // FIXME
+        resources,
+        location,
+        country_id: 0,
+        city_id: 0,
+        role: "Node"
+    }
+
+    tfclient.createNode(node, (content) => {
+        events(content, res, 201);
+
+    }).catch(err => { json_error(res, err) })
+})
+
+router.delete('/nodes/:id', function(req, res) {
+    tfclient.deleteNode(parseInt(req.params.id), (content) => {
+        events(content, res, 200);
+
+    }).catch(err => { json_error(res, err) })
+})
+
+//
+// gateway
+//
+router.post('/gateways', function(req, res) {
+    var required = ['farm_id', 'node_id', 'capacity', 'location'];
+
+    if((value = fields_validate(required, req.body)) !== true)
+        return json_error(res, "Required field: " + value);
+
+    var required = ['cru', 'mru', 'sru', 'hru'];
+
+    if((value = fields_validate(required, req.body['capacity'])) !== true)
+        return json_error(res, "Required field: " + value);
+
+    var required = ['longitude', 'latitude'];
+
+    if((value = fields_validate(required, req.body['location'])) !== true)
+        return json_error(res, "Required field: " + value);
 
     let resources = tfclient.api.createType('Resources', req.body['capacity'])
 
@@ -351,7 +381,8 @@ router.post('/nodes', function(req, res) {
         resources,
         location,
         country_id: 0,
-        city_id: 0
+        city_id: 0,
+        role: "Gateway"
     }
 
     tfclient.createNode(node, (content) => {
@@ -360,12 +391,6 @@ router.post('/nodes', function(req, res) {
     }).catch(err => { json_error(res, err) })
 })
 
-router.delete('/nodes/:id', function(req, res) {
-    tfclient.deleteNode(parseInt(req.params.id), (content) => {
-        events(content, res, 200);
-
-    }).catch(err => { json_error(res, err) })
-})
 
 //
 // account
