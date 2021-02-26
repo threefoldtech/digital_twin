@@ -7,6 +7,8 @@ services:
       context: ../
       dockerfile: ./dev/Dockerfile
     restart: always
+    environment: 
+      - USER_ID=development
     volumes:
       - ../frontend:/frontend
       - ../backend:/backend
@@ -22,6 +24,30 @@ services:
       - NET_ADMIN
     devices:
       - /dev/net/tun
+
+  # doublename-digitaltwin:
+  #   container_name: doublename-chat
+  #   build:
+  #     context: ../
+  #     dockerfile: ./dev/Dockerfile
+  #   restart: always
+  #   environment: 
+  #     - USER_ID=doublename
+  #   volumes:
+  #     - ../frontend:/frontend
+  #     - ../backend:/backend
+  #     - ./appdata1:/appdata
+  #     # - ./dev/logs:/var/log/
+  #     # - ./dev/logs:/var/log
+
+  #   networks:
+  #     - chatnet
+  #   sysctls:
+  #     - net.ipv6.conf.all.disable_ipv6=0
+  #   cap_add:
+  #     - NET_ADMIN
+  #   devices:
+  #     - /dev/net/tun
 
 networks:
   chatnet:

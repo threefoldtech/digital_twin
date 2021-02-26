@@ -58,6 +58,7 @@ export const startSocketIo = (httpServer: http.Server) => {
                 console.log(`send message to socket ${connection}`);
             });
             let location = chat.contacts.find(c => c.id == chat.adminId).location
+            
 
             if (newMessage.type === MessageTypes.READ) {
                 handleRead(<Message<StringMessageTypeInterface>>newMessage);

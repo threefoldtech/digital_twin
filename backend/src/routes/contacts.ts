@@ -30,14 +30,13 @@ router.post("/", async (req, res) => {
     const myLocation = await getMyLocation()
     const chat = addChat(contact.id,[contact, new Contact(config.userid, myLocation )],false, [message] ,contact.id, true, contact.id)
 
-
     const url = `/api/messages`
     const data:Message<ContactRequest> = {
         "id": uuidv4(),
         "to": contact.id,
         "body": {
             "id": <DtIdInterface>contact.id,
-            "location": <string>contact.location
+            "location": <string>myLocation
         },
         "from": config.userid,
         "type": MessageTypes.CONTACT_REQUEST,
@@ -46,6 +45,7 @@ router.post("/", async (req, res) => {
         subject: null,
     }
     console.log("sending to ",url)
+    console.log(data)
     sendMessageToApi(contact.location,data)
     sendEventToConnectedSockets("connectionRequest",chat)
     res.sendStatus(200)

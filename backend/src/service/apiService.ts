@@ -9,28 +9,13 @@ export const sendMessageToApi = async (
     location: String,
     newMessage: Message<MessageBodyTypeInterface>
 ) => {
-    const url = `${location}/api/messages`;
+    const url = `http://[${location}]/api/messages`;
     try {
         await axios.put(url, newMessage)
     } catch (e) {
         console.error(`couldn't send message ${url}`)
     }
 };
-
-
-// export const getDigitalTwinUrl = (location: IdInterface) => {
-//     //@todo
-
-//     if (location === "localhost:3000-chat"){
-//         return 'http://localhost:3000'
-//     }
-
-//     return `http://${getLocationForId(<string>location)}`
-// };
-
-// export const getLocationForId= (id:string) => {
-//     return `${(id.replace('-chat', ''))}-chat`
-// }
 
 export const getChatfromAdmin = async (adminLocation:string, chatId:string) => {
     const url = `${adminLocation}/api/messages/${chatId}`

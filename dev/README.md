@@ -18,4 +18,4 @@ docker network create chatnet
 docker-compose up --build
 
 ### Spin up other digitaltwins
-docker run -d --name doublename-chat  --network=chatnet --sysctl net.ipv6.conf.all.disable_ipv6=0 --cap-add=NET_ADMIN --device=/dev/net/tun jimbersoftware/chat:0.5 
+docker run -d --name doublename-chat  --network=chatnet --sysctl net.ipv6.conf.all.disable_ipv6=0 --cap-add=NET_ADMIN --device=/dev/net/tun -e USER_ID=doublename jimbersoftware/chat:0.5 

@@ -13,8 +13,9 @@ export const getMyLocation = ():Promise<string> => {
                 console.log(`stderr: ${stderr}`);
                 return reject();
             }
-            console.log(`Found yggdrasil address ${stdout}`);
-            resolve(stdout)
+            const address = stdout.replace(/(\r\n|\n|\r)/gm, "").trim()
+            console.log(`Found yggdrasil address ${address}`);
+            resolve(address)
         });
     })
     }

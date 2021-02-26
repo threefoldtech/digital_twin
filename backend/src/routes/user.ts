@@ -36,9 +36,9 @@ router.post('/avatar',async(req,resp)=>{
     const avatarId= uuidv4()
     saveAvatar(fileToSave.data,avatarId)
     let url = `https://${config.appId}/api/user/avatar/${avatarId}`
-    if(config.userid == "localhost:3000"){
-        url = `http://${config.userid}/api/user/avatar/${avatarId}`
-    }
+    // if(config.userid == "localhost:3000"){
+    //     url = `http://${config.userid}/api/user/avatar/${avatarId}`
+    // }
     user.updateAvatar(url)
     resp.status(200).json(url)
 })

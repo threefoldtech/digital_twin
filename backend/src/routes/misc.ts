@@ -26,7 +26,7 @@ router.get('/test', async (req, res) => {
 })
 
 router.get('/yggdrasil_address', async (req,res)=> {
-    const myLocation = await getMyLocation()
+    let myLocation = await getMyLocation()
     res.json(myLocation)
 })
 

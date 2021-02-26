@@ -1,4 +1,4 @@
-let userid = process.env.USER_ID || 'localhost:3000';
+let userid = process.env.USER_ID  || "please set your env var";
 let appId = process.env.DIGITALTWIN_APPID || "digitaltwin.jimbertesting.be"
 
 

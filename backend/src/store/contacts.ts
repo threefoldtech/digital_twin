@@ -3,8 +3,6 @@ import {getChatIds, getChat} from "../service/dataService"
 import {config} from "../config/config"
 import Chat from "../models/chat";
 
-const dummycontact = new Contact("jason_parser", "localhost:3000");
-
 //todo create propper contactArray
 const chatIds = getChatIds()
 const chats:Chat[] = getChatIds().map((chatId):Chat=>getChat(chatId))
