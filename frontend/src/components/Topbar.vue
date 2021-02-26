@@ -1,6 +1,7 @@
 <template>
   <div class="items-center bg-gradient grid grid-cols-12 relative h-full">
     <button class="col-span-2 text-lg text-white" @click="backOrMenu">
+      <!-- TODO check if you can go back, else show burger menu -->
       <i :class="`fas ${true ? 'fa-chevron-left' : 'fa-bars'}`"></i>
     </button>
     <div class="h-5 col-span-5 flex items-center">
@@ -12,7 +13,7 @@
       class="col-end-13 col-span-2 pr-4 text-right text-gray-500 flex items-center justify-end"
     >
       <slot name="actions">
-        <button class="text-lg text-white">
+        <button class="text-lg text-white" @click="addUser">
           <i class="fas fa-edit"></i>
         </button>
         <button class="text-lg text-white">
@@ -130,7 +131,7 @@ import { useRouter } from "vue-router";
 export default defineComponent({
   name: "Topbar",
   components: { AvatarImg, jdialog: Dialog },
-  setup() {
+  setup({}, ctx) {
     const { user } = useAuthState();
     const showDialog = ref(false);
     const showEdit = ref(false);
@@ -187,7 +188,12 @@ export default defineComponent({
       showDialog.value = false;
     };
 
+    const addUser = (() => {
+      ctx.emit('addUser')
+    })
+
     return {
+      addUser,
       backOrMenu,
       user,
       showEditPic,

@@ -1,5 +1,5 @@
 <template>
-  <app-layout>
+  <app-layout @addUser="showDialog = true">
     <top>
         <Topbar />
     </top>

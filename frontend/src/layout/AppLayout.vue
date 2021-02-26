@@ -2,7 +2,7 @@
   <div class="bg-gray-100 h-full overflow-hidden relative">
     <div class="pl-0 relative h-full w-full maingrid">
       <div class="top h-20 red">
-        <Topbar @userAdd="addUser">
+        <Topbar @addUser="addUser">
           <template v-slot:default>
             <slot name="top"> </slot>
           </template>
@@ -37,7 +37,7 @@ export default defineComponent({
   components: { Sidebar, Topbar },
   setup({}, ctx) {
     const addUser = () => {
-      console.log("Add user");
+      ctx.emit('addUser')
     };
 
     return {
