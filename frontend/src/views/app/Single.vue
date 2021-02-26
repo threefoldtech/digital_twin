@@ -1,11 +1,7 @@
 <template>
   <appLayout>
     <template v-slot:top>
-      <div v-if="!chat"></div>
-      <div class="grid bg-gradient grid-cols-12 z-10 text-white" v-else>
-        <button @click="goBack" class="md:hidden col-span-2">
-          <i class="fas fa-chevron-left"></i>
-        </button>
+      <div class="flex">
         <div class="col-span-2 place-items-center grid">
           <AvatarImg :id="chat.chatId"></AvatarImg>
         </div>
@@ -18,54 +14,56 @@
           </p>
           <p class="font-thin" v-if="chat.isGroup">Group chat</p>
         </div>
-        <div
-          class="col-end-13 col-span-2 text-right text-gray-500 flex items-center justify-end"
-        >
-          <button class="text-lg text-white">
-            <i class="fas fa-search"></i>
+      </div>
+    </template>
+    <template v-slot:actions>
+      <div
+        class=" text-gray-500 flex items-center justify-end"
+      >
+        <button class="text-lg text-white">
+          <i class="fas fa-search"></i>
+        </button>
+        <div class="relative">
+          <button class="text-lg text-white" @click="showMenu = true">
+            <i class="fas fa-ellipsis-v"></i>
           </button>
-          <div class="relative">
-            <button class="text-lg text-white" @click="showMenu = true">
-              <i class="fas fa-ellipsis-v"></i>
+          <div class="backdrop" v-if="showMenu" @click="showMenu = false"></div>
+          <div
+            class="right-2 z-20 -top-2 flex flex-col bg-white shadow-sm w-40 rounded absolute py-2"
+            v-if="showMenu"
+          >
+            <button @click="popupMeeting" class="flex">
+              <div class="w-8">
+                <i class="fas fa-video"></i>
+              </div>
+              <span class="ml-2 text-left">Call</span>
             </button>
-            <div
-              class="backdrop"
-              v-if="showMenu"
-              @click="showMenu = false"
-            ></div>
-            <div
-              class="right-2 -top-2 flex flex-col bg-white z-10 shadow-sm w-40 rounded absolute py-2"
-              v-if="showMenu"
-            >
-              <button @click="popupMeeting" class="flex">
-                <div class="w-8">
-                  <i class="fas fa-video"></i>
-                </div>
-                <span class="ml-2 text-left">Call</span>
-              </button>
 
-              <button @click="null" class="flex">
-                <div class="w-8">
-                  <i class="fas fa-bell-slash"></i>
-                </div>
-                <span class="ml-2 text-left">Mute</span>
-              </button>
-              <button @click="null" class="flex">
-                <div class="w-8">
-                  <i class="fas fa-info-circle"></i>
-                </div>
-                <span class="ml-2 text-left">Info</span>
-              </button>
+            <button @click="null" class="flex">
+              <div class="w-8">
+                <i class="fas fa-bell-slash"></i>
+              </div>
+              <span class="ml-2 text-left">Mute</span>
+            </button>
+            <button @click="null" class="flex">
+              <div class="w-8">
+                <i class="fas fa-info-circle"></i>
+              </div>
+              <span class="ml-2 text-left">Info</span>
+            </button>
 
-              <button @click="deleteChat" class="flex">
-                <div class="w-8">
-                  <i class="fas fa-trash"></i>
-                </div>
-                <span class="ml-2 text-left">Delete chat</span>
-              </button>
-              <!-- <button @click="deleteChat" class="text-red-600">Delete</button>
-            <button @click="blockChat" class="text-red-600">Block</button> -->
-            </div>
+            <button @click="blockChat" class="flex">
+              <div class="w-8">
+                <i class="fas fa-cube"></i>
+              </div>
+              <span class="ml-2 text-left">Block chat</span>
+            </button>
+            <button @click="deleteChat" class="flex">
+              <div class="w-8">
+                <i class="fas fa-trash"></i>
+              </div>
+              <span class="ml-2 text-left">Delete chat</span>
+            </button>
           </div>
         </div>
       </div>
@@ -198,16 +196,13 @@ export default defineComponent({
 
   setup(props) {
     const route = useRoute();
-    const router = useRouter();
     let selectedId = ref(null);
     const { retrievechats } = usechatsActions();
     onBeforeMount(retrievechats);
-    onMounted(() => {
+    onBeforeMount(() => {
       selectedId.value = route.params.id;
     });
-    const goBack = (() => {
-        router.push('/chat');
-    })
+
     const { chats } = usechatsState();
     const { sendMessage, sendFile } = usechatsActions();
     const { user } = useAuthState();
@@ -347,7 +342,6 @@ export default defineComponent({
     // });
 
     return {
-      goBack,
       chats,
       chat,
       truncate,

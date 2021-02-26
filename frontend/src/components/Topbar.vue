@@ -1,19 +1,24 @@
 <template>
-  <div class="items-center bg-gradient grid grid-cols-12 relative h-16">
-
-    <button class="col-span-2 text-lg text-white">
-      <i class="fas fa-bars"></i>
+  <div class="items-center bg-gradient grid grid-cols-12 relative h-full">
+    <button class="col-span-2 text-lg text-white" @click="backOrMenu">
+      <i :class="`fas ${true ? 'fa-chevron-left' : 'fa-bars'}`"></i>
     </button>
-    <img src="/TFN.svg" alt="TF-Logo" class="h-5 col-span-5 -ml-2"/>
+    <div class="h-5 col-span-5 flex items-center">
+      <slot>
+        <img src="/TFN.svg" alt="TF-Logo" class="-ml-2" />
+      </slot>
+    </div>
     <div
-      class="col-end-13 col-span-2 text-right text-gray-500 flex items-center justify-end"
+      class="col-end-13 col-span-2 pr-4 text-right text-gray-500 flex items-center justify-end"
     >
-    <button class="text-lg text-white">
-      <i class="fas fa-edit"></i>
-    </button>
-    <button class="text-lg text-white">
-      <i class="fas fa-search"></i>
-    </button>
+      <slot name="actions">
+        <button class="text-lg text-white">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="text-lg text-white">
+          <i class="fas fa-search"></i>
+        </button>
+      </slot>
     </div>
 
     <jdialog v-model="showDialog" @close="showDialog = false" noActions>
@@ -86,15 +91,21 @@
           <ul class="max-h-28 overflow-y-auto">
             <template v-for="blockedUser in blockedUsers">
               <li>
-                {{blockedUser}}
-                <button class="px-4 py-2 text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:border-blue-700 active:bg-blue-700 ease-in-out duration-150 cursor-pointer uppercase" @click="unblockUser(blockedUser)">unblock</button>
+                {{ blockedUser }}
+                <button
+                  class="px-4 py-2 text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:border-blue-700 active:bg-blue-700 ease-in-out duration-150 cursor-pointer uppercase"
+                  @click="unblockUser(blockedUser)"
+                >
+                  unblock
+                </button>
               </li>
             </template>
 
-            <li v-if="blockedUsers.length === 0 && blockedUsersLoading">... </li>
-            <li v-if="blockedUsers.length === 0 && !blockedUsersLoading"> No blocked users</li>
+            <li v-if="blockedUsers.length === 0 && blockedUsersLoading">...</li>
+            <li v-if="blockedUsers.length === 0 && !blockedUsersLoading">
+              No blocked users
+            </li>
           </ul>
-
         </div>
       </div>
     </jdialog>
@@ -102,15 +113,20 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onBeforeMount, ref} from "vue";
-import {useAuthState} from "../store/authStore";
-import {useSocketActions} from "../store/socketStore";
+import { computed, defineComponent, onBeforeMount, ref } from "vue";
+import { useAuthState } from "../store/authStore";
+import { useSocketActions } from "../store/socketStore";
 import Dialog from "./Dialog.vue";
 import AvatarImg from "@/components/AvatarImg.vue";
-import {deleteBlockedEntry, getBlockList, initBlocklist} from "@/store/blockStore";
-import {setNewavater} from "@/store/userStore"
-import {fetchStatus} from "@/store/statusStore"
-     
+import {
+  deleteBlockedEntry,
+  getBlockList,
+  initBlocklist,
+} from "@/store/blockStore";
+import { setNewavater } from "@/store/userStore";
+import { fetchStatus } from "@/store/statusStore";
+import { useRouter } from "vue-router";
+
 export default defineComponent({
   name: "Topbar",
   components: { AvatarImg, jdialog: Dialog },
@@ -123,13 +139,17 @@ export default defineComponent({
     const file = ref();
     const userStatus = ref("");
     const isEditingStatus = ref(false);
+    const router = useRouter();
+    const backOrMenu = () => {
+      router.push("/chat");
+    };
 
     const selectFile = () => {
       fileinput.value.click();
     };
     const changeFile = () => {
       file.value = fileinput.value?.files[0];
-      sendNewAvatar()
+      sendNewAvatar();
     };
     const removeFile = () => {
       file.value = null;
@@ -137,7 +157,7 @@ export default defineComponent({
 
     const sendNewAvatar = async () => {
       const newUrl = await setNewavater(file.value);
-      await fetchStatus(user.id)
+      await fetchStatus(user.id);
       showDialog.value = false;
     };
 
@@ -153,22 +173,22 @@ export default defineComponent({
       isEditingStatus.value = false;
     };
 
-    const blockedUsers = computed(()=>{
-      return getBlockList()
-    })
+    const blockedUsers = computed(() => {
+      return getBlockList();
+    });
     // @todo: config
 
-    onBeforeMount(()=>{
-      initBlocklist()
-    })
-    
+    onBeforeMount(() => {
+      initBlocklist();
+    });
 
     const unblockUser = async (user) => {
       await deleteBlockedEntry(user);
       showDialog.value = false;
-    }
+    };
 
     return {
+      backOrMenu,
       user,
       showEditPic,
       showEdit,
