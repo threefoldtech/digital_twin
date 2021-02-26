@@ -3,6 +3,7 @@ import {parseChat} from "../service/chatService";
 import {persistChat} from "../service/dataService";
 import axios from "axios";
 import { sendEventToConnectedSockets } from '../service/socketService';
+import { getFullIPv6ApiLocation } from '../service/urlService';
 
 const router = Router();
 
@@ -23,7 +24,7 @@ router.put('/', async (req, res) => {
     persistChat(chat);
 
     chat.contacts.forEach(async c => {
-        const path = `${c.location}/api/group/invite`;
+        const path = getFullIPv6ApiLocation(c.location,"/group/invite");
         console.log("sending group request to ", path)
         try {
             await axios.put(path, chat)

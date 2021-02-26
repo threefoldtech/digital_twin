@@ -4,12 +4,13 @@ import Message from "../models/message";
 import {MessageBodyTypeInterface} from "../types";
 import Chat from "../models/chat";
 import { parseChat } from "./chatService";
+import { getFullIPv6ApiLocation } from "./urlService";
 
 export const sendMessageToApi = async (
-    location: String,
+    location: string,
     newMessage: Message<MessageBodyTypeInterface>
 ) => {
-    const url = `http://[${location}]/api/messages`;
+    const url = getFullIPv6ApiLocation(location, "/messages" );
     try {
         await axios.put(url, newMessage)
     } catch (e) {
@@ -18,7 +19,8 @@ export const sendMessageToApi = async (
 };
 
 export const getChatfromAdmin = async (adminLocation:string, chatId:string) => {
-    const url = `${adminLocation}/api/messages/${chatId}`
+    const url = getFullIPv6ApiLocation(adminLocation, `/messages/${chatId}` );
+
     try {
         console.log("getting chat from ", url)
         const chat =  await axios.get(url)
