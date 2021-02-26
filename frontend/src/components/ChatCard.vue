@@ -72,7 +72,7 @@ export default defineComponent({
     };
 
     const status = computed(() => {
-      return statusList[props.chat.chatId];
+      return statusList[props.chat.chatId].status;
     });
 
     const lastMessageBody = computed(() => {

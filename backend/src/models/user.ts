@@ -1,6 +1,7 @@
 import { UserInterface } from "./../types/index";
 import { getUserdata, persistUserdata } from "../service/dataService";
 import { config } from "../config/config";
+import { getMyLocation } from "../service/locationService";
 export default class User implements UserInterface {
   status: string;
   image: string;
@@ -16,7 +17,7 @@ export default class User implements UserInterface {
       this.lastSeen = userData.lastSeen
     } catch (error) {
       this.status = "Exploring the new DigitalTwin";
-      this.image = `https://${config.appId}/api/user/avatar/default`;
+      this.image = `default`;
       this.id = config.userid;
       persistUserdata({
         status: this.status,
@@ -30,8 +31,9 @@ export default class User implements UserInterface {
   getStatus() {
     return this.status;
   }
-  getAvatar() {
-    return this.image;
+  async getAvatar() {
+    const myLocation = await getMyLocation()
+    return `http://${myLocation}/api/user/avatar/${this.image}`;
   }
   getData() {
     return {

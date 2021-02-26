@@ -7,3 +7,7 @@ export const calculateBaseUrl = (userId) => {
     url.splice(0,1);
     return location =  `https://${userId}.${url.join(".")}`;
 }
+
+export const calcExternalResourceLink = (location) => {
+  return `${window.location.origin}/getExternalResource?resource=${location}`
+}

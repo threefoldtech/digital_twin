@@ -187,7 +187,7 @@ export default defineComponent({
 
     const selectedChat = computed(()=>chats.value.find(chat=> chat.chatId == selectedId.value))
 
-    startFetchStatusLoop(user.id);
+    // startFetchStatusLoop(user.id);
 
     const filteredChatRequests = computed(() => {
       chatRequests.value = chatRequests.value.filter(cr => !chats.value.find(c => c.chatId === cr.chatId));

@@ -2,30 +2,33 @@ import axios from "axios";
 import { ref } from "vue";
 import { reactive } from "@vue/reactivity";
 import {useAuthState} from "@/store/authStore";
-import {calculateBaseUrl} from "../services/urlService"
+import {calcExternalResourceLink} from "../services/urlService"
+import { Contact } from "@/types";
 
 export const statusList = reactive<Object>({});
 export const watchingUsers = [];
 
 export const fetchStatus = async digitalTwinId => {
-  const baseLocation = calculateBaseUrl(digitalTwinId)
-  let url = `${baseLocation}/api/user/getStatus`;
-  const response = await axios.get(url);
+  const location = calcExternalResourceLink(`${watchingUsers[digitalTwinId].location}/api/user/getStatus`)
+  const response = await axios.get(location);
   let status = response.data;
-  statusList[digitalTwinId] = status;
+  statusList[digitalTwinId].status = status;
   return status;
 };
 
-export const startFetchStatusLoop = digitalTwinId => {
-  if (watchingUsers.find(wu => wu === digitalTwinId)) {
+export const startFetchStatusLoop = (contact:Contact) => {
+  if (watchingUsers.find(wu => wu === contact.id)) {
     return;
   }
-  watchingUsers.push(digitalTwinId);
-  fetchStatus(digitalTwinId);
+  watchingUsers.push(contact.id);
+  watchingUsers[<string>contact.id] = {
+    location: contact.location,
+  }
+  fetchStatus(contact.id);
 
   setInterval(() => {
     try {
-      fetchStatus(digitalTwinId);
+      fetchStatus(contact.id);
     } catch (e) {}
   }, 5000);
 };

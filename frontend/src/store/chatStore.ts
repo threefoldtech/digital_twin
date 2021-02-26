@@ -44,7 +44,8 @@ const retrievechats = async () => {
 
 const addChat = (chat: Chat) => {
   if (!chat.isGroup) {
-    startFetchStatusLoop(chat.chatId);
+    const { user }= useAuthState()
+    startFetchStatusLoop(<Contact>chat.contacts.find( c => c.id !== user.id ) );
   }
 
   if (chat.acceptedChat) {

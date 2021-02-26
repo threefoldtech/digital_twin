@@ -12,7 +12,7 @@ const router = Router();
 router.get('/getStatus', async(req, res) => {
     const isOnline = connections.getConnections().length ? true : false
     const status = user.getStatus()
-    const avatar = user.getAvatar()
+    const avatar = await user.getAvatar()
     const lastSeen = user.getLastSeen()
     const data = {
         status,
@@ -35,12 +35,10 @@ router.post('/avatar',async(req,resp)=>{
     const fileToSave = <UploadedFile>req.files.file
     const avatarId= uuidv4()
     saveAvatar(fileToSave.data,avatarId)
-    let url = `https://${config.appId}/api/user/avatar/${avatarId}`
-    // if(config.userid == "localhost:3000"){
-    //     url = `http://${config.userid}/api/user/avatar/${avatarId}`
-    // }
-    user.updateAvatar(url)
-    resp.status(200).json(url)
+    
+    user.updateAvatar(avatarId)
+    const newUrl = user.getAvatar()
+    resp.status(200).json(newUrl)
 })
 
 export default router

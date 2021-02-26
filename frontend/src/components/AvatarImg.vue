@@ -26,7 +26,7 @@ export default {
     // startFetchStatusLoop(props.id)
 
     const status = computed(() => {
-      return statusList[props.id]
+      return statusList[props.id].status
     })
     const src = computed(() => {
       if (!status.value || !status.value.avatar) {
