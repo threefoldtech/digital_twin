@@ -57,17 +57,23 @@ async function getDomains(id, drive){
 
         try{
             var content = await  drive.promises.readFile(domainfilepath, 'utf8');
-            var repo = await  drive.promises.readFile(repofilepath, 'utf8');
+            var repoData = await  drive.promises.readFile(repofilepath, 'utf8');
+            var repoInfo = JSON.parse(repoData)
+            
             var data = JSON.parse(content)
             for (var i=0; i < data.domains.length; i++){
+                
                 domains[data.domains[i]] = {
                     "drive": id,
                     "dir": path.join("/", dir),
-                    "repo": repo
+                    "repo": repoInfo["repo"],
+                    "alias": repoInfo["alias"],
+                    "isWebSite": repoInfo["repo"].startsWith("www")
                 }
             }
             return domains
         }catch(e){
+            console.log(e)
             console.log(chalk.red(` ✓ (Drive (${id}) Error reading: ${domainfilepath}`))
         }
     })
@@ -141,8 +147,8 @@ async function load(){
     }
     
     cache.domains = domains
-    cache.domains["127.0.0.1"] = {"drive": null, "dir": "", "repo": ""}
-    cache.domains["localhost"] = {"drive": null, "dir": "", "repo": ""}
+    cache.domains["127.0.0.1"] = {"drive": null, "dir": "", "repo": "", "alias": "", "isWebSite": false}
+    cache.domains["localhost"] = {"drive": null, "dir": "", "repo": "", "alias": "", "isWebSite": false}
 }
 
 

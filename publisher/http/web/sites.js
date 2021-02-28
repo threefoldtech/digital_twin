@@ -3,8 +3,50 @@ var router = express.Router();
 const asyncHandler = require('express-async-handler')
 
 var drive = require('../../drive.js')
-var cache = require('../../cache')
+var cache = require('../../cache');
+const { default: computeSourceMap } = require('sucrase/dist/computeSourceMap');
 
+async function update(req) {
+    var info = await getRequestInfo(req)
+    var repo = info.repo
+
+    if(info.status != 200){
+        return res.status(info.status).json({"err": info.err});
+    }
+
+    var spawn = require('child_process').spawn;
+    var prc = spawn('publishtools',  ['pull', '--repo', repo]);
+    
+    //noinspection JSUnresolvedFunction
+    prc.stdout.setEncoding('utf8');
+    prc.stdout.on('data', function (data) {
+        var str = data.toString()
+        var lines = str.split(/(\r?\n)/g);
+        console.log(lines.join(""));
+    });
+
+    prc.on('close', function (code) {
+        console.log('process exit code ' + code);
+    });
+    
+    if (repo.startsWith("www")){
+        prc = spawn('publishtools',  ['build', '--repo', repo]);
+    }else{
+        prc = spawn('publishtools',  ['flatten', '--repo', repo]);
+    }
+    //noinspection JSUnresolvedFunction
+    prc.stdout.setEncoding('utf8');
+    prc.stdout.on('data', function (data) {
+        var str = data.toString()
+        var lines = str.split(/(\r?\n)/g);
+        console.log(lines.join(""));
+    });
+
+    prc.on('close', function (code) {
+        console.log('process exit code ' + code);
+    });
+
+}
 
 async function getRequestInfo(req){
     var domains = cache.domains
@@ -33,9 +75,28 @@ async function getRequestInfo(req){
         err = "Host is unknown"
     }
 
-    driveObj = await drive.get(domains[host]["drive"])
-    dir = domains[host]["dir"]
-    repo = domains[host]["repo"]
+    var isWebsite = 'website' in req.params? true : false
+    var alias = 'website' in req.params? req.params.website : req.params.wiki
+
+    driveObj = null
+    dir = ""
+    repo = ""
+
+   
+    for(var item in cache.domains){
+        if(cache.domains[item].alias == alias && cache.domains[item].isWebSite == isWebsite){
+            var obj = cache.domains[item]
+            driveObj = await drive.get(obj.drive)
+            dir = obj.dir
+            repo = obj.repo
+            break
+        }
+    }
+
+    if(!driveObj){
+        status = 404
+        err = "NOT FOUND"
+    }
     
     return {
         "status" : status,
@@ -44,14 +105,17 @@ async function getRequestInfo(req){
         "host": host,
         "drive": driveObj,
         "dir" : dir,
-        "repo": repo
+        "repo": repo,
+        "alias": alias,
+        "isWebsite": isWebsite
     }
-
 }
 
 async function handleWebsiteFile(req, res, info){
     driveObj = info.drive
-    var filepath = `${info.dir}/${req.url}`
+    var url = req.url.replace(`/${info.alias}/`, "")
+    var filepath = `${info.dir}/${url}`
+    console.log(filepath)
     var encoding = 'utf-8'
     if(filepath.endsWith('png') || filepath.endsWith('jpg') || filepath.endsWith('jpeg')){
         encoding = 'binary'
@@ -80,16 +144,15 @@ async function handleWebsiteFile(req, res, info){
 }
 
 async function handleWikiFile(req, res, info){
-    
-    var filepath = `${info.dir}/${req.url}`
-    var filename = req.url.substring(1)
+    var filename = req.url.replace(`/info`, "").replace(`/${info.alias}/`, "")
     var wikiname = info.dir.substring(1)
-    
+
     if(filename.includes("__")){
         var splitted = filename.split("__")
         filename = splitted[1]
-        wikiname = `wiki_${splitted[0]}`
+        wikiname = splitted[0] == 'legal' ? 'legal' : `wiki_${splitted[0]}` 
     }
+   
 
     var encoding = 'utf-8'  
     
@@ -152,50 +215,67 @@ async function handleWikiFile(req, res, info){
 
 // Home (list of wikis and sites)
 router.get('/', asyncHandler(async (req, res) =>  {
-    var info = await getRequestInfo(req)
 
-    if(info.status != 200){
-        return res.status(info.status).json({"err": info.err});
-    }
+        var info = await getRequestInfo(req)
+        var wikis = new Set()
+        var sites = new Set()
+        for (var item in cache.domains){
+            if(item == "localhost" || item == "127.0.0.1"){
+                continue;
+            }
+            var alias  = cache.domains[item].alias
 
-    var domains = cache.domains
-
-    // Local listing page
-    if (info.host == "localhost" || info.host == "127.0.0.1" ){
-        var wikis = []
-        var sites = []
-        for (var item in domains){
-            if (domains[item]["dir"].startsWith("/wiki")){
-                wikis.push(item)
+            var isWebsite = cache.domains[item].isWebSite
+            
+            if (!isWebsite){
+                wikis.add(alias)
             }else{
-                sites.push(item)
+                sites.add(alias)
             }
         }
         res.render('sites/home.mustache', {
-            sites : sites,
-            wikis: wikis,
+            sites : Array.from(sites),
+            wikis: Array.from(wikis),
             port: info.port
-        });   
-        return
-    }else{
-        // Handle website or wiki
-        var driveObj = info.drive
-        var dir = info.dir
-        var filepath = `${dir}/index.html`
-        var entry = null
-        try {
-            entry = await driveObj.promises.stat(filepath)
-            var content = await  driveObj.promises.readFile(filepath, 'utf8');
-            return res.send(content)
-        } catch (e) {
-            console.log(e)
-            return res.status(404).json('');
-        }
+        });       
+    }
+))
+
+router.get('/:website', asyncHandler(async (req, res) =>  {
+     var info = await getRequestInfo(req)
+     var driveObj = info.drive
+     var dir = info.dir
+     var filepath = `${dir}/index.html`
+     var entry = null
+     try {
+         entry = await driveObj.promises.stat(filepath)
+         var content = await  driveObj.promises.readFile(filepath, 'utf8');
+         return res.send(content)
+     } catch (e) {
+         console.log(e)
+         return res.status(404).json('');
+     }
+}))
+
+router.get('/info/:wiki', asyncHandler(async (req, res) =>  {
+    var info = await getRequestInfo(req)
+    var driveObj = info.drive
+    var dir = info.dir
+    var filepath = `${dir}/index.html`
+    var entry = null
+    try {
+        entry = await driveObj.promises.stat(filepath)
+        var content = await  driveObj.promises.readFile(filepath, 'utf8');
+        return res.send(content)
+    } catch (e) {
+        console.log(e)
+        return res.status(404).json('');
     }
 }))
 
 
-router.get('/flexsearch', asyncHandler(async (req, res) => {
+
+router.get('/:website/flexsearch', asyncHandler(async (req, res) => {
     var info = await getRequestInfo(req)
 
     if(info.status != 200){
@@ -217,7 +297,7 @@ router.get('/flexsearch', asyncHandler(async (req, res) => {
 }))
 
 // Wiki errors
-router.get('/errors', asyncHandler(async (req, res) => {
+router.get('/info/:wiki/errors', asyncHandler(async (req, res) => {
     var info = await getRequestInfo(req)
 
     if(info.status != 200){
@@ -228,7 +308,6 @@ router.get('/errors', asyncHandler(async (req, res) => {
     var wikiname = info.dir.substring(1)
     
     filepath = `${info.dir}/errors.json`
-    var entry = null
     try {
         entry = await driveObj.promises.stat(filepath)
 
@@ -255,61 +334,38 @@ router.get('/errors', asyncHandler(async (req, res) => {
     }
 }))
 
-// files
-router.get('/update', asyncHandler(async (req, res) => {
-    var info = await getRequestInfo(req)
-    var repo = info.repo
 
+router.get('/info/:wiki/update', asyncHandler(async (req, res) => {
+    await update(req)
+    return res.redirect(`/info/${req.params.wiki}`)
+}))
+
+router.get('/:website/update', asyncHandler(async (req, res) => {
+    await update(req)
+    return res.redirect(`/${req.params.website}`)
+}))
+
+// wiki files
+router.get('/info/:wiki/*', asyncHandler(async (req, res) => {
+    var info = await getRequestInfo(req)
     if(info.status != 200){
         return res.status(info.status).json({"err": info.err});
     }
-
-    var spawn = require('child_process').spawn;
-    var prc = spawn('publishtools',  ['pull', '--repo', repo]);
-    
-    //noinspection JSUnresolvedFunction
-    prc.stdout.setEncoding('utf8');
-    prc.stdout.on('data', function (data) {
-        var str = data.toString()
-        var lines = str.split(/(\r?\n)/g);
-        console.log(lines.join(""));
-    });
-
-    prc.on('close', function (code) {
-        console.log('process exit code ' + code);
-    });
-    
-   
-    if (repo.startsWith("www")){
-        prc = spawn('publishtools',  ['build', '--repo', repo]);
-    }else{
-        prc = spawn('publishtools',  ['flatten', '--repo', repo]);
-    }
-    //noinspection JSUnresolvedFunction
-    prc.stdout.setEncoding('utf8');
-    prc.stdout.on('data', function (data) {
-        var str = data.toString()
-        var lines = str.split(/(\r?\n)/g);
-        console.log(lines.join(""));
-    });
-
-    prc.on('close', function (code) {
-        console.log('process exit code ' + code);
-    });
-
-    return res.redirect("/")
+    return handleWikiFile(req, res, info)
 }))
 
-// files
-router.get('/*', asyncHandler(async (req, res) => {
+// website files
+router.get('/:website/*', asyncHandler(async (req, res) => {
     var info = await getRequestInfo(req)
 
     if(info.status != 200){
         return res.status(info.status).json({"err": info.err});
     }
-    return info.dir.startsWith("/www") ? handleWebsiteFile(req, res, info) : handleWikiFile(req, res, info)
-    
+    return handleWebsiteFile(req, res, info)
 }))
+
+
+
 
 module.exports = router
 
