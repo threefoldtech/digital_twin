@@ -36,7 +36,7 @@ router.post('/:chatid/:messageid',async(req,resp)=>{
     }
     sendEventToConnectedSockets("message",message)
     const chat = getChat(chatId)
-    sendMessageToApi(chat.adminId,message)
+    sendMessageToApi(<string>chat.adminId,message)
     chat.addMessage(message)
     persistChat(chat)
     resp.sendStatus(200)
