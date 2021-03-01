@@ -39,7 +39,14 @@ async function process(){
         domains[element.subject] = element.renewAt || 1
     });
 
-    console.log(domains)
+    // force one domain for now
+    var d = process.env.DOMAIN
+    if (!d){
+        throw new Error("DOMAIN env variable is required in production")
+    }
+
+    letsencrypt = {d : {"altnames": [d], "renewAt": 1}}
+    
     for(var item in domains){
         if (!(item in letsencrypt)){
             continue
