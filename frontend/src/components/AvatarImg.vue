@@ -26,20 +26,15 @@ export default {
     // startFetchStatusLoop(props.id)
 
     const status = computed(() => {
-      // return statusList[props.id].status
-      return 
+      return statusList[props.id]
     })
     const src = computed(() => {
-console.log(statusList)
-return `https://avatars.dicebear.com/4.5/api/jdenticon/${encodeURI(
+      if (!status.value || !status.value.avatar) {
+        return `https://avatars.dicebear.com/4.5/api/jdenticon/${encodeURI(
             props.id
         )}.svg?m=14&b=%23ffffff`;
-      // if (!status.value || !status.value.avatar) {
-      //   return `https://avatars.dicebear.com/4.5/api/jdenticon/${encodeURI(
-      //       props.id
-      //   )}.svg?m=14&b=%23ffffff`;
-      // }
-      // return status.value.avatar;
+      }
+      return status.value.avatar;
 
     })
 

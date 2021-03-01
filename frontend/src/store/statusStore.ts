@@ -22,7 +22,6 @@ export const fetchStatus = async (digitalTwinId:DtId) => {
   }
   const response = await axios.get(location);
   let status = response.data;
-  console.log("status from ", location, "is", status)
 
   statusList[<string>digitalTwinId] = status;
   return status;
