@@ -145,6 +145,7 @@ import { startFetchStatusLoop } from "@/store/statusStore";
 import {statusList} from "@/store/statusStore";
 import ChatRequestList from "@/views/app/ChatRequestList.vue";
 import {uniqBy} from "lodash";
+import { Contact } from "../../types";
 
 export default defineComponent({
   name: "Apps",
@@ -187,7 +188,7 @@ export default defineComponent({
 
     const selectedChat = computed(()=>chats.value.find(chat=> chat.chatId == selectedId.value))
 
-    // startFetchStatusLoop(user.id);
+    startFetchStatusLoop(<Contact>{id:user.id, location:window.location.origin});
 
     const filteredChatRequests = computed(() => {
       chatRequests.value = chatRequests.value.filter(cr => !chats.value.find(c => c.chatId === cr.chatId));

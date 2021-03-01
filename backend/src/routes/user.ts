@@ -20,6 +20,7 @@ router.get('/getStatus', async(req, res) => {
         isOnline,
         lastSeen
     }
+    console.log("getStatus",data);
     res.json(data);
 })
 
