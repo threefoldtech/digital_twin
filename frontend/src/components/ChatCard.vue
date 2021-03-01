@@ -19,7 +19,7 @@
     </div>
     <div class="md:col-span-10 col-span-9 pl-2">
       <p class="flex place-content-between">
-        <span class="font-bold break-normal overflow-ellipsis overflow-hidden ">
+        <span class="font-bold break-normal overflow-ellipsis overflow-hidden">
           {{ chat.name }}
         </span>
         <span class="font-thin" v-if="chat.isGroup"> group</span>
@@ -72,26 +72,26 @@ export default defineComponent({
     };
 
     const status = computed(() => {
-      console.log(statusList)
-      // return statusList[props.chat.chatId].status;
-      return true
+      return statusList[props.chat.chatId];
     });
 
     const lastMessageBody = computed(() => {
-      const lstmsg = lastMessage.value
+      const lstmsg = lastMessage.value;
       switch (lstmsg.type) {
         case "GIF":
           return "Gif was sent";
         case "GROUP_UPDATE":
-          if(lstmsg.body.type == "REMOVEUSER") return `${lstmsg.body.contact.id } removed from group.`
-          if(lstmsg.body.type == "ADDUSER") return `${lstmsg.body.contact.id } added to group.`
+          if (lstmsg.body.type == "REMOVEUSER")
+            return `${lstmsg.body.contact.id} removed from group.`;
+          if (lstmsg.body.type == "ADDUSER")
+            return `${lstmsg.body.contact.id} added to group.`;
         case "QUOTE":
-          return lstmsg.body.message
+          return lstmsg.body.message;
         case "FILE":
           return "File has been uploaded";
         case "DELETE":
         default:
-          return lstmsg.body
+          return lstmsg.body;
       }
     });
 
