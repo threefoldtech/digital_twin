@@ -1,4 +1,10 @@
-import {DtIdInterface, IdInterface, MessageBodyTypeInterface, MessageInterface, MessageTypes} from "../types";
+import {
+    DtIdInterface,
+    IdInterface,
+    MessageBodyTypeInterface,
+    MessageInterface,
+    MessageTypes,
+} from '../types';
 
 export default class Message<T> implements MessageInterface<T> {
     public from: DtIdInterface;
@@ -8,10 +14,18 @@ export default class Message<T> implements MessageInterface<T> {
     public id: IdInterface;
     public type: MessageTypes;
     public replys: MessageInterface<MessageBodyTypeInterface>[];
-    public subject: IdInterface | null  ;
+    public subject: IdInterface | null;
 
-
-    constructor(from: DtIdInterface, to: IdInterface, body: T, timeStamp: Date, id: IdInterface, type: MessageTypes, replys: MessageInterface<MessageBodyTypeInterface>[], subject: IdInterface | null) {
+    constructor(
+        from: DtIdInterface,
+        to: IdInterface,
+        body: T,
+        timeStamp: Date,
+        id: IdInterface,
+        type: MessageTypes,
+        replys: MessageInterface<MessageBodyTypeInterface>[],
+        subject: IdInterface | null
+    ) {
         this.from = from;
         this.to = to;
         this.body = body;
@@ -21,5 +35,4 @@ export default class Message<T> implements MessageInterface<T> {
         this.replys = replys;
         this.subject = subject;
     }
-
 }

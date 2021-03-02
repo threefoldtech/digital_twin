@@ -1,10 +1,10 @@
-import {Router} from 'express';
-import {appCallback, getAppLoginUrl} from "../service/authService";
+import { Router } from 'express';
+import { appCallback, getAppLoginUrl } from '../service/authService';
 
 const router = Router();
 
 router.get('/', async (request, response) => {
-    response.json({status: true})
+    response.json({ status: true });
 });
 
 router.get('/signin', async (request, response) => {
@@ -17,4 +17,4 @@ router.get('/callback', async (request, response) => {
     response.redirect(callback);
 });
 
-export default router
+export default router;

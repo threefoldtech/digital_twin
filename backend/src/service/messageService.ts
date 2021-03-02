@@ -1,9 +1,15 @@
-import {IdInterface, StringMessageTypeInterface} from "./../types/index";
-import {ContactRequest, FileMessageType, MessageBodyTypeInterface, MessageInterface, MessageTypes,} from "../types";
-import Message from "../models/message";
-import {getChat, persistChat, saveFile} from "./dataService";
-import {sendEventToConnectedSockets} from "./socketService";
-import {determinChatId} from "../routes/messages";
+import { IdInterface, StringMessageTypeInterface } from './../types/index';
+import {
+    ContactRequest,
+    FileMessageType,
+    MessageBodyTypeInterface,
+    MessageInterface,
+    MessageTypes,
+} from '../types';
+import Message from '../models/message';
+import { getChat, persistChat, saveFile } from './dataService';
+import { sendEventToConnectedSockets } from './socketService';
+import { determinChatId } from '../routes/messages';
 
 export const parseMessage = (
     msg: any
@@ -19,7 +25,7 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                [...msg.replys?.map((r: any) => parseMessage(r))],
                 msg?.subject
             );
         case MessageTypes.GIF:
@@ -30,7 +36,7 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                [...msg.replys?.map((r: any) => parseMessage(r))],
                 msg?.subject
             );
         case MessageTypes.CONTACT_REQUEST:
@@ -41,7 +47,7 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                [...msg.replys?.map((r: any) => parseMessage(r))],
                 msg?.subject
             );
         case MessageTypes.GROUP_UPDATE:
@@ -52,7 +58,7 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                [...msg.replys?.map((r: any) => parseMessage(r))],
                 msg?.subject
             );
         case MessageTypes.FILE_UPLOAD:
@@ -61,11 +67,11 @@ export const parseMessage = (
             return new Message<FileMessageType>(
                 msg.from,
                 msg.to,
-                <FileMessageType>{filename: msg.body.name},
+                <FileMessageType>{ filename: msg.body.name },
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.FILE,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                [...msg.replys?.map((r: any) => parseMessage(r))],
                 msg?.subject
             );
         case MessageTypes.FILE:
@@ -76,7 +82,7 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                [...msg.replys?.map((r: any) => parseMessage(r))],
                 msg?.subject
             );
         case MessageTypes.EDIT:
@@ -87,7 +93,7 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.EDIT,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                [...msg.replys?.map((r: any) => parseMessage(r))],
                 msg?.subject
             );
         case MessageTypes.DELETE:
@@ -98,7 +104,7 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.DELETE,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                [...msg.replys?.map((r: any) => parseMessage(r))],
                 msg?.subject
             );
         case MessageTypes.QUOTE:
@@ -109,7 +115,7 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.QUOTE,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                [...msg.replys?.map((r: any) => parseMessage(r))],
                 msg?.subject
             );
         case MessageTypes.READ:
@@ -120,7 +126,7 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.READ,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                [...msg.replys?.map((r: any) => parseMessage(r))],
                 msg?.subject
             );
 
@@ -132,7 +138,7 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 msg.type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                [...msg.replys?.map((r: any) => parseMessage(r))],
                 msg?.subject
             );
     }
@@ -143,27 +149,31 @@ export const editMessage = (
     newMessage: Message<MessageBodyTypeInterface>
 ) => {
     const chat = getChat(chatId);
-    const index = chat.messages.findIndex((mes) => mes.id === newMessage.id);
+    const index = chat.messages.findIndex(mes => mes.id === newMessage.id);
     chat.messages[index].body = newMessage.body;
     persistChat(chat);
 };
 
 export const handleRead = (message: Message<StringMessageTypeInterface>) => {
-    console.log("reading");
+    console.log('reading');
 
     let chatId = determinChatId(message);
     const chat = getChat(chatId);
 
-    const newRead = chat.messages.find((m) => m.id === message.body);
+    const newRead = chat.messages.find(m => m.id === message.body);
     const oldRead = chat.messages.find(
-        (m) => m.id === chat.read[<string>message.from]
+        m => m.id === chat.read[<string>message.from]
     );
 
-    if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) {
+    if (
+        oldRead &&
+        newRead &&
+        newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()
+    ) {
         return;
     }
 
     chat.read[<string>message.from] = <string>message.body;
     persistChat(chat);
-    sendEventToConnectedSockets("message", message);
+    sendEventToConnectedSockets('message', message);
 };

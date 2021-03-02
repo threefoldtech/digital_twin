@@ -1,11 +1,13 @@
-import {createLogger, format, transports} from 'winston';
-import {TransformableInfo} from "logform";
-import {underline, italic, white} from "chalk";
+import { createLogger, format, transports } from 'winston';
+import { TransformableInfo } from 'logform';
+import { underline, italic, white } from 'chalk';
 
 const getDetailsFromFile = (fileDetails: any) => {
     const fileAndRow = fileDetails
-        .split("at ").pop()
-        .split("(").pop()
+        .split('at ')
+        .pop()
+        .split('(')
+        .pop()
         .replace(')', '')
         .split(':');
 
@@ -16,7 +18,13 @@ const getDetailsFromFile = (fileDetails: any) => {
     };
 
     // @ts-ignore
-    detailsFromFile.formattedInfos = white(Object.keys(detailsFromFile).reduce((previous, key) => `${previous}${underline(key)}: ${italic(detailsFromFile[key])}`, `\n`));
+    detailsFromFile.formattedInfos = white(
+        Object.keys(detailsFromFile).reduce(
+            (previous, key) =>
+                `${previous}${underline(key)}: ${italic(detailsFromFile[key])}`,
+            `\n`
+        )
+    );
 
     return detailsFromFile;
 };
@@ -29,26 +37,28 @@ export const logger = createLogger({
             format: format.combine(
                 format.colorize(),
                 format.timestamp({
-                    format: 'YY/MM/DD:HH:mm:ss:SSS'
+                    format: 'YY/MM/DD:HH:mm:ss:SSS',
                 }),
                 format.printf((info: TransformableInfo) => {
-                    const detailsFromFile = getDetailsFromFile(new Error().stack);
+                    const detailsFromFile = getDetailsFromFile(
+                        new Error().stack
+                    );
 
                     // S'il y a un objet, on le formatte
-                    const meta = (info.meta && Object.keys(info.meta).length)
-                        ? JSON.stringify(info.meta, null, 2)
-                        : "";
+                    const meta =
+                        info.meta && Object.keys(info.meta).length
+                            ? JSON.stringify(info.meta, null, 2)
+                            : '';
 
-                    return `[${info.timestamp}] ${info.level}: ${info.message}${info.splat !== undefined ? `${info.splat}` : " "}`;
+                    return `[${info.timestamp}] ${info.level}: ${info.message}${
+                        info.splat !== undefined ? `${info.splat}` : ' '
+                    }`;
                 })
-            )
+            ),
         }),
     ],
-    exitOnError: false
+    exitOnError: false,
 });
-;
-
-
 // creates a new Winston Logger
 export const httpLogger = createLogger({
     level: 'info',
@@ -59,15 +69,19 @@ export const httpLogger = createLogger({
             format: format.combine(
                 format.colorize(),
                 format.timestamp({
-                    format: 'YY/MM/DD:HH:mm:ss:SSS'
-                }), format.printf((info: any) => `[${info.timestamp}] ${info.level}: ${info.message}` + (info.splat !== undefined ? `${info.splat}` : " "))
-            )
+                    format: 'YY/MM/DD:HH:mm:ss:SSS',
+                }),
+                format.printf(
+                    (info: any) =>
+                        `[${info.timestamp}] ${info.level}: ${info.message}` +
+                        (info.splat !== undefined ? `${info.splat}` : ' ')
+                )
+            ),
         }),
-        new transports.File(
-            {
-                filename: './logs/error.log',
-                level: 'error'
-            }),
+        new transports.File({
+            filename: './logs/error.log',
+            level: 'error',
+        }),
     ],
-    exitOnError: false
+    exitOnError: false,
 });

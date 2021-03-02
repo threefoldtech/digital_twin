@@ -1,10 +1,8 @@
-var Drives = {
+var Drives = {};
 
-}
-
-var Domains = []
+var Domains = [];
 
 module.exports = {
-    drives: Drives,
-    domains : Domains
-}
+  drives: Drives,
+  domains: Domains,
+};

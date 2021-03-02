@@ -3,12 +3,12 @@ import authRouter from './auth';
 import chatsRouter from './chats';
 import messageRouter from './messages';
 import contactsRouter from './contacts';
-import userRouter from "./user"
-import filesRouter from "./files"
-import groupUser from "./group";
-import blockedRouter from "./blocked";
+import userRouter from './user';
+import filesRouter from './files';
+import groupUser from './group';
+import blockedRouter from './blocked';
 
-import misc from "./misc";
+import misc from './misc';
 
 const routes = Router();
 

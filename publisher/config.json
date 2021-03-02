@@ -1,21 +1,21 @@
 {
-    "http" : {
-        "host": "localhost",
-        "port" : 3000,
-        "httpsPort": 443
-    },
+  "http": {
+    "host": "localhost",
+    "port": 3000,
+    "httpsPort": 443
+  },
 
-    "dns":{
-        "port": 5352
-    },
+  "dns": {
+    "port": 5352
+  },
 
-    "hyperdrive" : {
-        "path" : "~/.digitaltwin"
-    },
+  "hyperdrive": {
+    "path": "~/.digitaltwin"
+  },
 
-    "filesystem" : {
-        "path" : "~/.publisher/publish/"
-    },
+  "filesystem": {
+    "path": "~/.publisher/publish/"
+  },
 
-    "development": false
+  "development": false
 }
