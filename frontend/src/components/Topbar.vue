@@ -1,17 +1,29 @@
 <template>
-  <div class="items-center bg-gradient grid grid-cols-12 relative h-full">
-    <button class="col-span-2 text-lg text-white" @click="backOrMenu">
-      <!-- TODO check if you can go back, else show burger menu -->
-      <i :class="`fas ${true ? 'fa-chevron-left' : 'fa-bars'}`"></i>
-    </button>
-    <div class="h-5 col-span-5 flex items-center">
+  <div
+    class="items-center bg-gradient flex md:topgrid relative h-full px-4 md:px-0"
+  >
+    <div class="h-5 ml-4 items-center">
+      <button
+        class="text-lg text-white md:hidden w-12"
+        @click="backOrMenu"
+        :class="{ 'md:hidden': !(route.meta && route.meta.back) }"
+      >
+        <i
+          :class="`fas ${
+            route.meta && route.meta.back ? 'fa-chevron-left' : 'fa-bars'
+          }`"
+        ></i>
+      </button>
+      <img src="/TFN.svg" alt="TF-Logo" class="md:ml-4 h-full hidden md:flex" />
+    </div>
+
+    <div class="h-5 flex items-center col-span-3 md:col-span-1">
       <slot>
-        <img src="/TFN.svg" alt="TF-Logo" class="-ml-2" />
+        <img src="/TFN.svg" alt="TF-Logo" class="md:hidden md:ml-4 h-full" />
       </slot>
     </div>
-    <div
-      class="col-end-13 col-span-2 pr-4 text-right text-gray-500 flex items-center justify-end"
-    >
+
+    <div class="pr-4 text-right text-gray-500 flex items-center justify-end">
       <slot name="actions">
         <button class="text-lg text-white" @click="addUser">
           <i class="fas fa-edit"></i>
@@ -19,10 +31,11 @@
         <button class="text-lg text-white">
           <i class="fas fa-search"></i>
         </button>
+        <!-- <input class="hidden md:block" type="text"/> -->
       </slot>
     </div>
 
-    <jdialog v-model="showDialog" @close="showDialog = false" noActions>
+    <jdialog v-model="showDialog" noActions>
       <template v-slot:title>
         <h1>Profile settings</h1>
       </template>
@@ -126,7 +139,7 @@ import {
 } from "@/store/blockStore";
 import { setNewavater } from "@/store/userStore";
 import { fetchStatus } from "@/store/statusStore";
-import { useRouter } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 
 export default defineComponent({
   name: "Topbar",
@@ -141,8 +154,13 @@ export default defineComponent({
     const userStatus = ref("");
     const isEditingStatus = ref(false);
     const router = useRouter();
+    const route = useRoute();
     const backOrMenu = () => {
-      router.push("/chat");
+      if (route.meta && route.meta.back) {
+        router.push({ name: route.meta.back });
+        return;
+      }
+      alert("Show profile");
     };
 
     const selectFile = () => {
@@ -188,9 +206,9 @@ export default defineComponent({
       showDialog.value = false;
     };
 
-    const addUser = (() => {
-      ctx.emit('addUser')
-    })
+    const addUser = () => {
+      ctx.emit("addUser");
+    };
 
     return {
       addUser,
@@ -211,10 +229,23 @@ export default defineComponent({
       isEditingStatus,
       blockedUsers,
       unblockUser,
+      route,
     };
   },
 });
 </script>
 
 <style scoped>
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  @variants responsive {
+    .topgrid {
+      display: grid !important;
+      grid-template-columns: 500px 2fr 1fr !important;
+    }
+  }
+}
 </style>

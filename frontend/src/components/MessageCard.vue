@@ -1,7 +1,9 @@
 <template>
-  <div class="grid grid-cols-12">
-    <AvatarImg class="mr-8 col-span-2" :id="message.from"/>
-    <div class="card col-span-10 bg-white rounded-md mb-4 overflow-hidden">
+  <div class="flex">
+    <div class="flex justify-center w-18 mr-4">
+      <AvatarImg :id="message.from"/>
+    </div>
+    <div class="card w-full bg-white rounded-md mb-4 overflow-hidden">
       <header class="flex justify-between pl-2 pt-2 text-xs items-center">
         <div class="title">
           <div class="name inline-block pr-5 ">

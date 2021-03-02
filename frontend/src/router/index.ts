@@ -29,17 +29,19 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: '/chat',
-        name: 'chat',
         component: Basic,
         children: [
             {
                 path: '',
-                name: '',
+                name: 'chat',
                 component: Chat,
             }, {
                 path: ':id',
                 name: 'single',
                 component: Single,
+                meta: {
+                    back: 'chat'
+                }
             }
         ]
     },

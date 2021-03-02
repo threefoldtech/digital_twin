@@ -1,11 +1,11 @@
 <template>
   <appLayout>
     <template v-slot:top>
-      <div class="flex">
-        <div class="col-span-2 place-items-center grid">
+      <div class="w-full flex md:px-4" v-if="chat">
+        <div class="place-items-center grid mr-4">
           <AvatarImg :id="chat.chatId"></AvatarImg>
         </div>
-        <div class="col-span-6 py-4 pl-2">
+        <div class="py-4 pl-2">
           <p class="font-bold font overflow-hidden overflow-ellipsis">
             {{ chat.name }}
           </p>
@@ -15,11 +15,10 @@
           <p class="font-thin" v-if="chat.isGroup">Group chat</p>
         </div>
       </div>
+      <div v-else>Loading</div>
     </template>
     <template v-slot:actions>
-      <div
-        class=" text-gray-500 flex items-center justify-end"
-      >
+      <div class="text-gray-500 flex items-center justify-end w-full">
         <button class="text-lg text-white">
           <i class="fas fa-search"></i>
         </button>
@@ -41,12 +40,6 @@
 
             <button @click="null" class="flex">
               <div class="w-8">
-                <i class="fas fa-bell-slash"></i>
-              </div>
-              <span class="ml-2 text-left">Mute</span>
-            </button>
-            <button @click="null" class="flex">
-              <div class="w-8">
                 <i class="fas fa-info-circle"></i>
               </div>
               <span class="ml-2 text-left">Info</span>
@@ -54,7 +47,7 @@
 
             <button @click="blockChat" class="flex">
               <div class="w-8">
-                <i class="fas fa-cube"></i>
+                <i class="fas fa-minus-circle"></i>
               </div>
               <span class="ml-2 text-left">Block chat</span>
             </button>
@@ -68,89 +61,124 @@
         </div>
       </div>
     </template>
+
     <template v-slot:default>
-      <div v-if="chat" class="relative h-full w-full flex flex-col">
-        <div
-          class="flex-grow row-span-4 relative overflow-y-auto"
-          ref="messageBox"
-        >
-          <div class="absolute w-full mt-8 px-4">
-            <div
-              v-for="(message, i) in chat?.messages"
-              :key="`${message.id}-${message.type}-${message.timeStamp}`"
-            >
-              <div v-if="showDivider(message, i)" class="text-center px-4">
-                <span class="font-thin">
-                  {{ m(message.timeStamp).fromNow() }}
-                </span>
-              </div>
-              <MessageCard
-                :isread="i <= lastRead"
-                :isreadbyme="i <= lastReadByMe"
-                :message="message"
-                :chatId="chat.chatId"
-                :isGroup="chat.isGroup"
-                :isMine="message.from === user.id"
-                v-on:scroll="scrollToBottom"
-              />
-              <div
-                class="font-thin text-right align-middle"
-                v-if="reads[message.id]"
-              >
-                <div
-                  class="inline-block justify-end align-bottom"
-                  v-for="(value, key) in reads[message.id].slice(0, 3)"
-                  :key="key"
-                >
-                  <AvatarImg xsmall :id="value"></AvatarImg>
-                </div>
-                <span v-if="reads[message.id].length > 3">
-                  + {{ reads[message.id].length - 3 }}
-                </span>
-              </div>
-            </div>
-
-            <div
-              id="viewAnchor"
-              ref="viewAnchor"
-              style="
-                height: 40vh;
-                position: absolute;
-                bottom: 0;
-                width: 50%;
-                pointer-events: none;
-              "
-            ></div>
-          </div>
+      <div
+        class="grid grid-cols-1 md:singleGrid relative h-full w-full"
+        v-if="chat"
+      >
+        <div class="hidden md:block relative h-full flex-col overflow-y-auto">
+          <ChatList/>
         </div>
+        <div class="relative h-full flex flex-col">
+          <div class="flex-grow relative overflow-y-auto" ref="messageBox">
+            <div class="absolute w-full mt-8 px-4">
+              <div
+                v-for="(message, i) in chat?.messages"
+                :key="`${message.id}-${message.type}-${message.timeStamp}`"
+              >
+                <div v-if="showDivider(message, i)" class="text-center px-4">
+                  <span class="font-thin">
+                    {{ m(message.timeStamp).fromNow() }}
+                  </span>
+                </div>
+                <MessageCard
+                  :isread="i <= lastRead"
+                  :isreadbyme="i <= lastReadByMe"
+                  :message="message"
+                  :chatId="chat.chatId"
+                  :isGroup="chat.isGroup"
+                  :isMine="message.from === user.id"
+                  v-on:scroll="scrollToBottom"
+                />
+                <div
+                  class="font-thin text-right align-middle"
+                  v-if="reads[message.id]"
+                >
+                  <div
+                    class="inline-block justify-end align-bottom"
+                    v-for="(value, key) in reads[message.id].slice(0, 3)"
+                    :key="key"
+                  >
+                    <AvatarImg xsmall :id="value"></AvatarImg>
+                  </div>
+                  <span v-if="reads[message.id].length > 3">
+                    + {{ reads[message.id].length - 3 }}
+                  </span>
+                </div>
+              </div>
 
-        <ChatInput
-          class="chatInput"
-          :selectedid="chat.chatId"
-          v-on:messageSend="scrollToBottom(true)"
-        />
-        <jdialog
-          v-model="showDialog"
-          @close="showDialog = false"
-          noActions
-          class="max-w-10"
-        >
-          <template v-slot:title class="center">
-            <h1 class="text-center">Blocking</h1>
-          </template>
-          <div>
-            Do you really want to block <b> {{ chat.name }} </b>?
+              <div
+                id="viewAnchor"
+                ref="viewAnchor"
+                style="
+                  height: 40vh;
+                  position: absolute;
+                  bottom: 0;
+                  width: 50%;
+                  pointer-events: none;
+                "
+              ></div>
+            </div>
           </div>
-          <div class="grid grid-cols-2 mt-2">
-            <button
-              @click="doBlockChat"
-              class="bg-red-500 p-2 text-white font-bold"
+
+          <ChatInput
+            class="chatInput"
+            :selectedid="chat.chatId"
+            @messageSend="scrollToBottom(true)"
+          />
+          <jdialog
+            v-model="showDialog"
+            noActions
+            class="max-w-10"
+          >
+            <template v-slot:title class="center">
+              <h1 class="text-center">Blocking</h1>
+            </template>
+            <div>
+              Do you really want to block <b> {{ chat.name }} </b>?
+            </div>
+            <div class="grid grid-cols-2 mt-2">
+              <button
+                @click="doBlockChat"
+                class="bg-red-500 p-2 text-white font-bold"
+              >
+                YES
+              </button>
+              <button @click="showDialog = false" class="p-2">NO</button>
+            </div>
+          </jdialog>
+        </div>
+        <aside class="hidden md:flex relative h-full flex-col overflow-y-auto">
+          <div class="absolute max-w-full w-full p-4 pt-8">
+            <div
+              class="bg-white p-2 pb-6 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1 md:px-4"
             >
-              YES
-            </button>
-            <button @click="showDialog = false" class="p-2">NO</button>
+              <div class="place-items-center grid relative">
+                <AvatarImg class="-mt-7" :id="chat.chatId" />
+                <div
+                  v-if="!chat.isGroup"
+                  class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-0 transition-all"
+                  :class="{
+                    'bg-red-500': status && !status.isOnline,
+                    'bg-green-500': status && status.isOnline,
+                  }"
+                ></div>
+              </div>
+              <h2
+                class="my-3 break-words text-center w-full overflow-y-auto max-h-28"
+              >
+                {{ chat.name }}
+              </h2>
+              <p
+                class="break-words w-full overflow-y-auto font-bold text-center text-gray-300"
+              >
+                {{ status?.status || "No status found" }}
+              </p>
+            </div>
+            <group-management :group-chat="chat"></group-management>
           </div>
-        </jdialog>
+        </aside>
       </div>
 
       <div class="grid h-full w-full place-items-center" v-else>
@@ -183,8 +211,10 @@ import { useContactsState } from "@/store/contactStore";
 import { useAuthState } from "@/store/authStore";
 import { popupCenter } from "@/services/popupService";
 import MessageCard from "@/components/MessageCard.vue";
+import ChatList from "@/components/ChatList.vue";
 import ChatInput from "@/components/ChatInput.vue";
 import AvatarImg from "@/components/AvatarImg.vue";
+import GroupManagement from "@/components/GroupManagement.vue";
 import Dialog from "@/components/Dialog.vue";
 import * as crypto from "crypto-js";
 import { useIntersectionObserver } from "@/lib/intersectionObserver";
@@ -192,7 +222,15 @@ import { useRoute, useRouter } from "vue-router";
 
 export default defineComponent({
   name: "ChatView",
-  components: { AvatarImg, ChatInput, MessageCard, jdialog: Dialog, appLayout },
+  components: {
+    AvatarImg,
+    ChatInput,
+    MessageCard,
+    jdialog: Dialog,
+    appLayout,
+    GroupManagement,
+    ChatList,
+  },
 
   setup(props) {
     const route = useRoute();
@@ -337,9 +375,12 @@ export default defineComponent({
 
     //@TODO fix this
     // @ts-ignore
-    // watch(chat.value.messages, () => {
-    //   scrollToBottom();
-    // });
+    watch(chat.value?.messages, () => {
+      scrollToBottom();
+    });
+    const status = computed(() => {
+      return statusList[selectedId.value];
+    });
 
     return {
       chats,
@@ -351,6 +392,7 @@ export default defineComponent({
       m,
       messageBox,
       scrollToBottom,
+      status,
       statusList,
       popupMeeting,
       lastRead,
@@ -371,4 +413,16 @@ export default defineComponent({
 </script>
 
 <style scoped type="text/css">
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  @variants responsive {
+    .singleGrid {
+      grid-template-columns: 400px 2fr 1fr;
+    }
+  }
+}
+
 </style>

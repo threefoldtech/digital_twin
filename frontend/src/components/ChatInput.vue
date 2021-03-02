@@ -74,6 +74,7 @@ import GifSelector from "@/components/GifSelector.vue";
 export default {
   name: 'ChatInput',
   components: {GifSelector},
+  emits: ['messageSend'],
   props: {
     selectedid: {},
   },
