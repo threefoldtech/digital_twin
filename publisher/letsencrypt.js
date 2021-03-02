@@ -44,8 +44,9 @@ async function process(){
     if (!d){
         throw new Error("DOMAIN env variable is required in production")
     }
+    letsencrypt = {}
 
-    letsencrypt = {d : {"altnames": [d], "renewAt": 1}}
+    letsencrypt[d] = {"altnames": [d], "renewAt": 1}
     
     for(var item in domains){
         if (!(item in letsencrypt)){
