@@ -40,7 +40,7 @@ async function process(){
     });
 
     // force one domain for now
-    var d = process.env.DOMAIN
+    var d = require('process').env.DOMAIN
     if (!d){
         throw new Error("DOMAIN env variable is required in production")
     }
