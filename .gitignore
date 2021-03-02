@@ -26,3 +26,6 @@ digitaltwin
 build
 *.lock
 package-lock.json
+.greenlockrci
+
+greenlock.d/config.json

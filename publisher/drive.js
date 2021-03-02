@@ -7,7 +7,7 @@ const { Client: HyperspaceClient } = require('hyperspace')
 const HyperDrive = require('hyperdrive')
 const config = require('./config.js')
 const db  = JSON.parse(fs.readFileSync('db/drives.json'));
-const cache = require('./cache.js')
+const cache = require('./cache.js');
 
 let client
 let server
@@ -15,7 +15,6 @@ let server
 class LocalDrive{
     constructor(){
         var base = config.filesystem.path
-        console.log(base)
         this.promises =  {
             stat : async function(filepath){
                 return fs.lstatSync(path.join(base, filepath));
@@ -31,6 +30,55 @@ class LocalDrive{
             },
         }
     }
+}
+
+async function getDomains(id, drive){
+    var dirs = await drive.promises.readdir("/")
+    dirs = dirs.filter((item) => {if(!item.startsWith(".")){return item}}).sort()
+
+    var res = await dirs.map( async function(dir) {
+        var domainfilepath = path.join("/", dir, ".domains.json")
+        var repofilepath = path.join("/", dir, ".repo")
+
+        var domains = {}
+        try{
+            await drive.promises.stat(domainfilepath)
+        }catch(e){
+            console.log(chalk.red(`    ✓ (Drive (${id}) Ignoring path: /${dir} does not contain .domains.json`))
+            return []
+        }
+
+        try{
+            await drive.promises.stat(repofilepath)
+        }catch(e){
+            console.log(chalk.red(`    ✓ (Drive (${id}) Ignoring path: /${dir} does not contain .repo`))
+            return []
+        }
+
+        try{
+            var content = await  drive.promises.readFile(domainfilepath, 'utf8');
+            var repoData = await  drive.promises.readFile(repofilepath, 'utf8');
+            var repoInfo = JSON.parse(repoData)
+            
+            var data = JSON.parse(content)
+            for (var i=0; i < data.domains.length; i++){
+                
+                domains[data.domains[i]] = {
+                    "drive": id,
+                    "dir": path.join("/", dir),
+                    "repo": repoInfo["repo"],
+                    "alias": repoInfo["alias"],
+                    "isWebSite": repoInfo["repo"].startsWith("www")
+                }
+            }
+            return domains
+        }catch(e){
+            console.log(e)
+            console.log(chalk.red(` ✓ (Drive (${id}) Error reading: ${domainfilepath}`))
+        }
+    })
+
+    return res.filter((item)=> item !== undefined)
 }
 
 async function create(name){
@@ -61,6 +109,10 @@ async function get(id_or_name){
 }
 
 async function load(){
+    var domains = {}
+    var drivedomains = []
+    var letsencrypt = []
+
     db.hyperdrives.map( async function(item) {
         let drive = new HyperDrive(client.corestore(), item.key)
         await drive.promises.ready()
@@ -70,10 +122,33 @@ async function load(){
         console.log(chalk.blue(`✓ (HyperSpace Drive) loaded ${item.name} (${item.key})`))
         cache.drives[item.name] = drive
         cache.drives[item.key] = drive
-        
+        drivedomains.push(...await getDomains(item.key, drive))
     })
-    cache.drives["local"] = new LocalDrive()
-    console.log(chalk.blue(`✓ (LocalDrive Drive) loaded`))
+    var localdrive = new LocalDrive()
+    cache.drives["local"] = localdrive 
+    console.log(chalk.blue(`\n✓ (LocalDrive Drive) loaded`))
+
+    drivedomains.push(...await getDomains("local", localdrive))
+    
+    for (var i=0; i < drivedomains.length; i++){
+        var item = await drivedomains[i]
+        if(!item){
+            continue
+        }
+        for (var domain in item){
+            if (domain in domains){
+                console.log(chalk.red(`(X Duplicate domain) ${domain}`))
+            }else{
+                domains[domain] = item[domain]
+                console.log(chalk.blue(`    ✓ (Loaded domain ${domain}`))
+
+            }
+        } 
+    }
+    
+    cache.domains = domains
+    cache.domains["127.0.0.1"] = {"drive": null, "dir": "", "repo": "", "alias": "", "isWebSite": false}
+    cache.domains["localhost"] = {"drive": null, "dir": "", "repo": "", "alias": "", "isWebSite": false}
 }
 
 

@@ -58,3 +58,8 @@ using `pkg` tool
     ./node_modules/sodium-native/prebuilds
     ./node_modules/fd-lock/prebuilds
     ```
+
+
+# dns
+
+dig @127.0.0.1 -p5333 lsong.org
