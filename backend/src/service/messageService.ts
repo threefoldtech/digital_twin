@@ -16,7 +16,7 @@ export const parseMessage = (
 ): MessageInterface<MessageBodyTypeInterface> => {
     const type: MessageTypes = <MessageTypes>msg.type;
     const replies: MessageInterface<MessageBodyTypeInterface>[] = [
-        ...msg.replies?.map((r: any) => parseMessage(r)),
+        ...msg.replys?.map((r: any) => parseMessage(r)),
     ];
 
     switch (type) {
