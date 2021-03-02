@@ -14,21 +14,21 @@
     </div>
 </template>
 <script lang="ts">
-    import { usechatsActions } from '@/store/chatStore';
+import { usechatsActions } from '@/store/chatStore';
 
-    export default {
-        name: 'ChatRequestList',
-        props: {
-            chatRequests: {},
-        },
-        setup() {
-            const acceptChatRequest = id => {
-                const { acceptChat } = usechatsActions();
-                acceptChat(id);
-            };
-            return {
-                acceptChatRequest,
-            };
-        },
-    };
+export default {
+    name: 'ChatRequestList',
+    props: {
+        chatRequests: {},
+    },
+    setup() {
+        const acceptChatRequest = id => {
+            const { acceptChat } = usechatsActions();
+            acceptChat(id);
+        };
+        return {
+            acceptChatRequest,
+        };
+    },
+};
 </script>
