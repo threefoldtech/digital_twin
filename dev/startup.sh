@@ -11,8 +11,8 @@ fi
 exec yggdrasil -useconffile /etc/yggdrasil.conf -logto /var/log/yggdrasil/yggdrasil.log >> /var/log/yggdrasil/yggdrasil.log &
 nginx
 
-cd /backend && yarn && yarn serve >> /var/log/backend.log &
-cd /frontend && yarn && yarn serve >> /var/log/frontend.log &
+# cd /backend && yarn && yarn serve >> /var/log/backend.log &
+# cd /frontend && yarn && yarn serve >> /var/log/frontend.log &
 
 
 tail -f /dev/null

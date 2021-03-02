@@ -33,7 +33,7 @@ export default class User implements UserInterface {
   }
   async getAvatar() {
     const myLocation = await getMyLocation()
-    return `http://${myLocation}/api/user/avatar/${this.image}`;
+    return `http://[${myLocation}]/api/user/avatar/${this.image}`;
   }
   getData() {
     return {

@@ -46,7 +46,7 @@
 
 <script lang="ts">
 import {computed, defineComponent, ref, watch} from "vue";
-import moment from "moment";=
+import moment from "moment";
 import AvatarImg from "@/components/AvatarImg.vue";
 import MessageContent from "@/components/MessageContent.vue";
 

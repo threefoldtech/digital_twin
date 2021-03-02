@@ -100,7 +100,7 @@ export default defineComponent({
       chats.value.find((chat) => chat.chatId == selectedId.value)
     );
 
-    startFetchStatusLoop(user.id);
+    // startFetchStatusLoop(user.id);
 
     const filteredChatRequests = computed(() => {
       chatRequests.value = chatRequests.value.filter(
@@ -109,6 +109,7 @@ export default defineComponent({
       const filteredChats = chatRequests.value.filter(
         (cr) => !chats.value.find((c) => c.chatId === cr.chatId)
       );
+      //@ts-ignore
       return uniqBy(filteredChats, (c) => c.chatId);
     });
 
