@@ -23,6 +23,7 @@ export interface TabInterface {
 
 export enum MessageTypes {
     STRING = "STRING",
+    SYSTEM = "SYSTEM",
     GIF = "GIF",
     MESSAGE = "MESSAGE",
     FILE = "FILE",
@@ -34,6 +35,7 @@ export enum MessageTypes {
     GROUP_UPDATE = "GROUP_UPDATE",
     QUOTE = "QUOTE",
 }
+
 
 export enum MessageOperations {
     NEW = "NEW",

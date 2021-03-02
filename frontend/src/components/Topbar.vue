@@ -1,17 +1,41 @@
 <template>
-  <div class="grid grid-cols-3 md:grid-cols-7 h-12 items-center p-4">
-    <img src="/TFN-black.svg" alt="TF-Logo" class="h-full hidden md:block col-end-3" />
-    <img src="/TF-small-black.svg" alt="TF-Logo" class="h-12 md:hidden col-span-1" />
-    <div
-      class="md:col-end-13 col-span-2 text-right text-gray-500 flex items-center justify-end"
-    >
-      <AvatarImg :id="user.id" />
-      <span class="ml-2">{{ user.id }}</span>
-      <button @click="showDialog = true">
-        <i class="fas fa-cog text-gray-500"></i>
+  <div
+    class="items-center bg-gradient flex md:topgrid relative h-full px-4 md:px-0"
+  >
+    <div class="h-5 ml-4 items-center">
+      <button
+        class="text-lg text-white md:hidden w-12"
+        @click="backOrMenu"
+        :class="{ 'md:hidden': !(route.meta && route.meta.back) }"
+      >
+        <i
+          :class="`fas ${
+            route.meta && route.meta.back ? 'fa-chevron-left' : 'fa-bars'
+          }`"
+        ></i>
       </button>
+      <img src="/TFN.svg" alt="TF-Logo" class="md:ml-4 h-full hidden md:flex" />
     </div>
-    <jdialog v-model="showDialog" @close="showDialog = false" noActions>
+
+    <div class="h-5 flex items-center col-span-3 md:col-span-1">
+      <slot>
+        <img src="/TFN.svg" alt="TF-Logo" class="md:hidden md:ml-4 h-full" />
+      </slot>
+    </div>
+
+    <div class="pr-4 text-right text-gray-500 flex items-center justify-end">
+      <slot name="actions">
+        <button class="text-lg text-white" @click="addUser">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="text-lg text-white">
+          <i class="fas fa-search"></i>
+        </button>
+        <!-- <input class="hidden md:block" type="text"/> -->
+      </slot>
+    </div>
+
+    <jdialog v-model="showDialog" noActions>
       <template v-slot:title>
         <h1>Profile settings</h1>
       </template>
@@ -81,15 +105,21 @@
           <ul class="max-h-28 overflow-y-auto">
             <template v-for="blockedUser in blockedUsers">
               <li>
-                {{blockedUser}}
-                <button class="px-4 py-2 text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:border-blue-700 active:bg-blue-700 ease-in-out duration-150 cursor-pointer uppercase" @click="unblockUser(blockedUser)">unblock</button>
+                {{ blockedUser }}
+                <button
+                  class="px-4 py-2 text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:border-blue-700 active:bg-blue-700 ease-in-out duration-150 cursor-pointer uppercase"
+                  @click="unblockUser(blockedUser)"
+                >
+                  unblock
+                </button>
               </li>
             </template>
 
-            <li v-if="blockedUsers.length === 0 && blockedUsersLoading">... </li>
-            <li v-if="blockedUsers.length === 0 && !blockedUsersLoading"> No blocked users</li>
+            <li v-if="blockedUsers.length === 0 && blockedUsersLoading">...</li>
+            <li v-if="blockedUsers.length === 0 && !blockedUsersLoading">
+              No blocked users
+            </li>
           </ul>
-
         </div>
       </div>
     </jdialog>
@@ -97,19 +127,24 @@
 </template>
 
 <script lang="ts">
-import {computed, defineComponent, onBeforeMount, ref} from "vue";
-import {useAuthState} from "../store/authStore";
-import {useSocketActions} from "../store/socketStore";
+import { computed, defineComponent, onBeforeMount, ref } from "vue";
+import { useAuthState } from "../store/authStore";
+import { useSocketActions } from "../store/socketStore";
 import Dialog from "./Dialog.vue";
 import AvatarImg from "@/components/AvatarImg.vue";
-import {deleteBlockedEntry, getBlockList, initBlocklist} from "@/store/blockStore";
-import {setNewavater} from "@/store/userStore"
-import {fetchStatus} from "@/store/statusStore"
-     
+import {
+  deleteBlockedEntry,
+  getBlockList,
+  initBlocklist,
+} from "@/store/blockStore";
+import { setNewavater } from "@/store/userStore";
+import { fetchStatus } from "@/store/statusStore";
+import { useRoute, useRouter } from "vue-router";
+
 export default defineComponent({
   name: "Topbar",
   components: { AvatarImg, jdialog: Dialog },
-  setup() {
+  setup({}, ctx) {
     const { user } = useAuthState();
     const showDialog = ref(false);
     const showEdit = ref(false);
@@ -118,13 +153,22 @@ export default defineComponent({
     const file = ref();
     const userStatus = ref("");
     const isEditingStatus = ref(false);
+    const router = useRouter();
+    const route = useRoute();
+    const backOrMenu = () => {
+      if (route.meta && route.meta.back) {
+        router.push({ name: route.meta.back });
+        return;
+      }
+      alert("Show profile");
+    };
 
     const selectFile = () => {
       fileinput.value.click();
     };
     const changeFile = () => {
       file.value = fileinput.value?.files[0];
-      sendNewAvatar()
+      sendNewAvatar();
     };
     const removeFile = () => {
       file.value = null;
@@ -132,7 +176,7 @@ export default defineComponent({
 
     const sendNewAvatar = async () => {
       const newUrl = await setNewavater(file.value);
-      await fetchStatus(user.id)
+      await fetchStatus(user.id);
       showDialog.value = false;
     };
 
@@ -148,22 +192,27 @@ export default defineComponent({
       isEditingStatus.value = false;
     };
 
-    const blockedUsers = computed(()=>{
-      return getBlockList()
-    })
+    const blockedUsers = computed(() => {
+      return getBlockList();
+    });
     // @todo: config
 
-    onBeforeMount(()=>{
-      initBlocklist()
-    })
-    
+    onBeforeMount(() => {
+      initBlocklist();
+    });
 
     const unblockUser = async (user) => {
       await deleteBlockedEntry(user);
       showDialog.value = false;
-    }
+    };
+
+    const addUser = () => {
+      ctx.emit("addUser");
+    };
 
     return {
+      addUser,
+      backOrMenu,
       user,
       showEditPic,
       showEdit,
@@ -180,10 +229,23 @@ export default defineComponent({
       isEditingStatus,
       blockedUsers,
       unblockUser,
+      route,
     };
   },
 });
 </script>
 
 <style scoped>
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  @variants responsive {
+    .topgrid {
+      display: grid !important;
+      grid-template-columns: 500px 2fr 1fr !important;
+    }
+  }
+}
 </style>

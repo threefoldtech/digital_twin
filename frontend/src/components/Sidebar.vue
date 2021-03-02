@@ -1,12 +1,12 @@
 <template>
   <nav>
-    <div class="flex flex-col h-full items-center justify-center mx-2">
+    <div class="flex flex-col h-full items-center mx-2">
       <div
           v-for="app in apps"
           :key="app.name"
           class="mb-4 grid text-center text-white"
           :class="{
-            'text-gray-400': !app?.enabled,
+            'text-gray-300': !app?.enabled,
           'cursor-pointer': app.enabled}
 "
       >

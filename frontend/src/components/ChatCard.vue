@@ -1,12 +1,12 @@
 <template>
   <div class="chatcard relative grid grid-cols-12 rounded-lg mb-2 py-2">
-    <div
+    <!-- <div
       v-if="newMessages >= 1"
       class="h-5 w-5 bg-accent rounded-full absolute -top-2 -right-2 transition-all z-10 grid place-items-center text-xs text-white"
     >
       {{ newMessages }}
-    </div>
-    <div class="md:col-span-2 col-span-3 place-items-center grid relative">
+    </div> -->
+    <div class="col-span-2 place-items-center grid relative">
       <AvatarImg :id="chat.chatId" />
       <div
         v-if="!chat.isGroup"
@@ -17,17 +17,17 @@
         }"
       ></div>
     </div>
-    <div class="md:col-span-10 col-span-9 pl-2">
+    <div class="col-span-10 px-2">
       <p class="flex place-content-between">
         <span class="font-bold break-normal overflow-ellipsis overflow-hidden">
           {{ chat.name }}
         </span>
         <span class="font-thin" v-if="chat.isGroup"> group</span>
-        <span class="font-thin pr-2" v-if="lastMessage">
+        <span class="font-thin" v-if="lastMessage">
           {{ timeAgo(lastMessage.timeStamp) }}
         </span>
       </p>
-      <p class="font-thin truncate">
+      <p class="col-end-13 col-span-2 font-thin truncate">
         {{ lastMessageBody }}
       </p>
     </div>

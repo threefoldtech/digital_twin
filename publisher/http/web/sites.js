@@ -3,21 +3,52 @@ var router = express.Router();
 const asyncHandler = require('express-async-handler')
 
 var drive = require('../../drive.js')
+var cache = require('../../cache')
 
-// HELPERS
 
-async function iswiki(drive, alias){
-    try {
-        await drive.promises.stat(`/info_${alias}`)
-        return true
-    }catch(e){
-       return false
+async function getRequestInfo(req){
+    var domains = cache.domains
+    var port = 443
+    var host = ""
+    var err = ""
+    var driveObj = null
+    var status = 200
+    var dir = ""
+
+    if (req.headers.host){
+        var splitted = req.headers.host.split(':')
+        if (splitted.length > 1){
+            port = splitted[1]
+            host = splitted[0]
+        }
     }
+
+    if (host === ""){
+        status = 500
+        err = "Host is missing from headers"
+    }else if (!(host in domains)){
+        status = 404
+        err = "Host is unknown"
+    }
+
+    driveObj = await drive.get(domains[host]["drive"])
+    dir = domains[host]["dir"]
+
+    return {
+        "status" : status,
+        "err": err,
+        "drive": drive,
+        "port": port,
+        "host": host,
+        "drive": driveObj,
+        "dir" : dir
+    }
+
 }
 
-async function handleWebsiteFile(req, res, driveObj){
-    var filename = req.url.replace(`/${req.params.id}/${req.params.sitename}/`, "")
-    var filepath = `/www_${req.params.sitename}/${filename}`
+async function handleWebsiteFile(req, res, info){
+    driveObj = info.drive
+    var filepath = `${info.dir}/${req.url}`
     var encoding = 'utf-8'
     if(filepath.endsWith('png') || filepath.endsWith('jpg') || filepath.endsWith('jpeg')){
         encoding = 'binary'
@@ -27,7 +58,6 @@ async function handleWebsiteFile(req, res, driveObj){
             res.type("text/css");
     }else if (filepath.endsWith("json")){
         res.type("application/json");
-
     }
 
     var entry = null
@@ -39,30 +69,20 @@ async function handleWebsiteFile(req, res, driveObj){
         }
 
         var content = await  driveObj.promises.readFile(filepath, encoding);
-        if (encoding != 'binary'){
-            content = content.replace(/src="\//g, `src="/${req.params.id}/${req.params.sitename}/`)
-            content = content.replace(/href="\//g, `href="/${req.params.id}/${req.params.sitename}/`)
-            content = content.replace(/data-srcset="\//g, `data-srcset="/${req.params.id}/${req.params.sitename}/`)
-            content = content.replace(/url\(\//g, `url(/${req.params.id}/${req.params.sitename}/`)
-            if (filepath.endsWith("js")){
-                content = content.replace(/assets/g, `${req.params.id}/${req.params.sitename}/assets`)
-            }
-            content = content.split("/flexsearch").join(`/${req.params.id}/${req.params.sitename}/flexsearch`);
-        }
-       
         return res.send(content)
-        
     } catch (e) {
         console.log(e)
         return res.status(404).json('');
     }
 }
 
-async function handleWikiFile(req, res, driveObj){
-    var wikiname = `info_${req.params.sitename}`
-    var encoding = 'utf-8'
-    var filename = req.url.replace(`/${req.params.id}/${req.params.sitename}/`, "")
-   
+async function handleWikiFile(req, res, info){
+    
+    var filepath = `${info.dir}/${req.url}`
+    var filename = req.url.substring(1)
+    var wikiname = info.dir.substring(1)
+    
+    var encoding = 'utf-8'  
     if (filename.startsWith("file__") || filename.startsWith("page__")){
         var splitted = filename.split("__")
         if (splitted.length != 3){
@@ -73,7 +93,7 @@ async function handleWikiFile(req, res, driveObj){
         }
 
         filename = splitted[2]
-        wikiname = `info_${splitted[1]}`
+        wikiname = `wiki_${splitted[1]}`
     }else if (filename.startsWith("html__")){
 		var splitted = filename.split("__")
 
@@ -82,7 +102,7 @@ async function handleWikiFile(req, res, driveObj){
         }
 
 		
-        wikiname =`info_${splitted[1]}`
+        wikiname =`wiki_${splitted[1]}`
         splitted.shift()
         splitted.shift()
         filename = splitted.join("__")
@@ -90,8 +110,35 @@ async function handleWikiFile(req, res, driveObj){
 	}else if (filename == "_sidebar.md"){
         filename = "sidebar.md"
     }
+    
+    var splitted = filename.split("/")
+    if (splitted.length > 1){
+        filename = splitted[splitted.length - 1]
+    }
+
+    if (filename.endsWith("jpeg") || filename.endsWith("jpg") || filename.endsWith("gif") || filename.endsWith("png")){
+        encoding = 'binary'
+    }
 
     filepath = `/${wikiname}/${filename}`
+    driveObj = null
+
+    var domains = cache.domains
+    for(var key in domains){
+        var item = domains[key]
+        if(item.dir == `/${wikiname}`){
+            try{
+                driveObj =  await drive.get(item.drive)
+            }catch(e){
+
+            }
+        }
+    }
+
+    if(!driveObj){
+        return res.status(404).json('');
+    }
+
     // `/${req.params.wikiname}/${req.params.filename}`
     var entry = null
     try {
@@ -115,85 +162,65 @@ async function handleWikiFile(req, res, driveObj){
     }
 }
 
-// Home
-router.get('/', (req, res) => {
-    res.render('sites/home.mustache', {
-        drives : ["local"],
-    });   
-})
+// Home (list of wikis and sites)
+router.get('/', asyncHandler(async (req, res) =>  {
+    var info = await getRequestInfo(req)
 
-// LIST Sites & Wikis in a DRIVE
-router.get('/:id', asyncHandler(async (req, res) => {
-    var driveObj = await drive.get(req.params.id)
-    var filepath = "/"
-    try {
-        await driveObj.promises.stat(filepath)
-        var files = await driveObj.promises.readdir(filepath)
-        files.sort()
-        var sites = []
+    if(info.status != 200){
+        return res.status(info.status).json({"err": info.err});
+    }
+
+    var domains = cache.domains
+
+    // Local listing page
+    if (info.host == "localhost" || info.host == "127.0.0.1" ){
         var wikis = []
-
-        files.map( function(file) {
-            if(file.startsWith("www")){
-                var alias = file.replace("www_", "")
-                sites.push({"name": alias, "url": `/${req.params.id}/${alias}`})
-            }else if(file.startsWith("info_")){
-                var alias = file.replace("info_", "")
-                wikis.push({"name": alias, "url": `/${req.params.id}/${alias}`, "err" :`/${req.params.id}/wikis/${alias}/errors`})
+        var sites = []
+        for (var item in domains){
+            if (domains[item]["dir"].startsWith("/wiki")){
+                wikis.push(item)
+            }else{
+                sites.push(item)
             }
-        })
-        res.render('sites/sites.mustache', {
-            sites : sites,
-            wikis: wikis
-        });
-    } catch (e) {
-        console.log(e)
-        return res.status(404).json('');
-    }
-}))
-
-// Sites index page
-router.get('/:id/:sitename', asyncHandler(async (req, res) => {
-    prefix = "www"
-    var driveObj = await drive.get(req.params.id)
-    
-    if (await iswiki(driveObj, req.params.sitename)){
-        prefix = "info"
-    }
-    var filepath = `/${prefix}_${req.params.sitename}/index.html`
-    var entry = null
-    try {
-        entry = await driveObj.promises.stat(filepath)
-        var content = await  driveObj.promises.readFile(filepath, 'utf8');
-        
-        if (prefix == "www"){
-            content = content.replace(/src="\//g, `src="/${req.params.id}/${req.params.sitename}/`)
-            content = content.replace(/href="\//g, `href="/${req.params.id}/${req.params.sitename}/`)
-            content = content.replace(/data-srcset="\//g, `data-srcset="/${req.params.id}/${req.params.sitename}/`)
-            content = content.replace(/url\(\//g, `url(/${req.params.id}/${req.params.sitename}/`)
         }
-
-        return res.send(content)
-    } catch (e) {
-        console.log(e)
-        return res.status(404).json('');
+        res.render('sites/home.mustache', {
+            sites : sites,
+            wikis: wikis,
+            port: info.port
+        });   
+        return
+    }else{
+        // Handle website or wiki
+        var driveObj = info.drive
+        var dir = info.dir
+        var filepath = `${dir}/index.html`
+        var entry = null
+        try {
+            entry = await driveObj.promises.stat(filepath)
+            var content = await  driveObj.promises.readFile(filepath, 'utf8');
+            return res.send(content)
+        } catch (e) {
+            console.log(e)
+            return res.status(404).json('');
+        }
     }
 }))
 
-router.get('/:id/:sitename/flexsearch', asyncHandler(async (req, res) => {
-    var driveObj = await drive.get(req.params.id)
-    var filepath = `/${req.params.sitename}/flexsearch.json`
+
+router.get('/flexsearch', asyncHandler(async (req, res) => {
+    var info = await getRequestInfo(req)
+
+    if(info.status != 200){
+        return res.status(info.status).json({"err": info.err});
+    }
+
+    var driveObj = info.drive
+    var filepath = `${info.dir}/flexsearch.json`
     var entry = null
     try {
         entry = await driveObj.promises.stat(filepath)
         var content = await  driveObj.promises.readFile(filepath, 'utf8');
-        content = content.replace(/src="\//g, `src="/${req.params.id}/${req.params.sitename}/`)
-        content = content.replace(/href="\//g, `href="/${req.params.id}/${req.params.sitename}/`)
-        content = content.replace(/data-srcset="\//g, `data-srcset="/${req.params.id}/${req.params.sitename}/`)
-        content = content.replace(/url\(\//g, `url(/${req.params.id}/${req.params.sitename}/`)
-
         res.type("application/json");
-        
         return res.send(content)
     } catch (e) {
         console.log(e)
@@ -202,11 +229,17 @@ router.get('/:id/:sitename/flexsearch', asyncHandler(async (req, res) => {
 }))
 
 // Wiki errors
-router.get('/:id/wikis/:sitename/errors', asyncHandler(async (req, res) => {
-    var driveObj = await drive.get(req.params.id)
-    var wikiname = req.params.sitename
+router.get('/errors', asyncHandler(async (req, res) => {
+    var info = await getRequestInfo(req)
+
+    if(info.status != 200){
+        return res.status(info.status).json({"err": info.err});
+    }
+
+    var driveObj = info.drive
+    var wikiname = info.dir.substring(1)
     
-    filepath = `info_${wikiname}/errors.json`
+    filepath = `${info.dir}/errors.json`
     var entry = null
     try {
         entry = await driveObj.promises.stat(filepath)
@@ -235,42 +268,15 @@ router.get('/:id/wikis/:sitename/errors', asyncHandler(async (req, res) => {
 }))
 
 // files
-router.get('/:id/:sitename/*', asyncHandler(async (req, res) => {
-    var driveObj = await drive.get(req.params.id)
-    
-    prefix = "www"
-    var driveObj = await drive.get(req.params.id)
-    
-    if (await iswiki(driveObj, req.params.sitename)){
-        prefix = "info"
+router.get('/*', asyncHandler(async (req, res) => {
+    var info = await getRequestInfo(req)
+
+    if(info.status != 200){
+        return res.status(info.status).json({"err": info.err});
     }
-    if (prefix == "www"){
-        return handleWebsiteFile(req, res, driveObj)
-    }else{
-        return handleWikiFile(req, res, driveObj)
-    }
+    return info.dir.startsWith("/www") ? handleWebsiteFile(req, res, info) : handleWikiFile(req, res, info)
     
 }))
-
-// wiki files only
-router.get('/:id/:sitename/img/:filename', asyncHandler(async (req, res) => {
-    var driveObj = await drive.get(req.params.id)
-    var filepath = `/info_${req.params.sitename}/${req.params.filename}`
-    var encoding = 'binary'
-
-    var entry = null
-    try {
-        entry = await driveObj.promises.stat(filepath)
-        var content = await  driveObj.promises.readFile(filepath, encoding);
-        return res.send(content)
-       
-    } catch (e) {
-        return res.status(404).json('');
-    }
-}))
-
-
-
 
 module.exports = router
 

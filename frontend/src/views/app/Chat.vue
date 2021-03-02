@@ -1,134 +1,26 @@
 <template>
-  <div class="md:grid-cols-12 md:grid relative h-full w-full">
-    <div
-      class="fixed h-screen w-screen bg-black bg-opacity-25 top-0 left-0 md:hidden transition-all z-20"
-      :class="{ hidden: !showContacts }"
-      @click="showContacts = false"
-    ></div>
-    <aside
-      class="fixed md:static md:col-span-3 flex flex-col md:bg-transparent bg-white rounded-r-lg shadow md:shadow-none h-screen md:h-auto top-0 left-0 z-30 transition-all"
-      :class="{ '-left-full': !showContacts }"
-    >
-      <div>
-        <div class="flex m-2 mt-5">
-          <button @click="showContacts = false" class="md:hidden">
-            <i class="fas fa-chevron-left"></i>
-          </button>
-          <h1>Chats</h1>
-        </div>
-        <div class="flex items-center mb-2 px-2 md:px-0">
-          <button class="h-10 rounded-full" @click="showDialog = true">
-            <i class="fas fa-plus"></i><span> New Chat </span>
+  <app-layout @addUser="showAddUserDialog = true">
+    <div class="relative h-full w-full grid md:customgrid">
+      <chat-list v-model="showAddUserDialog"/>
+      <div class="hidden w-full h-full md:grid place-items-center">
+        <div class="flex flex-col mb-12 text-center">
+          <p>Select a chat</p>
+          <button
+            @click="showAddUserDialog = true"
+            class="mt-2 border rounded-full py-1 px-3"
+          >
+            Or start a new conversation
           </button>
         </div>
-
-        <div v-if="filteredChatRequests.length > 0">
-          <h2 style="font-size: 1.5em">
-            You have
-            <span style="color: red"> {{ filteredChatRequests.length }} </span>
-            new connection request<span v-if="filteredChatRequests.length > 1">s</span>
-          </h2>
-          <ChatRequestList :chat-requests="filteredChatRequests"/>
-        </div>
-        <div class="relative full md:px-0 px-4">
-          <div
-            class="absolute inset-y-0 left-0 md:pl-3 pl-7 flex items-center pointer-events-none"
-          >
-            <i class="text-gray-500 fas fa-search"></i>
-          </div>
-          <input
-            type="text"
-            placeholder="Search..."
-            class="w-full pl-12 py-3 sm:text-sm  rounded-full md:bg-white bg-gray-200"
-            v-model="searchValue"
-          />
-        </div>
       </div>
-      <div class="relative overflow-y-auto w-full max-h-full h-full mt-4">
-        <div class="absolute w-full px-2 pt-2">
-          <ChatCard
-            v-for="chat in filteredChats"
-            :key="`${chat.chatId}-${chat.messages.length}-${
-              chat.read[user.id]
-            }`"
-            class="grid grid-cols-12 rounded-lg mb-2 py-2 cursor-pointer"
-            :class="{
-              'bg-white text-black': chat.chatId !== selectedId,
-              'bg-icon text-white': chat.chatId === selectedId,
-            }"
-            @click="setSelected(chat.chatId)"
-            :chat="chat"
-          />
-        </div>
-      </div>
-    </aside>
-    <main class="md:col-span-6 w-full h-full relative">
-      <chat-view v-if="selectedId && chats.find((c) => c.chatId === selectedId)" :selectedId="selectedId" :key="selectedId" @showContacts="showContacts=true"></chat-view>
-      <div class="text-center" v-else-if="chats.length >= 1">
-        No chat has been selected <br class="md:block hidden">
-        <span class="md:block hidden">Please select a chat from the left side</span>
-        <br>
-        <button
-            @click="showContacts = true"
-            class="mt-2 bg-gray-200 border-2 rounded-full px-4"
-        >
-          Click to Show Chat
-        </button>
-      </div>
-      <div v-else class="text-center">
-        <p>It feels lonely over here :(</p>
-        <button
-          @click="showDialog = true"
-          class="mt-2 border rounded-full px-4"
-        >
-          Add a contact
-        </button>
-      </div>
-    </main>
-    <aside
-      class="hidden md:block col-span-3 relative h-full w-full overflow-y-auto flex-col"
-      v-if="selectedChat"
-    >
-      <div class="absolute max-w-full w-full px-4 pb-4" v-if="selectedId">
-        <div
-          class="bg-white p-2 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1 md:px-4"
-        >
-          <div
-            class="place-items-center grid relative"
-          >
-            <AvatarImg :id="selectedId" />
-            <div
-              v-if="!selectedChat.isGroup"
-              class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-0 transition-all"
-              :class="{
-                'bg-red-500':  status && !status.isOnline,
-                'bg-green-500': status && status.isOnline,
-              }"
-            ></div>
-          </div>
-          <h2 class="my-3  break-words text-center w-full overflow-y-auto max-h-28">
-            {{selectedChat.name}}
-          </h2>
-          <h4 class="break-words w-full h-20 overflow-y-auto font-bold text-center">
-            {{status?.status}}
-          </h4>
-        </div>
-        <group-management v-if="selectedChat.isGroup" :groupChat="selectedChat" :key="selectedChat.chatId + selectedChat.contacts.length"></group-management>
-      </div>
-    </aside>
-    <jdialog v-model="showDialog" @close="showDialog = false" noActions>
-      <template v-slot:title>
-        <h1>Create a new chat</h1>
-      </template>
-      <add-contact @closeDialog="showDialog = false"> </add-contact>
-    </jdialog>
-  </div>
+    </div>
+  </app-layout>
 </template>
 
 <script lang="ts">
-import moment from "moment";
-import { useSocketActions } from "../../store/socketStore";
+import appLayout from "../../layout/AppLayout.vue";
 import { defineComponent, ref, computed, onBeforeMount } from "vue";
+<<<<<<< HEAD
 import {usechatsState, usechatsActions, selectedId} from "../../store/chatStore";
 import { useContactsState, useContactsActions } from "../../store/contactStore";
 import { useAuthState, useAuthActions } from "../../store/authStore";
@@ -196,21 +88,36 @@ export default defineComponent({
       return uniqBy(filteredChats, c => c.chatId);
     })
 
+=======
+import ChatList from "@/components/ChatList.vue";
+
+export default defineComponent({
+  name: "Apps",
+  components: {
+    appLayout,
+    ChatList,
+  },
+  setup({}, ctx) {
+    const showAddUserDialog = ref(false);
+>>>>>>> development_messageCard
     return {
-      status,
-      selectedId,
-      selectedChat,
-      setSelected,
-      chats,
-      filteredChatRequests,
-      searchValue,
-      filteredChats,
-      showDialog,
-      showContacts,
-      user,
-      m,
+      showAddUserDialog,
     };
   },
 });
 </script>
 
+
+<style scoped type="text/css">
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  @variants responsive {
+    .customgrid {
+      grid-template-columns: 400px 1fr;
+    }
+  }
+}
+</style>

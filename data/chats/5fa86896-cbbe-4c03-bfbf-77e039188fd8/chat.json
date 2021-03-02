@@ -1,0 +1,186 @@
+{
+    "read": {},
+    "chatId": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+    "contacts": [
+        {
+            "id": "localhost:3000",
+            "location": "localhost:3000-chat"
+        }
+    ],
+    "isGroup": true,
+    "messages": [
+        {
+            "from": "localhost:3000",
+            "to": "teset",
+            "body": "localhost:3000 has created and invited you to teset",
+            "timeStamp": "2021-02-23T14:04:47.543Z",
+            "id": "3a05114e-410e-4f8f-964f-128b8942ea87",
+            "type": "SYSTEM",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:54.990Z",
+            "id": "0d336ab9-79eb-4b44-b0bf-29e38705be95",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:55.303Z",
+            "id": "6f91d607-839e-485f-b96a-a9c21f2f24f4",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:55.587Z",
+            "id": "d7c3cbf4-8305-449f-a621-f1cf608baa36",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:55.889Z",
+            "id": "fe05a031-f972-478f-8174-cd8872840b5f",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:56.159Z",
+            "id": "089d1253-0fcb-4acf-aa96-5cb226684c32",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:56.444Z",
+            "id": "11b322ef-bc4d-4da7-9a6f-ffb5a5473cb3",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:56.718Z",
+            "id": "541f7057-1d9b-436a-bd08-6e75e514ce15",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:57.099Z",
+            "id": "b5b47a4d-791d-4ece-b568-eea3c4eb0732",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:57.328Z",
+            "id": "f0b0754f-a72f-4e30-8513-dd549e79759d",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:57.517Z",
+            "id": "7d9076a2-076f-4d72-b5a6-7dc77c4a6281",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:57.672Z",
+            "id": "5d5a9067-d71d-44b2-bc7d-3dfc669386ca",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:57.876Z",
+            "id": "4be9fe71-1e99-45e0-8463-b54e7679de1a",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:57.996Z",
+            "id": "77e8b7d4-da9f-4817-878d-6b9e3e0ad735",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:58.184Z",
+            "id": "9fcf8ac3-6f49-4865-aeba-556c8bda4058",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "d",
+            "timeStamp": "2021-02-23T14:16:58.337Z",
+            "id": "d2ed62ab-fc3e-4962-859d-de6bdbb0b816",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        },
+        {
+            "from": "localhost:3000",
+            "to": "5fa86896-cbbe-4c03-bfbf-77e039188fd8",
+            "body": "a",
+            "timeStamp": "2021-02-23T14:16:59.026Z",
+            "id": "47ed2e77-6ef6-4efe-af1a-df4572b61960",
+            "type": "STRING",
+            "replys": [],
+            "subject": null
+        }
+    ],
+    "name": "teset",
+    "acceptedChat": true,
+    "adminId": "localhost:3000"
+}
