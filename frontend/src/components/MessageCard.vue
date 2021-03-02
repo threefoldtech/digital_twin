@@ -128,13 +128,13 @@
         </p>
       </div>
       <div
-          v-if="!disabled && message.replys && message.replys.length >= 1"
+          v-if="!disabled && message.replies && message.replies.length >= 1"
           class="bg-white p-2"
           :class='{
             "rounded-b-lg": !replyMessage && !editMessage && !quoteMessage
           }'
       >
-        <MessageCard v-for="reply in message.replys" :message="reply" is-group :is-mine="reply.from === user.id"
+        <MessageCard v-for="reply in message.replies" :message="reply" is-group :is-mine="reply.from === user.id"
                      :chat-id="chatId" isReply/>
       </div>
 
@@ -255,7 +255,7 @@ export default defineComponent({
           body: isDelete ? "Message has been deleted" : editMessageValue.value,
           timeStamp: oldmessage.timeStamp,
           type: isDelete ? "DELETE" : "EDIT",
-          replys: [],
+          replies: [],
           subject: null,
         };
         sendMessageObject(props.chatId, updatedMessage);
@@ -289,7 +289,7 @@ export default defineComponent({
         body: <StringMessageType>replyMessageValue.value,
         timeStamp: new Date(),
         type: "STRING",
-        replys: [],
+        replies: [],
         subject: props.message.id,
       };
       sendMessageObject(props.chatId, newMessage);
@@ -317,7 +317,7 @@ export default defineComponent({
           },
           timeStamp: new Date(),
           type: "QUOTE",
-          replys: [],
+          replies: [],
           subject: null,
         };
         sendMessageObject(props.chatId, newMessage);

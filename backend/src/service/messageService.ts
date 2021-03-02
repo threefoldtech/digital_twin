@@ -1,38 +1,25 @@
-import {IdInterface, StringMessageTypeInterface} from "./../types/index";
-import {ContactRequest, FileMessageType, MessageBodyTypeInterface, MessageInterface, MessageTypes,} from "../types";
+import { IdInterface, StringMessageTypeInterface } from "./../types/index";
+import {
+    ContactRequest,
+    FileMessageType,
+    MessageBodyTypeInterface,
+    MessageInterface,
+    MessageTypes,
+} from "../types";
 import Message from "../models/message";
-import {getChat, persistChat, saveFile} from "./dataService";
-import {sendEventToConnectedSockets} from "./socketService";
-import {determinChatId} from "../routes/messages";
+import { getChat, persistChat, saveFile } from "./dataService";
+import { sendEventToConnectedSockets } from "./socketService";
+import { determinChatId } from "../routes/messages";
 
 export const parseMessage = (
     msg: any
 ): MessageInterface<MessageBodyTypeInterface> => {
     const type: MessageTypes = <MessageTypes>msg.type;
+    const replies: MessageInterface<MessageBodyTypeInterface>[] = [
+        ...msg.replies?.map((r: any) => parseMessage(r)),
+    ];
 
     switch (type) {
-        case MessageTypes.STRING:
-            return new Message<StringMessageTypeInterface>(
-                msg.from,
-                msg.to,
-                msg.body,
-                new Date(msg.timeStamp),
-                msg.id,
-                type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
-                msg?.subject
-            );
-        case MessageTypes.GIF:
-            return new Message<StringMessageTypeInterface>(
-                msg.from,
-                msg.to,
-                msg.body,
-                new Date(msg.timeStamp),
-                msg.id,
-                type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
-                msg?.subject
-            );
         case MessageTypes.CONTACT_REQUEST:
             return new Message<ContactRequest>(
                 msg.from,
@@ -41,7 +28,7 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                replies,
                 msg?.subject
             );
         case MessageTypes.GROUP_UPDATE:
@@ -52,20 +39,20 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                replies,
                 msg?.subject
             );
         case MessageTypes.FILE_UPLOAD:
-            const url = saveFile(msg.to, msg.body.name, msg.body.parsedFile);
+            saveFile(msg.to, msg.body.name, msg.body.parsedFile);
 
             return new Message<FileMessageType>(
                 msg.from,
                 msg.to,
-                <FileMessageType>{filename: msg.body.name},
+                <FileMessageType>{ filename: msg.body.name },
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.FILE,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                replies,
                 msg?.subject
             );
         case MessageTypes.FILE:
@@ -76,54 +63,15 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                replies,
                 msg?.subject
             );
+        case MessageTypes.STRING:
         case MessageTypes.EDIT:
-            return new Message<StringMessageTypeInterface>(
-                msg.from,
-                msg.to,
-                <String>msg.body,
-                new Date(msg.timeStamp),
-                msg.id,
-                MessageTypes.EDIT,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
-                msg?.subject
-            );
         case MessageTypes.DELETE:
-            return new Message<StringMessageTypeInterface>(
-                msg.from,
-                msg.to,
-                <String>msg.body,
-                new Date(msg.timeStamp),
-                msg.id,
-                MessageTypes.DELETE,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
-                msg?.subject
-            );
         case MessageTypes.QUOTE:
-            return new Message<StringMessageTypeInterface>(
-                msg.from,
-                msg.to,
-                <String>msg.body,
-                new Date(msg.timeStamp),
-                msg.id,
-                MessageTypes.QUOTE,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
-                msg?.subject
-            );
+        case MessageTypes.GIF:
         case MessageTypes.READ:
-            return new Message<StringMessageTypeInterface>(
-                msg.from,
-                msg.to,
-                <String>msg.body,
-                new Date(msg.timeStamp),
-                msg.id,
-                MessageTypes.READ,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
-                msg?.subject
-            );
-
         default:
             return new Message<MessageBodyTypeInterface>(
                 msg.from,
@@ -131,8 +79,8 @@ export const parseMessage = (
                 <String>msg.body,
                 new Date(msg.timeStamp),
                 msg.id,
-                msg.type,
-                [...msg.replys?.map((r:any) => parseMessage(r))],
+                type,
+                replies,
                 msg?.subject
             );
     }
@@ -159,7 +107,11 @@ export const handleRead = (message: Message<StringMessageTypeInterface>) => {
         (m) => m.id === chat.read[<string>message.from]
     );
 
-    if (oldRead && newRead && newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()) {
+    if (
+        oldRead &&
+        newRead &&
+        newRead.timeStamp.getTime() < oldRead.timeStamp.getTime()
+    ) {
         return;
     }
 
