@@ -3,9 +3,12 @@ import {config} from "../config/config";
 import fs from "fs";
 import Chat from "../models/chat";
 import {parseChat} from "./chatService";
-import { uniqBy } from "lodash";
+import {uniqBy} from "lodash";
+import {db} from "./dbService";
 
 export const getChatIds = (): IdInterface[] => {
+    // db.get('chats').map(chat => chat)
+
     const location = config.baseDir + "chats"
     const locations = fs.readdirSync(location)
     console.log(locations)
@@ -13,9 +16,12 @@ export const getChatIds = (): IdInterface[] => {
 }
 
 export const getChat = (id: IdInterface): Chat => {
-    const path = config.baseDir + `chats/${id}/chat.json`
-    const chat: Chat = <Chat>JSON.parse(fs.readFileSync(path).toString());
-    return parseChat(chat)
+    // const path = config.baseDir + `chats/${id}/chat.json`
+    // const chat: Chat = <Chat>JSON.parse(fs.readFileSync(path).toString());
+    // persistChat(parseChat(chat))
+    // return parseChat(chat)
+    const dbChat = db.get('chats').find({chatId: id})
+    return parseChat(dbChat.value())
 };
 
 export const getUserdata = () => {
@@ -45,29 +51,18 @@ const sortChat = (chat: Chat) => {
 };
 
 export const persistChat = (chat: Chat) => {
-
     const sortedChat = sortChat(chat)
 
-    const path = config.baseDir + `chats/${sortedChat.chatId}`
-
-    try {
-        fs.statSync(path)
-    } catch {
-        fs.mkdirSync(path)
-        fs.mkdirSync(path + "/files")
+    console.log('db persist')
+    // @ts-ignore
+    const dbChat = db.get('chats').find({chatId: chat.chatId})
+    if (dbChat) {
+        dbChat.assign(sortedChat).write()
     }
-    fs.writeFileSync(path + "/chat.json", JSON.stringify(sortedChat, null, 4), {flag: 'w'})
+    db.get('chats').push(sortedChat).write()
 };
 export const deleteChat = (chatId: string) => {
-    const path = config.baseDir + `chats/${chatId}`
-
-    try {
-        fs.rmdirSync(path, {recursive: true});
-    } catch(e) {
-        console.log(e)
-        return false
-    }
-    return true
+    db.get('chats').remove({chatId}).write()
 };
 
 export const persistUserdata = (userData: UserInterface) => {
@@ -83,7 +78,7 @@ export const saveFile = (chatId: IdInterface, fileName: string, fileBuffer: Buff
     return path
 }
 
-export const saveAvatar = (fileBuffer: Buffer,id:string) => {
+export const saveAvatar = (fileBuffer: Buffer, id: string) => {
     const path = `${config.baseDir}user/avatar-${id}`
     fs.writeFileSync(path, fileBuffer)
 }
@@ -95,7 +90,7 @@ export const persistBlocklist = (blockList: string[]) => {
 };
 
 
-export const getBlocklist = ():string[] => {
+export const getBlocklist = (): string[] => {
     const location = config.baseDir + "user/blockList.json";
     try {
         return JSON.parse(fs.readFileSync(location).toString());

@@ -17,7 +17,6 @@ const corsOptions: CorsOptions = {
 const app: Application = express();
 const httpServer: http.Server = http.createServer(app)
 
-
 startSocketIo(httpServer)
 
 app.use(morgan('short', {
