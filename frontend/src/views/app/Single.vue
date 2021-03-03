@@ -348,7 +348,11 @@ export default defineComponent({
 
             const ID = crypto.SHA1(str);
             popupCenter(
-                'https://freeflowconnect.threefold.me/room/' + ID,
+                'https://freeflowconnect.threefold.me/room/' +
+                    ID +
+                    '&username=' +
+                    user.id +
+                    '.3bot',
                 'video chat',
                 800,
                 550

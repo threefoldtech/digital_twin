@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/views/Home.vue';
+import FileBrowser from '@/views/app/FileBrowser.vue';
 import AppLayout from '@/layout/AppLayout.vue';
 import Basic from '@/layout/Basic.vue';
 import Chat from '@/views/app/Chat.vue';
@@ -41,6 +42,11 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
         ],
+    },
+    {
+        name: 'filebrowser',
+        path: '/filebrowser',
+        component: FileBrowser,
     },
 ];
 

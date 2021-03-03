@@ -13,12 +13,12 @@
                 <div
                     class="h-20 w-20 rounded-full grid place-items-center mb-1"
                     style="position: relative"
+                    @click="changePage(app.name)"
                 >
                     <i :class="`fas ${app.icon} text-2xl`"></i>
                     <h3>
                         {{ app.name }}
                     </h3>
-                    <!--          <div class="bar" v-if="!app.enabled" style="width: 100%;height: 4px; background-color:#888; position:absolute; left:0;transform: rotate(-45deg)"></div>-->
                 </div>
             </div>
         </div>
@@ -26,57 +26,63 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, computed } from 'vue';
-    import { useRouter } from 'vue-router';
+import { defineComponent, computed } from 'vue';
+import { useRouter } from 'vue-router';
 
-    export default defineComponent({
-        name: 'Sidebar',
-        setup() {
-            const apps = [
-                {
-                    name: 'chat',
-                    icon: 'fas fa-comments',
-                    enabled: true,
-                },
-                {
-                    name: 'forum',
-                    icon: 'fas fa-stream',
-                    enabled: false,
-                },
-                {
-                    name: 'meetings',
-                    icon: 'fas fa-video',
-                },
-                {
-                    name: 'filebrowser',
-                    icon: 'fas fa-file-alt',
-                },
-            ];
-            const router = useRouter();
+export default defineComponent({
+    name: 'Sidebar',
+    setup() {
+        const apps = [
+            {
+                name: 'chat',
+                icon: 'fas fa-comments',
+                enabled: true,
+            },
+            {
+                name: 'filebrowser',
+                icon: 'fas fa-file-alt',
+                enabled: true,
+            },
+            {
+                name: 'forum',
+                icon: 'fas fa-stream',
+                enabled: false,
+            },
+            {
+                name: 'meetings',
+                icon: 'fas fa-video',
+            },
+        ];
+        const router = useRouter();
 
-            const currentRoute = computed(() => router.currentRoute.value);
+        const currentRoute = computed(() => router.currentRoute.value);
 
-            return {
-                currentRoute,
-                apps,
-            };
-        },
-    });
+        const changePage = (page: any) => {
+            router.push({ name: page });
+        };
+
+        return {
+            currentRoute,
+            apps,
+            changePage,
+        };
+    },
+});
 </script>
 
 <style scoped>
-    .active {
-        position: relative;
-    }
+.active {
+    position: relative;
+}
 
-    .active::after {
-        position: absolute;
-        content: '';
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background: #e69b5950;
-        border-left: 8px solid #e69b59;
-    }
+.active::after {
+    position: absolute;
+    content: '';
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background: #e69b5950;
+    border-left: 8px solid #e69b59;
+}
 </style>
