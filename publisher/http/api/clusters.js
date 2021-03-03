@@ -1,96 +1,73 @@
-var express = require('express');
-var router = express.Router();
-var fs = require("fs").promises;
-var path = require('path');
-var app = express();
+const fs = require('fs').promises
+const path = require('path')
+const rootpath = '/tmp/clusters'
+const httpError = require('http-errors')
 
-const asyncHandler = require('express-async-handler')
-const rootpath = "/tmp/clusters";
+async function list (cpath) {
+  const files = await fs.readdir(cpath)
+  const pathName = cpath
 
-async function list(cpath) {
-    const clusters = [];
+  const apath = path.resolve(pathName)
 
-    let files = await fs.readdir(cpath)
-    let pathName = cpath;
+  // make a map that contains al fs.readFile promises
+  const reads = files.map(file => {
+    return fs.readFile(apath + '/' + file)
+  })
 
-    const apath = path.resolve(pathName);
+  // resolve all promises
+  const result = await Promise.all(reads)
 
-    for(let file of files) {
-        try {
-            let content = await fs.readFile(apath + '/' + file)
-            let data = JSON.parse(content);
-            clusters.push(data);
-
-        } catch(err) {
-            console.log(`${err}`);
-        }
-
-        // clusters.push(file.substring(0, file.lastIndexOf('.')));
-    }
-
-    return clusters;
+  // return parsed result
+  return result.map(res => JSON.parse(res))
 }
 
-async function get(cpath) {
-    try {
-        await fs.access(cpath, fs.F_OK);
+async function get (cpath) {
+  try {
+    await fs.access(cpath, fs.F_OK)
+  } catch (err) {
+    throw httpError(400, 'invalid cluster')
+  }
 
-    } catch(err) {
-        throw "invalid cluster";
-    }
-
-    try {
-        let content = await fs.readFile(cpath)
-        let data = JSON.parse(content);
-        return data;
-
-    } catch(err) {
-        console.log(`${err}`);
-    }
+  try {
+    const content = await fs.readFile(cpath)
+    return JSON.parse(content)
+  } catch (err) {
+    console.log(`${err}`)
+    throw httpError(400, err)
+  }
 }
 
-async function remove(cpath) {
-    try {
-        await fs.access(cpath, fs.F_OK);
+async function remove (cpath) {
+  try {
+    await fs.access(cpath, fs.F_OK)
+  } catch (err) {
+    throw httpError(400, 'invalid cluster')
+  }
 
-    } catch(err) {
-        throw "invalid cluster";
-    }
+  try {
+    fs.unlink(cpath)
+  } catch (err) {
+    throw httpError(400, 'cannot delete cluster')
+  }
 
-    try {
-        fs.unlink(cpath);
-
-    } catch(err) {
-        throw "cannnot delete this cluster";
-    }
-
-    return {"status": "success"}
+  return { status: 'success' }
 }
 
-async function put(cpath, body) {
-    console.log(body);
+async function put (cpath, body) {
+  try {
+    await fs.writeFile(cpath, JSON.stringify(body))
+  } catch (err) {
+    console.log(`${err}`)
+    throw httpError(400, 'invalid cluster')
+  }
 
-    try {
-        let write = await fs.writeFile(cpath, JSON.stringify(body));
-
-    } catch(err) {
-        console.log(`${err}`);
-    }
-
-    return {"status": "created"};
+  return { status: 'created' }
 }
 
-async function findByName(cpath, name) {
-    let values = await list(cpath);
+async function findByName (cpath, name) {
+  const values = await list(cpath)
 
-    for(var i in values) {
-        const cluster = values[i];
-
-        if(cluster['name'] == name)
-            return cluster;
-    }
-
-    return null;
+  return values.filter(value => value.name === name)
 }
 
-module.exports = {rootpath, list, get, remove, put, findByName}
+module.exports = { rootpath, list, get, remove, put, findByName }

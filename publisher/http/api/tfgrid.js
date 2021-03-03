@@ -284,10 +284,10 @@ router.post('/gateways', validateBodyMiddleware('node-create'), (req, res, next)
 // account
 //
 
-router.get('/account/price', (req, res, next) => {
-  tfclient.getPrice().then(content => res.json(content))
-    .catch(next)
-})
+// router.get('/account/price', (req, res, next) => {
+//   tfclient.getPrice().then(content => res.json(content))
+//     .catch(next)
+// })
 
 router.get('/account/balance', (req, res, next) => {
   tfclient.getBalance().then(content => res.json(content))
