@@ -419,7 +419,7 @@ function events (content, res, okcode) {
         result = {
           success: true,
           message: method,
-          id: data[1].words[0]
+          id: data[0].words[0]
         }
       }
     })
