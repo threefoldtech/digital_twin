@@ -123,7 +123,7 @@ export default defineComponent({
             chats.value.find(chat => chat.chatId == selectedId.value)
         );
 
-        // startFetchStatusLoop(user.id);
+        startFetchStatusLoop(user);
 
         const filteredChatRequests = computed(() => {
             const filteredChats = chatRequests.value.filter(

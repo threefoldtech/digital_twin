@@ -239,6 +239,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false) => {
         replys: [],
         subject: null,
     };
+
     addMessage(chatId, msgToSend);
 
     try {
