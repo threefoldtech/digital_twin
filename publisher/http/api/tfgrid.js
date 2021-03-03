@@ -357,18 +357,18 @@ router.delete('/clusters/:id', (req, res, next) => {
   const fullpath = path.join(clusters.rootpath, id + '.json')
   const apath = path.resolve(fullpath)
 
-  clusters.remove(apath).then(content => res.json(content))
+  clusters.remove(apath).then(() => res.status(202).send())
     .catch(next)
 })
 
-router.put('/clusters/:id', (req, res, next) => {
-  const { params } = req
+router.put('/clusters/:id', validateBodyMiddleware('cluster-create'), (req, res, next) => {
+  const { params, body } = req
   const { id } = params
 
   const fullpath = path.join(clusters.rootpath, id + '.json')
   const apath = path.resolve(fullpath)
 
-  clusters.put(apath, req.body).then(content => res.json(content))
+  clusters.put(apath, body).then(() => res.status(202).send())
     .catch(next)
 })
 

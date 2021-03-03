@@ -45,12 +45,10 @@ async function remove (cpath) {
   }
 
   try {
-    fs.unlink(cpath)
+    await fs.unlink(cpath)
   } catch (err) {
     throw httpError(400, 'cannot delete cluster')
   }
-
-  return { status: 'success' }
 }
 
 async function put (cpath, body) {
@@ -60,8 +58,6 @@ async function put (cpath, body) {
     console.log(`${err}`)
     throw httpError(400, 'invalid cluster')
   }
-
-  return { status: 'created' }
 }
 
 async function findByName (cpath, name) {
