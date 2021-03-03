@@ -257,7 +257,7 @@ router.delete('/nodes/:id', (req, res, next) => {
 //
 router.post('/gateways', validateBodyMiddleware('node-create'), (req, res, next) => {
   const { body } = req
-  const { farm, node: nodeId, capacity, location, twin, city, country } = body
+  const { farm, node: nodeId, capacity, location } = body
 
   const resources = tfclient.api.createType('Resources', capacity)
   const loc = tfclient.api.createType('Location', {
@@ -268,11 +268,11 @@ router.post('/gateways', validateBodyMiddleware('node-create'), (req, res, next)
   const node = {
     farm_id: farm,
     pub_key: nodeId,
-    twin_id: twin,
+    twin_id: 1,
     resources,
     location: loc,
-    country_id: country,
-    city_id: city,
+    country_id: 1,
+    city_id: 1,
     role: 'Gateway'
   }
 
