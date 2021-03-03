@@ -21,6 +21,7 @@ const getDetailsFromFile = (fileDetails: any) => {
     detailsFromFile.formattedInfos = white(
         Object.keys(detailsFromFile).reduce(
             (previous, key) =>
+                // @ts-ignore
                 `${previous}${underline(key)}: ${italic(detailsFromFile[key])}`,
             `\n`
         )

@@ -21,7 +21,7 @@
             const router = useRouter();
             const loginAndPush = async () => {
                 await login();
-                await router.push('/app');
+                await router.push('/chat');
             };
 
             return {
