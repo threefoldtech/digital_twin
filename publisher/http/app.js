@@ -55,7 +55,6 @@ app.use(function (req, res, next) {
               }
             }
             
-            console.log(acls)
             var permissions = acls.acls
 
             if(isWebsite){
@@ -65,7 +64,9 @@ app.use(function (req, res, next) {
             }
             
             users = permissions [prefix]
-           
+            if (!users){
+              return res.status(404).json({"error": "invalid url"})
+            }
             if(users.length == 0){
               next()
               return
