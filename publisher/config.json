@@ -1,6 +1,6 @@
 {
     "http" : {
-        "host": "localhost",
+        "host": "::",
         "port" : 3000,
         "httpsPort": 443
     },

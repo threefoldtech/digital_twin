@@ -302,6 +302,22 @@ router.get('/debug/cluster/:name', (req, res, next) => {
 })
 
 //
+// node configuration
+//
+
+router.post('/debug/config', function(req, res) {
+    let config = {
+        type: "macvlan",
+        ipv4: "1.2.3.4",
+        ipv6: "::1",
+        gw4: "1.2.3.4",
+        gw6: "::1",
+    };
+
+    // node /api/v1/network/config/public
+})
+
+//
 // crypto verification
 //
 
