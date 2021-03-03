@@ -12,7 +12,7 @@ router.get('/threebot/connect', asyncHandler(async (req, res) => {
     var next = req.query.next
     const threeFoldAPIHost = 'https://login.threefold.me/';
     const appId = req.headers.host
-    const redirectUrl = '/threebot/authorize';
+    var redirectUrl = '/threebot/authorize';
 
     if (next){
         redirectUrl = redirectUrl + `?next=${next}`
@@ -47,6 +47,7 @@ router.get('/threebot/authorize', asyncHandler(async (req, res) => {
     try{
         const profileData = await login.parseAndValidateRedirectUrl(new url.URL(uri), state)
         req.session.authorized = true
+        req.session.user = profileData
         req.user = profileData
         req.session.save()
         res.redirect(next)

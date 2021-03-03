@@ -9,6 +9,7 @@ const sites = require('./web/sites')
 const threebot = require('./web/threebot')
 
 const process = require('process')
+const acls = require('../acls')
 
 let app = express()
 
@@ -35,11 +36,24 @@ app.set('view engine', 'mustache');
 
 // Threebot connect
 app.use(function (req, res, next) {
-    if (!req.url.startsWith('/threebot/setcookie') && req.url != '/threebot/connect' && !req.url.startsWith('/threebot/authorize' && !req.url('/'))){
+    if (!req.url.startsWith('/threebot/setcookie') && !req.url.startsWith('/threebot/connect') && !req.url.startsWith('/threebot/authorize')){
         if(!req.session.authorized){
             res.redirect(`/threebot/connect?next=${req.url}`)
         }else{
-            next()
+            // check acls
+            var splitted =  req.url.split("/")
+            var prefix = splitted[0]
+            users = acls[prefix]
+            if(users.length == 0){
+              next()
+              return
+            }
+            console.log(req.session.user)
+            if(users.contains(req.session.user.id)){
+              next()
+              return
+            }
+            return res.status(401).json({"error": "user has no permission to see this page"})
         }
     }else{
         next()

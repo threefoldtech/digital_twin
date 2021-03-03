@@ -31,6 +31,7 @@ class Acls{
                 
                 this.acls[cache.domains[domain].alias] = Array.from(users)
             } 
+            this.acls["/"] = []
         }
     }
 }
