@@ -217,7 +217,9 @@ router.get('/nodes/:id', (req, res, next) => {
 
 router.post('/nodes', validateBodyMiddleware('node-create'), (req, res, next) => {
   const { body } = req
-  const { farm, node: nodeId, capacity, location, twin, city, country } = body
+  const { farm, node: nodeId, capacity, location } = body
+
+  // TODO: do something with secret?
 
   const resources = tfclient.api.createType('Resources', capacity)
   const loc = tfclient.api.createType('Location', {
@@ -225,14 +227,16 @@ router.post('/nodes', validateBodyMiddleware('node-create'), (req, res, next) =>
     longitude: location.longitude.toString()
   })
 
+  // TODO: remove hard coded stuff
+
   const node = {
     farm_id: farm,
     pub_key: nodeId,
-    twin_id: twin,
+    twin_id: 1,
     resources,
     location: loc,
-    country_id: country,
-    city_id: city,
+    country_id: 1,
+    city_id: 1,
     role: 'Node'
   }
 
