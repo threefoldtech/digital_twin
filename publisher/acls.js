@@ -26,11 +26,11 @@ class Acls{
                         groupObj._allUsers.map((u)=>{users.add(u)})
                     })
                 }catch(e){
-                    throw new Error("Error loading acls for " + domain)
+                    continue
                 }
                 
-                this.acls[domain] = Array.from(users)
-            }            
+                this.acls[cache.domains[domain].alias] = Array.from(users)
+            } 
         }
     }
 }

@@ -8,6 +8,7 @@ const HyperDrive = require('hyperdrive')
 const config = require('./config.js')
 const db  = JSON.parse(fs.readFileSync('db/drives.json'));
 const cache = require('./cache.js');
+const process = require("process")
 
 let client
 let server
@@ -149,6 +150,7 @@ async function load(){
     cache.domains = domains
     cache.domains["127.0.0.1"] = {"drive": null, "dir": "", "repo": "", "alias": "", "isWebSite": false}
     cache.domains["localhost"] = {"drive": null, "dir": "", "repo": "", "alias": "", "isWebSite": false}
+    cache.domains[process.env.DOMAIN] = {"drive": 'local', "dir": "", "repo": "", "alias": "", "isWebSite": false}
 }
 
 

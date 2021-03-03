@@ -49,7 +49,6 @@ async function update(req) {
 }
 
 async function getRequestInfo(req){
-    var domains = cache.domains
     var port = 443
     var host = ""
     var err = ""
@@ -70,9 +69,6 @@ async function getRequestInfo(req){
     if (host === ""){
         status = 500
         err = "Host is missing from headers"
-    }else if (!(host in domains)){
-        status = 404
-        err = "Host is unknown"
     }
 
     var isWebsite = 'website' in req.params? true : false
@@ -81,7 +77,6 @@ async function getRequestInfo(req){
     driveObj = null
     dir = ""
     repo = ""
-
    
     for(var item in cache.domains){
         if(cache.domains[item].alias == alias && cache.domains[item].isWebSite == isWebsite){

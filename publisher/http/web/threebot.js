@@ -1,7 +1,6 @@
 var url = require('url');
 var express = require('express');
 var router = express.Router();
-var cache = require('../../cache')
 var config = require('../../config')
 
 const asyncHandler = require('express-async-handler')
@@ -10,10 +9,14 @@ var threebot = require('@threefoldjimber/threefold_login')
 
 
 router.get('/threebot/connect', asyncHandler(async (req, res) => {
-
+    var next = req.query.next
     const threeFoldAPIHost = 'https://login.threefold.me/';
     const appId = req.headers.host
     const redirectUrl = '/threebot/authorize';
+
+    if (next){
+        redirectUrl = redirectUrl + `?next=${next}`
+    }
 
     const login = new threebot.ThreefoldLogin( threeFoldAPIHost,
                                 appId,
@@ -33,6 +36,7 @@ router.get('/threebot/authorize', asyncHandler(async (req, res) => {
     const threeFoldAPIHost = 'https://login.threefold.me/';
     const appId = req.headers.host;
     const redirectUrl = '/threebot/authorize';
+    var next = req.query.next ? req.query.next : '/'
 
     const login = new threebot.ThreefoldLogin( threeFoldAPIHost,
                                 appId,
@@ -45,50 +49,12 @@ router.get('/threebot/authorize', asyncHandler(async (req, res) => {
         req.session.authorized = true
         req.user = profileData
         req.session.save()
-
-        var urls = []
-        for(var d in cache.domains){
-            var u = req.protocol + '://' + d
-            var host = req.get('host')
-            var port = ""
-            var splitted = host.split(":")
-            if (splitted.length > 0){
-                if(splitted[1] != "80"){
-                    port = splitted[1]
-                }
-            }
-            if (port){
-                u = u + `:${port}`
-            }
-            u = u + `/threebot/setcookie?state=${state}`
-            urls.push(u)
-        }
-        cache.authorized[state] = profileData
-
-        res.render('sites/authorize.mustache', {
-            sites : urls,
-        });   
-        return
+        res.redirect(next)
     }catch(e){
         console.log(e)
         return res.status(200).json(e)
     }
 
-}))
-
-router.get('/threebot/setcookie', asyncHandler(async (req, res) => {
-    req.session.cookie.domain = req.headers.host
-    var state = req.query.state
-    if(state in cache.authorized){
-        req.session.authorized = true
-        req.user = cache.authorized[state]
-        req.session.save()
-        res.status(200).json("")
-        return
-    }else{
-        res.status(401).json("")
-        return
-    }
 }))
 
 module.exports = router
