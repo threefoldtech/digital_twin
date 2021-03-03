@@ -50,7 +50,7 @@ export interface MessageInterface<T> {
     type: MessageTypes;
     timeStamp: Date;
     subject: IdInterface | null;
-    replys: MessageInterface<MessageBodyTypeInterface>[];
+    replies: MessageInterface<MessageBodyTypeInterface>[];
 }
 
 export interface MessageBodyTypeInterface {}

@@ -145,7 +145,7 @@
                 </p>
             </div>
             <div
-                v-if="!disabled && message.replys && message.replys.length >= 1"
+                v-if="!disabled && message.repies && message.repies.length >= 1"
                 class="bg-white p-2"
                 :class="{
                     'rounded-b-lg':
@@ -153,7 +153,7 @@
                 }"
             >
                 <MessageCard
-                    v-for="reply in message.replys"
+                    v-for="reply in message.repies"
                     :message="reply"
                     is-group
                     :is-mine="reply.from === user.id"
@@ -225,211 +225,209 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, nextTick, ref, watch } from 'vue';
-    import { useAuthState } from '../store/authStore';
-    import moment from 'moment';
-    import { usechatsActions } from '../store/chatStore';
-    import {
-        Message,
-        MessageBodyType,
-        QuoteBodyType,
-        StringMessageType,
-    } from '../types/index';
-    import { uuidv4 } from '@/common';
-    import config from '../../public/config/config';
-    import AvatarImg from '@/components/AvatarImg.vue';
-    import { calculateBaseUrl } from '@/services/urlService';
+import { defineComponent, nextTick, ref, watch } from 'vue';
+import { useAuthState } from '../store/authStore';
+import moment from 'moment';
+import { usechatsActions } from '../store/chatStore';
+import {
+    Message,
+    MessageBodyType,
+    QuoteBodyType,
+    StringMessageType,
+} from '../types/index';
+import { uuidv4 } from '@/common';
+import config from '../../public/config/config';
+import AvatarImg from '@/components/AvatarImg.vue';
+import { calculateBaseUrl } from '@/services/urlService';
 
-    export default defineComponent({
-        name: 'MessageCard',
-        components: { AvatarImg },
-        props: {
-            message: Object,
-            chatId: String,
-            disabled: {
-                type: Boolean,
-                default: false,
-            },
-            isReply: {
-                type: Boolean,
-                default: false,
-            },
-            isread: {
-                type: Boolean,
-                default: false,
-            },
-            isreadbyme: {
-                type: Boolean,
-                default: false,
-            },
-            isGroup: {
-                type: Boolean,
-                default: false,
-            },
-            isMine: {
-                type: Boolean,
-                default: false,
-            },
-            showQuoted: {
-                type: Boolean,
-                default: true,
-            },
+export default defineComponent({
+    name: 'MessageCard',
+    components: { AvatarImg },
+    props: {
+        message: Object,
+        chatId: String,
+        disabled: {
+            type: Boolean,
+            default: false,
         },
-        setup(props) {
-            const showActions = ref(false);
-            const m = val => moment(val);
+        isReply: {
+            type: Boolean,
+            default: false,
+        },
+        isread: {
+            type: Boolean,
+            default: false,
+        },
+        isreadbyme: {
+            type: Boolean,
+            default: false,
+        },
+        isGroup: {
+            type: Boolean,
+            default: false,
+        },
+        isMine: {
+            type: Boolean,
+            default: false,
+        },
+        showQuoted: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    setup(props) {
+        const showActions = ref(false);
+        const m = val => moment(val);
 
-            const editMessage = ref(false);
-            const editMessageValue = ref('');
+        const editMessage = ref(false);
+        const editMessageValue = ref('');
 
-            const quoteMessage = ref(false);
-            const quoteMessageValue = ref('');
-            const { sendMessageObject } = usechatsActions();
+        const quoteMessage = ref(false);
+        const quoteMessageValue = ref('');
+        const { sendMessageObject } = usechatsActions();
 
-            const setEditMessage = () => {
-                editMessage.value = true;
-                editMessageValue.value = props.message.body;
+        const setEditMessage = () => {
+            editMessage.value = true;
+            editMessageValue.value = props.message.body;
+        };
+        const sendUpdateMessage = (isDelete: Boolean) => {
+            editMessage.value = false;
+            if (props.message.value != editMessageValue.value) {
+                const { sendMessageObject } = usechatsActions();
+                const oldmessage = props.message;
+                console.log(props.message);
+                const updatedMessage: Message<StringMessageType> = {
+                    id: oldmessage.id,
+                    from: oldmessage.from,
+                    to: oldmessage.to,
+                    body: isDelete
+                        ? 'Message has been deleted'
+                        : editMessageValue.value,
+                    timeStamp: oldmessage.timeStamp,
+                    type: isDelete ? 'DELETE' : 'EDIT',
+                    repies: [],
+                    subject: null,
+                };
+                sendMessageObject(props.chatId, updatedMessage);
+                console.log(props.chatId);
+                console.log(props.message);
+                quoteMessageValue.value = '';
+            }
+            props.message.value = editMessageValue.value;
+        };
+        const setQuoteMessage = () => {
+            quoteMessage.value = true;
+        };
+
+        const replyMessage = ref(false);
+        const replyMessageValue = ref('');
+        const setReplyMessage = () => {
+            replyMessage.value = true;
+        };
+
+        const sendReplyMessage = () => {
+            console.log('reply');
+            if (replyMessageValue.value === '') {
+                return;
+            }
+            replyMessage.value = false;
+            const { user } = useAuthState();
+            const newMessage: Message<StringMessageType> = {
+                id: uuidv4(),
+                from: user.id,
+                to: props.chatId,
+                body: <StringMessageType>replyMessageValue.value,
+                timeStamp: new Date(),
+                type: 'STRING',
+                repies: [],
+                subject: props.message.id,
             };
-            const sendUpdateMessage = (isDelete: Boolean) => {
-                editMessage.value = false;
-                if (props.message.value != editMessageValue.value) {
-                    const { sendMessageObject } = usechatsActions();
-                    const oldmessage = props.message;
-                    console.log(props.message);
-                    const updatedMessage: Message<StringMessageType> = {
-                        id: oldmessage.id,
-                        from: oldmessage.from,
-                        to: oldmessage.to,
-                        body: isDelete
-                            ? 'Message has been deleted'
-                            : editMessageValue.value,
-                        timeStamp: oldmessage.timeStamp,
-                        type: isDelete ? 'DELETE' : 'EDIT',
-                        replys: [],
-                        subject: null,
-                    };
-                    sendMessageObject(props.chatId, updatedMessage);
-                    console.log(props.chatId);
-                    console.log(props.message);
-                    quoteMessageValue.value = '';
-                }
-                props.message.value = editMessageValue.value;
-            };
-            const setQuoteMessage = () => {
-                quoteMessage.value = true;
-            };
+            sendMessageObject(props.chatId, newMessage);
+            replyMessageValue.value = '';
+        };
 
-            const replyMessage = ref(false);
-            const replyMessageValue = ref('');
-            const setReplyMessage = () => {
-                replyMessage.value = true;
-            };
-
-            const sendReplyMessage = () => {
-                console.log('reply');
-                if (replyMessageValue.value === '') {
-                    return;
-                }
-                replyMessage.value = false;
+        const sendQuoteMessage = () => {
+            console.log('quote');
+            if (quoteMessageValue.value !== '') {
+                quoteMessage.value = false;
                 const { user } = useAuthState();
-                const newMessage: Message<StringMessageType> = {
+                const messageToQuote = props.message;
+                // from: user.id,
+                // to: chatId,
+                // timeStamp: new Date(),
+                // type: "STRING"
+
+                const newMessage: Message<QuoteBodyType> = {
                     id: uuidv4(),
                     from: user.id,
                     to: props.chatId,
-                    body: <StringMessageType>replyMessageValue.value,
+                    body: <QuoteBodyType>{
+                        message: quoteMessageValue.value,
+                        quotedMessage: <Message<MessageBodyType>>messageToQuote,
+                    },
                     timeStamp: new Date(),
-                    type: 'STRING',
-                    replys: [],
-                    subject: props.message.id,
+                    type: 'QUOTE',
+                    repies: [],
+                    subject: null,
                 };
                 sendMessageObject(props.chatId, newMessage);
-                replyMessageValue.value = '';
-            };
-
-            const sendQuoteMessage = () => {
-                console.log('quote');
-                if (quoteMessageValue.value !== '') {
-                    quoteMessage.value = false;
-                    const { user } = useAuthState();
-                    const messageToQuote = props.message;
-                    // from: user.id,
-                    // to: chatId,
-                    // timeStamp: new Date(),
-                    // type: "STRING"
-
-                    const newMessage: Message<QuoteBodyType> = {
-                        id: uuidv4(),
-                        from: user.id,
-                        to: props.chatId,
-                        body: <QuoteBodyType>{
-                            message: quoteMessageValue.value,
-                            quotedMessage: <Message<MessageBodyType>>(
-                                messageToQuote
-                            ),
-                        },
-                        timeStamp: new Date(),
-                        type: 'QUOTE',
-                        replys: [],
-                        subject: null,
-                    };
-                    sendMessageObject(props.chatId, newMessage);
-                    quoteMessageValue.value = '';
-                }
-                props.message.value = editMessageValue.value;
-            };
-
-            const read = () => {
-                const { readMessage } = usechatsActions();
-                readMessage(props.chatId, props.message.id);
-            };
-            if (!props.isreadbyme && !props.isReply && !props.disabled) {
-                read();
+                quoteMessageValue.value = '';
             }
+            props.message.value = editMessageValue.value;
+        };
 
-            const fromId = props.message.from.replace(
-                'localhost:8080',
-                'localhost:3000'
+        const read = () => {
+            const { readMessage } = usechatsActions();
+            readMessage(props.chatId, props.message.id);
+        };
+        if (!props.isreadbyme && !props.isReply && !props.disabled) {
+            read();
+        }
+
+        const fromId = props.message.from.replace(
+            'localhost:8080',
+            'localhost:3000'
+        );
+        const baseurl = calculateBaseUrl(fromId);
+        const fileUrl = props.message.body?.filename
+            ? `${baseurl}/api/files/${props.message.to}/${props.message.body.filename}`
+            : false;
+
+        const { user } = useAuthState();
+
+        const isImage = filename => {
+            return (
+                filename.indexOf('.gif') !== -1 ||
+                filename.indexOf('.png') !== -1 ||
+                filename.indexOf('.jpg') !== -1 ||
+                filename.indexOf('.jpeg') !== -1
             );
-            const baseurl = calculateBaseUrl(fromId);
-            const fileUrl = props.message.body?.filename
-                ? `${baseurl}/api/files/${props.message.to}/${props.message.body.filename}`
-                : false;
+        };
 
-            const { user } = useAuthState();
-
-            const isImage = filename => {
-                return (
-                    filename.indexOf('.gif') !== -1 ||
-                    filename.indexOf('.png') !== -1 ||
-                    filename.indexOf('.jpg') !== -1 ||
-                    filename.indexOf('.jpeg') !== -1
-                );
-            };
-
-            return {
-                showActions,
-                isMine: props.isMine,
-                m,
-                setEditMessage,
-                setQuoteMessage,
-                editMessage,
-                editMessageValue,
-                sendUpdateMessage,
-                quoteMessage,
-                quoteMessageValue,
-                sendQuoteMessage,
-                config,
-                read,
-                fileUrl,
-                isGroup: props.isGroup,
-                showQuoted: props.showQuoted,
-                replyMessage,
-                setReplyMessage,
-                replyMessageValue,
-                sendReplyMessage,
-                user,
-                isImage,
-            };
-        },
-    });
+        return {
+            showActions,
+            isMine: props.isMine,
+            m,
+            setEditMessage,
+            setQuoteMessage,
+            editMessage,
+            editMessageValue,
+            sendUpdateMessage,
+            quoteMessage,
+            quoteMessageValue,
+            sendQuoteMessage,
+            config,
+            read,
+            fileUrl,
+            isGroup: props.isGroup,
+            showQuoted: props.showQuoted,
+            replyMessage,
+            setReplyMessage,
+            replyMessageValue,
+            sendReplyMessage,
+            user,
+            isImage,
+        };
+    },
+});
 </script>

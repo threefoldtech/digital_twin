@@ -80,7 +80,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 timeStamp: new Date(),
                 id: uuidv4(),
                 type: 'SYSTEM',
-                replys: [],
+                repies: [],
                 subject: null,
             },
         ],
@@ -121,7 +121,7 @@ function getMessage(chat: Chat, id) {
 
     if (!message) {
         chat.messages.find(m => {
-            const found = m.replys.find(r => r.id === id);
+            const found = m.repies.find(r => r.id === id);
             if (!found) {
                 return false;
             }
@@ -169,7 +169,7 @@ const addMessage = (chatId, message) => {
             m => m.id === message.subject
         );
         const subjectMessage = chat.messages[subjectMessageIndex];
-        subjectMessage.replys = [...subjectMessage.replys, message];
+        subjectMessage.repies = [...subjectMessage.repies, message];
         chat.messages[subjectMessageIndex] = subjectMessage;
         setLastMessage(chatId, message);
         return;
@@ -197,7 +197,7 @@ const sendMessage = (chatId, message, type: string = 'STRING') => {
         to: chatId,
         timeStamp: new Date(),
         type: type,
-        replys: [],
+        repies: [],
         subject: null,
     };
     addMessage(chatId, msg);
@@ -236,7 +236,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false) => {
         to: chatId,
         timeStamp: new Date(),
         type: 'FILE_UPLOAD',
-        replys: [],
+        repies: [],
         subject: null,
     };
 
@@ -290,7 +290,7 @@ const readMessage = (chatId, messageId) => {
         body: messageId,
         timeStamp: new Date(),
         type: 'READ',
-        replys: [],
+        repies: [],
         subject: null,
     };
     sendMessageObject(chatId, newMessage);
@@ -312,7 +312,7 @@ const updateContactsInGroup = (groupId, contact: Contact, remove: boolean) => {
         },
         timeStamp: new Date(),
         type: 'GROUP_UPDATE',
-        replys: [],
+        repies: [],
         subject: null,
     };
     console.log(message);

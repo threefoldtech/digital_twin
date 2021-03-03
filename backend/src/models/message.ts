@@ -13,7 +13,7 @@ export default class Message<T> implements MessageInterface<T> {
     public timeStamp: Date;
     public id: IdInterface;
     public type: MessageTypes;
-    public replys: MessageInterface<MessageBodyTypeInterface>[];
+    public replies: MessageInterface<MessageBodyTypeInterface>[];
     public subject: IdInterface | null;
 
     constructor(
@@ -23,7 +23,7 @@ export default class Message<T> implements MessageInterface<T> {
         timeStamp: Date,
         id: IdInterface,
         type: MessageTypes,
-        replys: MessageInterface<MessageBodyTypeInterface>[],
+        replies: MessageInterface<MessageBodyTypeInterface>[],
         subject: IdInterface | null
     ) {
         this.from = from;
@@ -32,7 +32,7 @@ export default class Message<T> implements MessageInterface<T> {
         this.timeStamp = timeStamp;
         this.id = id;
         this.type = type;
-        this.replys = replys;
+        this.replies = replies;
         this.subject = subject;
     }
 }

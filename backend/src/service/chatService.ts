@@ -26,7 +26,7 @@ export const persistMessage = (
         m => m.id === message.subject
     );
     const subjectMessage = chat.messages[subjectMessageIndex];
-    subjectMessage.replys = [...subjectMessage.replys, message];
+    subjectMessage.replies = [...subjectMessage.replies, message];
     chat.messages[subjectMessageIndex] = subjectMessage;
 
     // logger.info(subjectMessage)

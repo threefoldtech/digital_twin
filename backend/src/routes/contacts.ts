@@ -56,7 +56,7 @@ router.post('/', async (req, res) => {
         from: config.userid,
         type: MessageTypes.CONTACT_REQUEST,
         timeStamp: new Date(),
-        replys: [],
+        replies: [],
         subject: null,
     };
     console.log('sending to ', url);

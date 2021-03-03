@@ -26,7 +26,7 @@ export interface Message<T> {
     timeStamp: Date;
     type: String;
     subject: Id | null;
-    replys: Message<MessageBodyType>[];
+    repies: Message<MessageBodyType>[];
 }
 
 export interface MessageBodyType {}

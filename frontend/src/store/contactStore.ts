@@ -44,7 +44,7 @@ const addContact = (username: DtId, location, dontCheck = false) => {
         to: username,
         timeStamp: new Date(),
         type: 'SYSTEM',
-        replys: [],
+        repies: [],
         subject: null,
     };
     const chatname: String = username;

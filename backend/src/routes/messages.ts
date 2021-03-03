@@ -47,7 +47,7 @@ async function handleContactRequest(message: Message<ContactRequest>) {
         id: uuidv4(),
         type: MessageTypes.STRING,
         timeStamp: new Date(),
-        replys: [],
+        replies: [],
         subject: null,
     };
     const newchat = new Chat(

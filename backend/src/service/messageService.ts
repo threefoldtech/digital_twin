@@ -16,6 +16,8 @@ export const parseMessage = (
 ): MessageInterface<MessageBodyTypeInterface> => {
     const type: MessageTypes = <MessageTypes>msg.type;
 
+    console.log('MESSAGE: ', msg);
+
     switch (type) {
         case MessageTypes.STRING:
             return new Message<StringMessageTypeInterface>(
@@ -25,7 +27,9 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r: any) => parseMessage(r))],
+                msg.replies
+                    ? [...msg.replies?.map((r: any) => parseMessage(r))]
+                    : [],
                 msg?.subject
             );
         case MessageTypes.GIF:
@@ -36,7 +40,9 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r: any) => parseMessage(r))],
+                msg.replies
+                    ? [...msg.replies?.map((r: any) => parseMessage(r))]
+                    : [],
                 msg?.subject
             );
         case MessageTypes.CONTACT_REQUEST:
@@ -47,7 +53,9 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r: any) => parseMessage(r))],
+                msg.replies
+                    ? [...msg.replies?.map((r: any) => parseMessage(r))]
+                    : [],
                 msg?.subject
             );
         case MessageTypes.GROUP_UPDATE:
@@ -58,7 +66,9 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r: any) => parseMessage(r))],
+                msg.replies
+                    ? [...msg.replies?.map((r: any) => parseMessage(r))]
+                    : [],
                 msg?.subject
             );
         case MessageTypes.FILE_UPLOAD:
@@ -71,7 +81,9 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.FILE,
-                [...msg.replys?.map((r: any) => parseMessage(r))],
+                msg.replies
+                    ? [...msg.replies?.map((r: any) => parseMessage(r))]
+                    : [],
                 msg?.subject
             );
         case MessageTypes.FILE:
@@ -82,7 +94,9 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 type,
-                [...msg.replys?.map((r: any) => parseMessage(r))],
+                msg.replies
+                    ? [...msg.replies?.map((r: any) => parseMessage(r))]
+                    : [],
                 msg?.subject
             );
         case MessageTypes.EDIT:
@@ -93,7 +107,9 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.EDIT,
-                [...msg.replys?.map((r: any) => parseMessage(r))],
+                msg.replies
+                    ? [...msg.replies?.map((r: any) => parseMessage(r))]
+                    : [],
                 msg?.subject
             );
         case MessageTypes.DELETE:
@@ -104,7 +120,9 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.DELETE,
-                [...msg.replys?.map((r: any) => parseMessage(r))],
+                msg.replies
+                    ? [...msg.replies?.map((r: any) => parseMessage(r))]
+                    : [],
                 msg?.subject
             );
         case MessageTypes.QUOTE:
@@ -115,7 +133,9 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.QUOTE,
-                [...msg.replys?.map((r: any) => parseMessage(r))],
+                msg.replies
+                    ? [...msg.replies?.map((r: any) => parseMessage(r))]
+                    : [],
                 msg?.subject
             );
         case MessageTypes.READ:
@@ -126,7 +146,9 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 MessageTypes.READ,
-                [...msg.replys?.map((r: any) => parseMessage(r))],
+                msg.replies
+                    ? [...msg.replies?.map((r: any) => parseMessage(r))]
+                    : [],
                 msg?.subject
             );
 
@@ -138,7 +160,9 @@ export const parseMessage = (
                 new Date(msg.timeStamp),
                 msg.id,
                 msg.type,
-                [...msg.replys?.map((r: any) => parseMessage(r))],
+                msg.replies
+                    ? [...msg.replies?.map((r: any) => parseMessage(r))]
+                    : [],
                 msg?.subject
             );
     }

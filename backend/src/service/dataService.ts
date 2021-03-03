@@ -32,9 +32,9 @@ const sortChat = (chat: Chat) => {
     const messages = uniqBy(chat.messages, m => m.id);
 
     messages.map(m => {
-        const replys = uniqBy(m.replys, r => r.id);
-        replys.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
-        m.replys = replys;
+        const replies = uniqBy(m.replies, r => r.id);
+        replies.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());
+        m.replies = replies;
     });
 
     messages.sort((a, b) => a.timeStamp.getTime() - b.timeStamp.getTime());

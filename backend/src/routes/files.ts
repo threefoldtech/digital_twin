@@ -31,7 +31,7 @@ router.post('/:chatid/:messageid', async (req, resp) => {
         timeStamp: new Date(),
         to: chatId,
         type: MessageTypes.FILE,
-        replys: [],
+        replies: [],
         subject: null,
     };
     sendEventToConnectedSockets('message', message);
