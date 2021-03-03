@@ -10,6 +10,8 @@ export const sendMessageToApi = async (
     location: string,
     newMessage: Message<MessageBodyTypeInterface>
 ) => {
+    console.log('Location: ', location);
+    console.log('newMessage: ', newMessage);
     const url = getFullIPv6ApiLocation(location, '/messages');
     try {
         await axios.put(url, newMessage);

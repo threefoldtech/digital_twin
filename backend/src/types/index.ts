@@ -62,6 +62,7 @@ export interface ContactRequest
         ContactInterface {}
 export interface FileMessageType extends MessageBodyTypeInterface {
     filename: string;
+    url: string;
 }
 
 export interface GroupUpdateType extends MessageBodyTypeInterface {

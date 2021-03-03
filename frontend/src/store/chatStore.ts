@@ -135,6 +135,7 @@ function getMessage(chat: Chat, id) {
 }
 
 const addMessage = (chatId, message) => {
+    console.log('Adding message: ', { chatId, message });
     if (message.type === 'READ') {
         const chat: Chat = state.chats.find(chat => chat.chatId == chatId);
 
@@ -252,6 +253,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false) => {
                 },
             }
         );
+        console.log('File uploaded.');
     } catch (e) {
         msgToSend.body = `Failed to send file: ${e.message}`;
         addMessage(chatId, msgToSend);
