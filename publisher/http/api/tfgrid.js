@@ -1,505 +1,427 @@
-const tfc = require('tfgrid-api-client')
+const TfgridApiClient = require('tfgrid-api-client')
 
-const url = "wss://explorer.devnet.grid.tf/ws";
-const mnemo = "maid major gossip speak thank disagree blame museum slide canvas trash submit";
-const botipv6 = "200:b57d:d1f0:aad3:71f3:bf:232:9c4";
+const url = 'wss://explorer.devnet.grid.tf/ws'
+const mnemo = 'maid major gossip speak thank disagree blame museum slide canvas trash submit'
+const botipv6 = '200:b57d:d1f0:aad3:71f3:bf:232:9c4'
 
-function client_get(url, mnemonic) {
-    const cli = new tfc(url, mnemonic)
-    cli.init()
+function getClient (url, mnemonic) {
+  const cli = new TfgridApiClient(url, mnemonic)
+  cli.init()
 
-    return cli
+  return cli
 }
 
 // global tfclient
-const tfclient = client_get(url, mnemo);
+const tfclient = getClient(url, mnemo)
 
-const express = require('express');
-const router = express.Router();
-const path = require('path');
-const app = express();
-const clusters = require('./clusters.js');
+const express = require('express')
+const router = express.Router()
+const path = require('path')
+const app = express()
+const clusters = require('./clusters.js')
+const httpError = require('http-errors')
+const { omit } = require('lodash')
+const log = require('pino')()
+
+const { validateBodyMiddleware } = require('./lib/validate')
 
 const tferrors = {
-    1: 'StorageOverflow',
-    2: 'CannotCreateNode',
-    3: 'NodeNotExists',
-    4: 'NodeWithPubkeyExists',
-    5: 'CannotDeleteNode',
-    6: 'FarmExists',
-    7: 'FarmNotExists',
-    8: 'CannotCreateFarmWrongTwin',
-    9: 'CannotDeleteFarm',
-    10: 'CannotDeleteFarmWrongTwin',
-    11: 'EntityWithNameExists',
-    12: 'EntityWithPubkeyExists',
-    13: 'EntityNotExists',
-    14: 'EntitySignatureDoesNotMatch',
-    15: 'EntityWithSignatureAlreadyExists',
-    16: 'CannotUpdateEntity',
-    17: 'CannotDeleteEntity',
-    18: 'TwinExists',
-    19: 'TwinNotExists',
-    20: 'CannotCreateTwin',
-    21: 'UnauthorizedToUpdateTwin',
-    22: 'PricingPolicyExists',
-    23: 'CertificationCodeExists',
-    24: 'OffchainSignedTxError',
-    25: 'NoLocalAcctForSigning'
+  1: 'StorageOverflow',
+  2: 'CannotCreateNode',
+  3: 'NodeNotExists',
+  4: 'NodeWithPubkeyExists',
+  5: 'CannotDeleteNode',
+  6: 'FarmExists',
+  7: 'FarmNotExists',
+  8: 'CannotCreateFarmWrongTwin',
+  9: 'CannotDeleteFarm',
+  10: 'CannotDeleteFarmWrongTwin',
+  11: 'EntityWithNameExists',
+  12: 'EntityWithPubkeyExists',
+  13: 'EntityNotExists',
+  14: 'EntitySignatureDoesNotMatch',
+  15: 'EntityWithSignatureAlreadyExists',
+  16: 'CannotUpdateEntity',
+  17: 'CannotDeleteEntity',
+  18: 'TwinExists',
+  19: 'TwinNotExists',
+  20: 'CannotCreateTwin',
+  21: 'UnauthorizedToUpdateTwin',
+  22: 'PricingPolicyExists',
+  23: 'CertificationCodeExists',
+  24: 'OffchainSignedTxError',
+  25: 'NoLocalAcctForSigning'
 }
 
-function events(content, res, okcode) {
-    if(content instanceof Error)
-        return json_error(res, content);
+app.use(function (err, req, res, next) {
+  if (httpError.isHttpError(err)) {
+    // use warning since we threw the error
+    log.warn(err)
+    res.status(err.status)
+    if (process.env.NODE_ENV !== 'development') return res.send(omit(err, ['stack']))
+    return res.send(err)
+  }
 
-    const { events = [], status } = content
-    console.log(`Current status is ${status.type}`)
-    let code = okcode;
+  // default error handler
+  log.error(err, 'error happened handling the request')
+  res.status(err.status || 500).send(err.message)
+})
 
-    var result = null;
-
-    if(status.isFinalized) {
-        console.log(`Transaction included at blockHash ${status.asFinalized}`)
-
-        // Loop through Vec<EventRecord> to display all events
-        events.forEach(({ phase, event: { data, method, section } }) => {
-            console.log(`>> ${phase}: ${section}.${method}:: ${data}`);
-
-            console.log(data);
-
-            // skip if result is already set
-            if(result != null)
-                return;
-
-            // error
-            if(section == "system" && method == "ExtrinsicFailed") {
-                code = 422; // Error code
-
-                let module = data[0].asModule;
-
-                let errid = module['error']['words'][0];
-                let errmsg = "unknown";
-
-                if(errid in tferrors)
-                    errmsg = tferrors[errid];
-
-                // node already exists, not an error
-                if(errmsg == "NodeWithPubkeyExists")
-                    code = 304; // Not Modified
-
-                result = {
-                    success: false,
-                    error: errmsg,
-                    errno: errid,
-                };
-            }
-
-            // success
-            if(section == "tfgridModule") {
-                result = {
-                    success: true,
-                    message: method,
-                    id: data[1]['words'][0],
-                };
-            }
-        })
-
-        res.status(code).json(result);
-    }
-}
-
-function fields_validate(required, body) {
-    for(var i in required) {
-        if(!(required[i] in body))
-            return required[i]
-    }
-
-    return true
-}
-
-function json_error(res, msg) {
-    console.log(msg);
-    return res.status(422).json({ success: false, message: msg });
+function jsonError (res, msg) {
+  return res.status(422).json({ success: false, message: msg })
 }
 
 //
 // entities
 //
+router.post('/entities', validateBodyMiddleware('entity-create'), (req, res, next) => {
+  const { body } = req
+  const { name, country, city } = body
 
-router.post('/entities', function(req, res) {
-    let required = ['name', 'country', 'city'];
-
-    if((value = fields_validate(required, req.body)) !== true)
-        return json_error(res, "Required field: " + value);
-
-    let name = req.body['name']
-    let country = req.body['country'];
-    let city = req.body['city'];
-
-    tfclient.createEntity(name, country, city, (content) => {
-        events(content, res, 201);
-
-    }).catch(err => { json_error(res, err) })
+  tfclient.createEntity(name, country, city, content => events(content, res, 201))
+    .catch(next)
 })
 
-router.get('/entities', function(req, res) {
-    tfclient.listEntities().then((content) => {
-        res.json(content);
-
-    }, (err) => { json_error(res, err.message); })
+router.get('/entities', (req, res, next) => {
+  tfclient.listEntities().then(content => res.json(content))
+    .catch(next)
 })
 
-router.get('/entities/:id', function(req, res) {
-    tfclient.getEntityByID(req.params.id).then((content) => {
-        res.json(content);
+router.get('/entities/:id', (req, res, next) => {
+  const { params } = req
+  const { id } = params
 
-    }, (err) => { json_error(res, err.message); })
+  tfclient.getEntityByID(id).then(content => res.json(content))
+    .catch(next)
 })
 
-router.delete('/entities', function(req, res) {
-    tfclient.deleteEntity((content) => {
-        events(content, res, 200);
-
-    }).catch(err => { json_error(res, err) })
+router.delete('/entities', (req, res, next) => {
+  tfclient.deleteEntity(content => events(content, res, 200))
+    .catch(next)
 })
 
-router.put('/entities/:id', function(req, res) {
-    // TODO: update entity
-});
-
+router.put('/entities/:id', (req, res, next) => {
+  // TODO: update entity
+})
 
 //
 // twins
 //
 
-router.post('/twins', function(req, res) {
-    tfclient.createTwin(botipv6, (content) => {
-        events(content, res, 201);
+router.post('/twins', validateBodyMiddleware('twin-create'), (req, res, next) => {
+  const { body } = req
+  const { ip = botipv6 } = body
 
-    }).catch(err => { json_error(res, err) })
+  tfclient.createTwin(ip, content => events(content, res, 201))
+    .catch(next)
 })
 
-router.get('/twins', function(req, res) {
-    tfclient.listTwins().then((content) => {
-        res.json(content);
-
-    }, (err) => { json_error(res, err.message); })
+router.get('/twins', (req, res, next) => {
+  tfclient.listTwins().then(content => res.json(content))
+    .catch(next)
 })
 
-router.get('/twins/:id', function(req, res) {
-    tfclient.getTwinByID(req.params.id).then((content) => {
-        res.json(content);
+router.get('/twins/:id', (req, res, next) => {
+  const { params } = req
+  const { id } = params
 
-    }, (err) => { json_error(res, err.message); })
+  tfclient.getTwinByID(id).then(content => res.json(content))
+    .catch(next)
 })
 
-router.delete('/twins/:id', function(req, res) {
-    tfclient.deleteTwin(parseInt(req.params.id), (content) => {
-        events(content, res, 200);
+router.delete('/twins/:id', (req, res, next) => {
+  const { params } = req
+  const { id } = params
 
-    }).catch(err => { json_error(req, err) })
+  tfclient.deleteTwin(parseInt(id), content => res.json(content))
+    .catch(next)
 })
 
-router.post('/twins/:id/entities', function(req, res) {
-    let required = ['signature', 'entity'];
+router.post('/twins/:id/entities', validateBodyMiddleware('twin-entity-create'), (req, res, next) => {
+  const { params, body } = req
+  const { id } = params
+  const { entity, signature } = body
 
-    if((value = fields_validate(required, req.body)) !== true)
-        return json_error(res, "Required field: " + value);
-
-    let signature = req.body['signature'];
-    let entity = parseInt(req.body['entity']);
-
-    tfclient.addTwinEntity(parseInt(req.params.id), entity, signature, (content) => {
-        events(content, res, 201);
-
-    }).catch(err => { json_error(req, err) })
+  tfclient.addTwinEntity(id, entity, signature, content => events(content, res, 201))
+    .catch(next)
 })
 
-router.delete('/twins/:tid/entities/:eid', function(req, res) {
-    tfclient.removeTwinEntity(parseInt(req.params.tid), parseInt(req.params.eid), (content) => {
-        events(content, res, 200);
+router.delete('/twins/:tid/entities/:eid', (req, res, next) => {
+  const { params } = req
+  const { tid, eid } = params
 
-    }).catch(err => { json_error(req, err) })
+  tfclient.removeTwinEntity(parseInt(tid), parseInt(eid), content => events(content, res, 200))
+    .catch(next)
 })
 
 //
 // farms
 //
 
-router.get('/farms', function(req, res) {
-    tfclient.listFarms().then((content) => {
-        res.json(content);
-
-    }, (err) => { json_error(res, err.message); })
+router.get('/farms', (req, res, next) => {
+  tfclient.listFarms().then(content => res.json(content))
+    .catch(next)
 })
 
-router.get('/farms/:id', function(req, res) {
-    tfclient.getFarmByID(req.params.id).then((content) => {
-        res.json(content);
+router.get('/farms/:id', (req, res, next) => {
+  const { params } = req
+  const { id } = params
 
-    }, (err) => { json_error(res, err.message); })
+  tfclient.getFarmByID(id).then(content => res.json(content))
+    .catch(next)
 })
 
-router.post('/farms', function(req, res) {
-    let required = ['name', 'entity', 'twin', 'country', 'city', 'policy'];
+router.post('/farms', validateBodyMiddleware('farm-create'), (req, res, next) => {
+  const { body } = req
+  const { name, entity, twin, country, city, policy } = body
 
-    if((value = fields_validate(required, req.body)) !== true)
-        return json_error(res, "Required field: " + value);
+  const certificationType = tfclient.api.createType('CertificationType', 0)
+  const farm = {
+    name: name,
+    entity_id: entity,
+    twin_id: twin,
+    pricingPolicyID: policy,
+    certificationType: certificationType,
+    country_id: country,
+    city_id: city
+  }
 
-    var name = req.body['name'];
-    var entityid = req.body['entity'];
-    var twinid = req.body['twin'];
-    var country = req.body['country'];
-    var city = req.body['city'];
-    var policy = req.body['policy'];
-
-    certificationType = tfclient.api.createType('CertificationType', 0)
-    const farm = {
-        name: name,
-        entity_id: entityid,
-        twin_id: twinid,
-        pricingPolicyID: policy,
-        certificationType: certificationType,
-        country_id: country,
-        city_id: city
-    }
-
-    console.log(farm);
-
-    tfclient.createFarm(farm, (content) => {
-        events(content, res, 201);
-
-    }).catch(err => { json_error(res, err) })
+  tfclient.createFarm(farm, (content) => events(content, res, 201))
+    .catch(next)
 })
 
-router.delete('/farms/:id', function(req, res) {
-    tfclient.deleteFarm(parseInt(req.params.id), (content) => {
-        events(content, res, 200);
+router.delete('/farms/:id', (req, res, next) => {
+  const { params } = req
+  const { id } = params
 
-    }).catch(err => { json_error(res, err) })
+  tfclient.deleteFarm(parseInt(id), (content) => events(content, res, 200))
+    .catch(next)
 })
-
-
 
 //
 // nodes
 //
 
-router.get('/nodes', function(req, res) {
-    tfclient.listNodes().then((content) => {
-        res.json(content);
-
-    }, (err) => { json_error(res, err.message); })
+router.get('/nodes', (req, res, next) => {
+  tfclient.listNodes().then(content => res.json(content))
+    .catch(next)
 })
 
-router.get('/nodes/:id', function(req, res) {
-    tfclient.getNodeByID(req.params.id).then((content) => {
-        res.json(content);
+router.get('/nodes/:id', (req, res, next) => {
+  const { params } = req
+  const { id } = params
 
-    }, (err) => { json_error(res, err.message); })
+  tfclient.getNodeByID(id).then(content => res.json(content))
+    .catch(next)
 })
 
-router.post('/nodes', function(req, res) {
-    var required = ['farm_id', 'node_id', 'capacity', 'location'];
+router.post('/nodes', validateBodyMiddleware('node-create'), (req, res, next) => {
+  const { body } = req
+  const { farm, node: nodeId, capacity, location, twin, city, country } = body
 
-    if((value = fields_validate(required, req.body)) !== true)
-        return json_error(res, "Required field: " + value);
+  const resources = tfclient.api.createType('Resources', capacity)
+  const loc = tfclient.api.createType('Location', {
+    latitude: location.latitude.toString(),
+    longitude: location.longitude.toString()
+  })
 
-    var required = ['cru', 'mru', 'sru', 'hru'];
+  const node = {
+    farm_id: farm,
+    pub_key: nodeId,
+    twin_id: twin,
+    resources,
+    location: loc,
+    country_id: country,
+    city_id: city,
+    role: 'Node'
+  }
 
-    if((value = fields_validate(required, req.body['capacity'])) !== true)
-        return json_error(res, "Required field: " + value);
-
-    var required = ['longitude', 'latitude'];
-
-    if((value = fields_validate(required, req.body['location'])) !== true)
-        return json_error(res, "Required field: " + value);
-
-    let resources = tfclient.api.createType('Resources', req.body['capacity'])
-
-    let location = tfclient.api.createType('Location', {
-        latitude: req.body['location']['latitude'].toString(),
-        longitude: req.body['location']['longitude'].toString(),
-    })
-
-    let node = {
-        farm_id: req.body['farm_id'],
-        pub_key: req.body['node_id'],
-        twin_id: 1, // FIXME
-        resources,
-        location,
-        country_id: 0,
-        city_id: 0,
-        role: "Node"
-    }
-
-    tfclient.createNode(node, (content) => {
-        events(content, res, 201);
-
-    }).catch(err => { json_error(res, err) })
+  tfclient.createNode(node, content => events(content, res, 201))
+    .catch(next)
 })
 
-router.delete('/nodes/:id', function(req, res) {
-    tfclient.deleteNode(parseInt(req.params.id), (content) => {
-        events(content, res, 200);
+router.delete('/nodes/:id', (req, res, next) => {
+  const { params } = req
+  const { id } = params
 
-    }).catch(err => { json_error(res, err) })
+  tfclient.deleteNode(parseInt(id), content => events(content, res, 200))
+    .catch(next)
 })
 
 //
 // gateway
 //
-router.post('/gateways', function(req, res) {
-    var required = ['farm_id', 'node_id', 'capacity', 'location'];
+router.post('/gateways', validateBodyMiddleware('node-create'), (req, res, next) => {
+  const { body } = req
+  const { farm, node: nodeId, capacity, location, twin, city, country } = body
 
-    if((value = fields_validate(required, req.body)) !== true)
-        return json_error(res, "Required field: " + value);
+  const resources = tfclient.api.createType('Resources', capacity)
+  const loc = tfclient.api.createType('Location', {
+    latitude: location.latitude.toString(),
+    longitude: location.longitude.toString()
+  })
 
-    var required = ['cru', 'mru', 'sru', 'hru'];
+  const node = {
+    farm_id: farm,
+    pub_key: nodeId,
+    twin_id: twin,
+    resources,
+    location: loc,
+    country_id: country,
+    city_id: city,
+    role: 'Gateway'
+  }
 
-    if((value = fields_validate(required, req.body['capacity'])) !== true)
-        return json_error(res, "Required field: " + value);
-
-    var required = ['longitude', 'latitude'];
-
-    if((value = fields_validate(required, req.body['location'])) !== true)
-        return json_error(res, "Required field: " + value);
-
-    let resources = tfclient.api.createType('Resources', req.body['capacity'])
-
-    let location = tfclient.api.createType('Location', {
-        latitude: req.body['location']['latitude'].toString(),
-        longitude: req.body['location']['longitude'].toString(),
-    })
-
-    let node = {
-        farm_id: req.body['farm_id'],
-        pub_key: req.body['node_id'],
-        twin_id: 1, // FIXME
-        resources,
-        location,
-        country_id: 0,
-        city_id: 0,
-        role: "Gateway"
-    }
-
-    tfclient.createNode(node, (content) => {
-        events(content, res, 201);
-
-    }).catch(err => { json_error(res, err) })
+  tfclient.createNode(node, content => events(content, res, 201))
+    .catch(next)
 })
-
 
 //
 // account
 //
 
-router.get('/account/price', function(req, res) {
-    tfclient.getPrice().then((content) => {
-        res.json(content);
-
-    }, (err) => { json_error(res, err.message); })
+router.get('/account/price', (req, res, next) => {
+  tfclient.getPrice().then(content => res.json(content))
+    .catch(next)
 })
 
-
-router.get('/account/balance', function(req, res) {
-    tfclient.getBalance().then((content) => {
-        res.json(content);
-
-    }, (err) => { json_error(res, err.message); })
+router.get('/account/balance', (req, res, next) => {
+  tfclient.getBalance().then(content => res.json(content))
+    .catch(next)
 })
 
 //
 // owner signing debug
 //
 
-router.get('/debug/cluster/:name', function(req, res) {
-    clusters.findByName(clusters.rootpath, req.params.name).then((content) => {
-        console.log(content);
-        res.json(content);
-    });
+router.get('/debug/cluster/:name', (req, res, next) => {
+  clusters.findByName(clusters.rootpath, req.params.name).then((content) => {
+    console.log(content)
+    res.json(content)
+  })
 })
-
 
 //
 // crypto verification
 //
 
-router.post('/signature', function(req, res) {
-    let required = ['entity', 'twin'];
+router.post('/signature', validateBodyMiddleware('sign-create'), (req, res, next) => {
+  const { body } = req
+  const { entity, twin } = body
 
-    if((value = fields_validate(required, req.body)) !== true)
-        return json_error(res, "Required field: " + value);
-
-    let entity = parseInt(req.body['entity']);
-    let twin = parseInt(req.body['twin']);
-
-    tfclient.sign(entity, twin).then((content) => {
-        res.json(content);
-
-    }, (err) => { json_error(res, err.message); })
+  tfclient.sign(entity, twin).then(content => res.json(content))
+    .catch(next)
 })
-
 
 //
 // clusters
 //
 
-router.get('/clusters', function(req, res) {
-    clusters.list(clusters.rootpath).then((content) => {
-        res.json(content);
-
-    }, (err) => { json_error(res, err.message); })
+router.get('/clusters', (req, res, next) => {
+  clusters.list(clusters.rootpath).then(content => res.json(content))
+    .catch(next)
 })
 
-router.post('/clusters', function(req, res) {
-    let required = ['name', 'secret', 'ipv4', 'ipv6']
+router.post('/clusters', validateBodyMiddleware('cluster-create'), (req, res, next) => {
+  const { body } = req
+  const { name } = body
 
-    if((value = fields_validate(required, req.body)) !== true)
-        return json_error(res, "Required field: " + value);
+  if (!name.match(/^[0-9a-zA-Z._-]*$/)) throw httpError(400, 'Invalid cluster name: only alpha, number, period, underscore and dash allowed')
 
-    let filename = req.body['name'];
-    if(!filename.match(/^[0-9a-zA-Z\._-]*$/))
-        return json_error(res, "Invalid cluster name: only alpha, number, period, underscore and dash allowed");
+  const fullpath = path.join(clusters.rootpath, name + '.json')
+  const apath = path.resolve(fullpath)
 
-    let fullpath = path.join(clusters.rootpath, filename + ".json");
-    const apath = path.resolve(fullpath);
-
-    clusters.put(apath, req.body).then((content) => {
-        res.status(201).json(content);
-
-    }, (err) => { json_error(res, err.message); })
+  clusters.put(apath, body).then(content => res.json(content))
+    .catch(next)
 })
 
-router.get('/clusters/:id', function(req, res) {
-    let fullpath = path.join(clusters.rootpath, req.params.id + ".json");
-    const apath = path.resolve(fullpath);
+router.get('/clusters/:id', (req, res, next) => {
+  const { params } = req
+  const { id } = params
 
-    clusters.get(apath).then((content) => {
-        res.json(content);
+  const fullpath = path.join(clusters.rootpath, id + '.json')
+  const apath = path.resolve(fullpath)
 
-    }, (err) => { json_error(res, err.message); })
+  clusters.get(apath).then(content => res.json(content))
+    .catch(next)
 })
 
-router.delete('/clusters/:id', function(req, res) {
-    let fullpath = path.join(clusters.rootpath, req.params.id + ".json");
-    const apath = path.resolve(fullpath);
+router.delete('/clusters/:id', (req, res, next) => {
+  const { params } = req
+  const { id } = params
 
-    clusters.remove(apath).then((content) => {
-        res.json(content);
+  const fullpath = path.join(clusters.rootpath, id + '.json')
+  const apath = path.resolve(fullpath)
 
-    }, (err) => { json_error(res, err.message); })
+  clusters.remove(apath).then(content => res.json(content))
+    .catch(next)
 })
 
-router.put('/clusters/:id', function(req, res) {
-    let fullpath = path.join(clusters.rootpath, req.params.id + ".json");
-    const apath = path.resolve(fullpath);
+router.put('/clusters/:id', (req, res, next) => {
+  const { params } = req
+  const { id } = params
 
-    clusters.put(apath, req.body).then((content) => {
-        res.json(content);
+  const fullpath = path.join(clusters.rootpath, id + '.json')
+  const apath = path.resolve(fullpath)
 
-    }, (err) => { json_error(res, err.message); })
+  clusters.put(apath, req.body).then(content => res.json(content))
+    .catch(next)
 })
 
+function events (content, res, okcode) {
+  if (content instanceof Error) return jsonError(res, content)
+
+  const { events = [], status } = content
+  console.log(`Current status is ${status.type}`)
+  let code = okcode
+
+  let result = null
+
+  if (status.isFinalized) {
+    console.log(`Transaction included at blockHash ${status.asFinalized}`)
+
+    // Loop through Vec<EventRecord> to display all events
+    events.forEach(({ phase, event: { data, method, section } }) => {
+      console.log(`>> ${phase}: ${section}.${method}:: ${data}`)
+
+      console.log(data)
+
+      // skip if result is already set
+      if (result) return
+
+      // error
+      if (section === 'system' && method === 'ExtrinsicFailed') {
+        code = 422 // Error code
+
+        const module = data[0].asModule
+
+        const errid = module.error.words[0]
+        let errmsg = 'unknown'
+
+        if (errid in tferrors) errmsg = tferrors[errid]
+
+        // node already exists, not an error
+        if (errmsg === 'NodeWithPubkeyExists') code = 304 // Not Modified
+
+        result = {
+          success: false,
+          error: errmsg,
+          errno: errid
+        }
+      }
+
+      // success
+      if (section === 'tfgridModule') {
+        result = {
+          success: true,
+          message: method,
+          id: data[1].words[0]
+        }
+      }
+    })
+
+    res.status(code).json(result)
+  }
+}
 
 module.exports = router
