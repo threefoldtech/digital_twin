@@ -42,14 +42,35 @@ app.use(function (req, res, next) {
         }else{
             // check acls
             var splitted =  req.url.split("/")
-            var prefix = splitted[0]
-            users = acls[prefix]
+            var isWebsite = true
+
+            if(req.url == "/" ){
+              var prefix = "/"
+            }else{
+              if( splitted[1] == "info"){
+                isWebsite = false
+                var prefix = splitted[2]
+              }else{
+                var prefix = splitted[1]
+              }
+            }
+            
+            console.log(acls)
+            var permissions = acls.acls
+
+            if(isWebsite){
+              var permissions  = acls.acls.websites
+            }else{
+              var permissions = acls.acls.wikis
+            }
+            
+            users = permissions [prefix]
+           
             if(users.length == 0){
               next()
               return
             }
-            console.log(req.session.user)
-            if(users.contains(req.session.user.id)){
+            if(users.contains(req.session.user.profile.doubleName)){
               next()
               return
             }

@@ -8,7 +8,7 @@ class Acls{
     constructor(root){
         this.root = root
 
-        this.acls = {}
+        this.acls = {"websites": {}, "wikis": {}}
 
         this.load = async function () {
             
@@ -18,6 +18,7 @@ class Acls{
                 }
                 var users = new Set()
                 try{
+                    var isWebSite = cache.domains[domain].isWebSite
                     var p = path.join(this.root, cache.domains[domain].dir, ".acls.json")
                     var acl = JSON.parse(fs.readFileSync(p));
                     acl.users.map((u)=>{users.add(u)})
@@ -28,10 +29,12 @@ class Acls{
                 }catch(e){
                     continue
                 }
-                
-                this.acls[cache.domains[domain].alias] = Array.from(users)
+                if(isWebSite)
+                     this.acls.websites[cache.domains[domain].alias] = Array.from(users)
+                 else
+                 this.acls.wikis[cache.domains[domain].alias] = Array.from(users)
             } 
-            this.acls["/"] = []
+            this.acls.websites["/"] = []
         }
     }
 }

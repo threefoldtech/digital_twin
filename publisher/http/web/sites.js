@@ -4,7 +4,6 @@ const asyncHandler = require('express-async-handler')
 
 var drive = require('../../drive.js')
 var cache = require('../../cache');
-const { default: computeSourceMap } = require('sucrase/dist/computeSourceMap');
 
 async function update(req) {
     var info = await getRequestInfo(req)
