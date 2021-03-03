@@ -13,10 +13,8 @@ module.exports = {
       longitude: { type: 'string' },
       latitude: { type: 'string' }
     },
-    twin: { type: 'integer' },
-    city: { type: 'integer' },
-    country: { type: 'integer' }
+    secret: { type: 'string' }
   },
-  required: ['farm', 'node', 'capacity', 'location', 'twin', 'city', 'country'],
+  required: ['farm', 'node', 'capacity', 'location', 'secret'],
   additionalProperties: false
 }
