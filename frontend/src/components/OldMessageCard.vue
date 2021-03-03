@@ -92,7 +92,7 @@
                     />
                     <br />
                     <a
-                        class="py-2 px-2 bg-blue-300 border-r-2"
+                        class="py-2 px-2 bg-gray-200 border-r-2"
                         :href="fileUrl"
                         download
                         >{{ message.body.filename }}</a
@@ -145,7 +145,9 @@
                 </p>
             </div>
             <div
-                v-if="!disabled && message.repies && message.repies.length >= 1"
+                v-if="
+                    !disabled && message.replies && message.replies.length >= 1
+                "
                 class="bg-white p-2"
                 :class="{
                     'rounded-b-lg':
@@ -153,7 +155,7 @@
                 }"
             >
                 <MessageCard
-                    v-for="reply in message.repies"
+                    v-for="reply in message.replies"
                     :message="reply"
                     is-group
                     :is-mine="reply.from === user.id"
@@ -305,7 +307,7 @@ export default defineComponent({
                         : editMessageValue.value,
                     timeStamp: oldmessage.timeStamp,
                     type: isDelete ? 'DELETE' : 'EDIT',
-                    repies: [],
+                    replies: [],
                     subject: null,
                 };
                 sendMessageObject(props.chatId, updatedMessage);
@@ -339,7 +341,7 @@ export default defineComponent({
                 body: <StringMessageType>replyMessageValue.value,
                 timeStamp: new Date(),
                 type: 'STRING',
-                repies: [],
+                replies: [],
                 subject: props.message.id,
             };
             sendMessageObject(props.chatId, newMessage);
@@ -367,7 +369,7 @@ export default defineComponent({
                     },
                     timeStamp: new Date(),
                     type: 'QUOTE',
-                    repies: [],
+                    replies: [],
                     subject: null,
                 };
                 sendMessageObject(props.chatId, newMessage);

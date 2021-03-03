@@ -306,9 +306,7 @@ export default defineComponent({
             return value;
         };
 
-        // @todo: fix so that properly scrools to bottom #Fixed it
         const scrollToBottom = (force = false) => {
-            console.log('Scrolling to bottom ???');
             if (!force && !isIntersecting.value) {
                 return;
             }
@@ -316,18 +314,12 @@ export default defineComponent({
             nextTick(() => {
                 messageBox.value.scrollTo(0, messageBox.value.scrollHeight);
             });
-            // messageBox.value.scrollTop = messageBox.value.scrollHeight;
         };
 
         const message = ref('');
 
         const chat = computed(() => {
-            const tmp = chats.value.find(c => c.chatId == selectedId.value);
-            return tmp;
-        });
-
-        watch(chat.value.messages, () => {
-            scrollToBottom();
+            return chats.value.find(c => c.chatId == selectedId.value);
         });
 
         onMounted(() => {
@@ -406,13 +398,6 @@ export default defineComponent({
         const { isIntersecting, intersectionRatio } = useIntersectionObserver(
             viewAnchor
         );
-
-        // //@TODO fix this
-        // // @ts-ignore
-        // watch(chat.value?.messages, () => {
-        //     console.log('THis is a watch???? ');
-        //     scrollToBottom();
-        // });
 
         const status = computed(() => {
             return statusList[selectedId.value];

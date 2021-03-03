@@ -19,6 +19,7 @@ import config from '../../public/config/config';
 import { uuidv4 } from '@/common';
 import { startFetchStatusLoop } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
+import { useScrollActions } from './scrollStore';
 
 const state = reactive<chatstate>({
     chats: [],
@@ -80,7 +81,7 @@ const addGroupchat = (name: string, contacts: Contact[]) => {
                 timeStamp: new Date(),
                 id: uuidv4(),
                 type: 'SYSTEM',
-                repies: [],
+                replies: [],
                 subject: null,
             },
         ],
@@ -121,7 +122,7 @@ function getMessage(chat: Chat, id) {
 
     if (!message) {
         chat.messages.find(m => {
-            const found = m.repies.find(r => r.id === id);
+            const found = m.replies.find(r => r.id === id);
             if (!found) {
                 return false;
             }
@@ -160,17 +161,19 @@ const addMessage = (chatId, message) => {
         return;
     }
 
-    // console.log("in addmessage chatid", chatId);
-    // console.log("in addmessage message", message);
+    console.log('in addmessage chatid', chatId);
+    // console.log('in addmessage message', message);
 
     const chat: Chat = state.chats.find(chat => chat.chatId == chatId);
+
+    console.log('Chat: ', chat);
 
     if (message.subject) {
         const subjectMessageIndex = chat.messages.findIndex(
             m => m.id === message.subject
         );
         const subjectMessage = chat.messages[subjectMessageIndex];
-        subjectMessage.repies = [...subjectMessage.repies, message];
+        subjectMessage.replies = [...subjectMessage.replies, message];
         chat.messages[subjectMessageIndex] = subjectMessage;
         setLastMessage(chatId, message);
         return;
@@ -186,6 +189,11 @@ const addMessage = (chatId, message) => {
     sortChats();
     console.log('before setLastmessage');
     setLastMessage(chatId, message);
+
+    // Add event to scroll.
+
+    const { addScrollEvent } = useScrollActions();
+    addScrollEvent();
 };
 
 const sendMessage = (chatId, message, type: string = 'STRING') => {
@@ -198,7 +206,7 @@ const sendMessage = (chatId, message, type: string = 'STRING') => {
         to: chatId,
         timeStamp: new Date(),
         type: type,
-        repies: [],
+        replies: [],
         subject: null,
     };
     addMessage(chatId, msg);
@@ -237,7 +245,7 @@ const sendFile = async (chatId, selectedFile, isBlob = false) => {
         to: chatId,
         timeStamp: new Date(),
         type: 'FILE_UPLOAD',
-        repies: [],
+        replies: [],
         subject: null,
     };
 
@@ -292,7 +300,7 @@ const readMessage = (chatId, messageId) => {
         body: messageId,
         timeStamp: new Date(),
         type: 'READ',
-        repies: [],
+        replies: [],
         subject: null,
     };
     sendMessageObject(chatId, newMessage);
@@ -314,7 +322,7 @@ const updateContactsInGroup = (groupId, contact: Contact, remove: boolean) => {
         },
         timeStamp: new Date(),
         type: 'GROUP_UPDATE',
-        repies: [],
+        replies: [],
         subject: null,
     };
     console.log(message);

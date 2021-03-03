@@ -1,6 +1,6 @@
 <template>
     <a
-        class="py-2 px-2 bg-blue-300 border-r-2"
+        class="py-2 px-2 bg-gray-200 border-r-2"
         :href="calcExternalResourceLink(message.body.url)"
         download
         >{{ message.body.filename }}</a
