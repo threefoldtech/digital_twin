@@ -1,13 +1,14 @@
 <template>
     <img
         :src="calcExternalResourceLink(message.body.url)"
-        @load="$emit('scroll')"
+        @load="imageLoaded"
     />
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { calcExternalResourceLink } from '@/services/urlService';
+import { useScrollActions, useScrollState } from '@/store/scrollStore';
 
 export default defineComponent({
     name: 'ImageContent',
@@ -15,7 +16,12 @@ export default defineComponent({
         message: { type: Object, required: true },
     },
     setup(props) {
-        return { calcExternalResourceLink };
+        const { addScrollEvent } = useScrollActions();
+
+        const imageLoaded = () => {
+            addScrollEvent();
+        };
+        return { imageLoaded, calcExternalResourceLink };
     },
 });
 </script>

@@ -213,6 +213,8 @@
 </template>
 
 <script lang="ts">
+import { useScrollActions, useScrollState } from '@/store/scrollStore';
+
 import appLayout from '../../layout/AppLayout.vue';
 import moment from 'moment';
 import {
@@ -320,20 +322,16 @@ export default defineComponent({
         const message = ref('');
 
         const chat = computed(() => {
-            console.log('Computed: ', chats.value, selectedId.value);
             const tmp = chats.value.find(c => c.chatId == selectedId.value);
-            console.log('tmp: ', tmp);
             return tmp;
         });
 
-        console.log('CHAT<VALUE ', chat.value);
         watch(chat.value.messages, () => {
             scrollToBottom();
         });
 
         onMounted(() => {
             nextTick(() => {
-                console.log('TICKING');
                 scrollToBottom(true);
             });
         });
@@ -418,6 +416,14 @@ export default defineComponent({
 
         const status = computed(() => {
             return statusList[selectedId.value];
+        });
+
+        const { scrollEvents } = useScrollState();
+
+        watch(scrollEvents, () => {
+            nextTick(() => {
+                scrollToBottom(true);
+            });
         });
 
         return {
