@@ -77,6 +77,7 @@
             <div
                 class="grid grid-cols-1 md:singleGrid relative h-full w-full"
                 v-if="chat"
+                :key="chat.id + selectedId"
             >
                 <div
                     class="hidden md:block relative h-full flex-col overflow-y-auto"
@@ -145,7 +146,7 @@
                             ></div>
                         </div>
                     </div>
-
+                    {{selectedId}}
                     <ChatInput
                         class="chatInput"
                         :selectedid="chat.chatId"
@@ -259,6 +260,9 @@ export default defineComponent({
     setup(props) {
         const route = useRoute();
         let selectedId = ref(<string>route.params.id);
+        watch(()=> route.params.id, (id)=>{
+            selectedId.value = <string>id
+        })
         const { retrievechats } = usechatsActions();
         onBeforeMount(retrievechats);
 
@@ -418,6 +422,7 @@ export default defineComponent({
 
         return {
             chats,
+            selectedId,
             chat,
             truncate,
             message,
