@@ -1,5 +1,5 @@
 <template>
-    <div class="col-span-2 place-items-center grid relative">
+    <div class="grid relative">
         <div
             class="bg-icon rounded-full"
             :style="`background:url(${src}) no-repeat center/cover`"
