@@ -1,7 +1,7 @@
 <template>
     <div class="flex">
-        <div 
-            class="flex justify-center "
+        <div
+            class="flex justify-center"
             :class="{
                 'w-18 mr-4': showActionButtons,
                 'w-8 mr-2': !showActionButtons,
@@ -20,9 +20,9 @@
                     </div>
                 </div>
                 <div class="header-actions align-end">
-                    <button>
+                    <!-- <button>
                         <i class="fa fa-ellipsis-v"></i>
-                    </button>
+                    </button> -->
                 </div>
             </header>
             <main class="px-4 pb-4">

@@ -21,8 +21,9 @@
             </div>
             <div v-else>Loading</div>
         </template>
+
         <template v-slot:actions>
-            <div class="text-gray-500 flex items-center justify-end w-full">
+            <div class="">
                 <!-- <button class="text-lg text-white">
                     <i class="fas fa-search"></i>
                 </button> -->
@@ -200,7 +201,12 @@
                                 {{ status?.status || 'No status found' }}
                             </p>
                         </div>
-                        <group-management :group-chat="chat"></group-management>
+                        <group-management
+                            :group-chat="chat"
+                            @app-call="popupMeeting"
+                            @app-block="blockChat"
+                            @app-delete="deleteChat"
+                        ></group-management>
                     </div>
                 </aside>
             </div>
@@ -364,7 +370,7 @@ export default defineComponent({
             const router = useRouter();
             // router is undefined?
             // router.push({ name: 'chat' });
-            window.location.href = "/chat"
+            window.location.href = '/chat';
         };
 
         const blockChat = () => {
