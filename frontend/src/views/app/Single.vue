@@ -3,7 +3,10 @@
         <template v-slot:top>
             <div class="w-full flex md:px-4" v-if="chat">
                 <div class="place-items-center grid mr-4">
-                    <AvatarImg :id="chat.chatId"></AvatarImg>
+                    <AvatarImg
+                        :id="chat.chatId"
+                        :showOnlineStatus="false"
+                    ></AvatarImg>
                 </div>
                 <div class="py-4 pl-2">
                     <p class="font-bold font overflow-hidden overflow-ellipsis">
@@ -177,17 +180,11 @@
                             class="bg-white p-2 pb-6 w-full relative rounded-lg mb-4 mt-0 md:grid place-items-center grid-cols-1 md:px-4"
                         >
                             <div class="place-items-center grid relative">
-                                <AvatarImg class="-mt-7" :id="chat.chatId" />
-                                <div
-                                    v-if="!chat.isGroup"
-                                    class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-0 transition-all"
-                                    :class="{
-                                        'bg-red-500':
-                                            status && !status.isOnline,
-                                        'bg-green-500':
-                                            status && status.isOnline,
-                                    }"
-                                ></div>
+                                <AvatarImg
+                                    class="-mt-7"
+                                    :id="chat.chatId"
+                                    :showOnlineStatus="true"
+                                />
                             </div>
                             <h2
                                 class="my-3 break-words text-center w-full overflow-y-auto max-h-28"
@@ -364,7 +361,7 @@ export default defineComponent({
             const router = useRouter();
             // router is undefined?
             // router.push({ name: 'chat' });
-            window.location.href = "/chat"
+            window.location.href = '/chat';
         };
 
         const blockChat = () => {

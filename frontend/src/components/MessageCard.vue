@@ -7,7 +7,7 @@
                 'w-8 mr-2': !showActionButtons,
             }"
         >
-            <AvatarImg :id="message.from" />
+            <AvatarImg :id="message.from" :showOnlineStatus=false />
         </div>
         <div class="card w-full bg-white rounded-md mb-4 overflow-hidden">
             <header class="flex justify-between pl-2 pt-2 text-xs items-center">

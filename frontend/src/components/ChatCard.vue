@@ -7,15 +7,7 @@
       {{ newMessages }}
     </div> -->
         <div class="col-span-2 place-items-center grid relative">
-            <AvatarImg :id="chat.chatId" />
-            <div
-                v-if="!chat.isGroup"
-                class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-2 transition-all"
-                :class="{
-                    'bg-red-500': status && !status.isOnline,
-                    'bg-green-500': status && status.isOnline,
-                }"
-            ></div>
+            <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
         </div>
         <div class="col-span-10 px-2">
             <p class="flex place-content-between">
