@@ -15,13 +15,6 @@
                     class="md:col-span-2 col-span-2 place-items-center grid relative"
                 >
                     <AvatarImg small :id="contact.id" />
-                    <div
-                        class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-2 transition-all"
-                        :class="{
-                            'bg-red-500': status && status[contact.id],
-                            'bg-green-500': status && status[contact.id],
-                        }"
-                    ></div>
                 </div>
                 <div class="md:col-span-8 col-span-8 pl-2">
                     <p class="flex place-content-between">

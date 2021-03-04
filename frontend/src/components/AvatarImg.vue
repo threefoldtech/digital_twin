@@ -1,13 +1,23 @@
 <template>
-    <div
-        class="bg-icon rounded-full"
-        :style="`background:url(${src}) no-repeat center/cover`"
-        :class="{
-            'h-12 w-12': !small && !xsmall,
-            'h-8 w-8': small,
-            'h-6 w-6': xsmall,
-        }"
-    ></div>
+    <div class="grid relative">
+        <div
+            class="bg-icon rounded-full"
+            :style="`background:url(${src}) no-repeat center/cover`"
+            :class="{
+                'h-12 w-12': !small && !xsmall,
+                'h-8 w-8': small,
+                'h-6 w-6': xsmall,
+            }"
+        ></div>
+        <div
+            v-if="showOnlineStatus"
+            class="h-3 w-3 bg-gray-300 rounded-full absolute bottom-0 right-0 transition-all"
+            :class="{
+                'bg-red-500': status && !status.isOnline,
+                'bg-green-500': status && status.isOnline,
+            }"
+        ></div>
+    </div>
 </template>
 
 <script lang="ts">
@@ -19,6 +29,11 @@ export default {
     name: 'AvatarImg',
     props: {
         id: { required: true },
+        showOnlineStatus: {
+            required: false,
+            default:true,
+            type: Boolean
+        },
         small: { required: false, default: false, type: Boolean },
         xsmall: { required: false, default: false, type: Boolean },
     },
@@ -40,6 +55,7 @@ export default {
 
         return {
             src,
+            status
         };
     },
 };
