@@ -146,7 +146,6 @@
                             ></div>
                         </div>
                     </div>
-                    {{selectedId}}
                     <ChatInput
                         class="chatInput"
                         :selectedid="chat.chatId"
