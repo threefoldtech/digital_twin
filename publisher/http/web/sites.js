@@ -111,8 +111,18 @@ async function handleWebsiteFile(req, res, info){
     var filepath = `${info.dir}/${url}`
     console.log(filepath)
     var encoding = 'utf-8'
-    if(filepath.endsWith('png') || filepath.endsWith('jpg') || filepath.endsWith('jpeg')){
+    if(filepath.endsWith('png')){
+        res.type("image/png")
         encoding = 'binary'
+    }else if(filepath.endsWith('jpg')){
+        res.type("image/jpg")
+        encoding = 'binary'
+    }else if(filepath.endsWith('jpeg')){
+        encoding = 'binary'
+        res.type('image/jpeg')
+    }else if(filepath.endsWith('svg')){
+        encoding = 'binary'
+        res.type('image/svg+xml')
     }else if (filepath.endsWith("js")){
         res.type("text/javascript");
     }else if (filepath.endsWith("css")){
@@ -159,8 +169,18 @@ async function handleWikiFile(req, res, info){
         filename = splitted[splitted.length - 1]
     }
 
-    if (filename.endsWith("jpeg") || filename.endsWith("jpg") || filename.endsWith("gif") || filename.endsWith("png")){
+    if(filepath.endsWith('png')){
+        res.type("image/png")
         encoding = 'binary'
+    }else if(filepath.endsWith('jpg')){
+        res.type("image/jpg")
+        encoding = 'binary'
+    }else if(filepath.endsWith('jpeg')){
+        encoding = 'binary'
+        res.type('image/jpeg')
+    }else if(filepath.endsWith('svg')){
+        encoding = 'binary'
+        res.type('image/svg+xml')
     }else if(filename.endsWith("md") ){
         encoding = 'utf-8'  
     }
