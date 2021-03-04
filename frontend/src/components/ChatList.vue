@@ -1,24 +1,23 @@
 <template>
     <section class="h-full">
-        <div class="absolute w-full px-2 pt-4">
-                <div v-if="filteredChatRequests.length > 0">
-                    <h2 style="font-size: 1.5em">
-                        You have
-                        <span style="">
-                            {{ filteredChatRequests.length }}
-                        </span>
-                        new connection request<span
-                            v-if="filteredChatRequests.length > 1"
-                            >s</span
-                        >
-                    </h2>
-                    <ChatRequestList :chat-requests="filteredChatRequests" />
-                </div>
-        <div
-            class="relative overflow-y-auto w-full max-h-full h-full pt-4"
-            v-if="filteredChats && filteredChats.length"
-        >
-            
+        <div class="relative w-full px-2 pt-4">
+            <div v-if="filteredChatRequests.length > 0">
+                <h2 style="font-size: 1.5em">
+                    You have
+                    <span style="">
+                        {{ filteredChatRequests.length }}
+                    </span>
+                    new connection request<span
+                        v-if="filteredChatRequests.length > 1"
+                        >s</span
+                    >
+                </h2>
+                <ChatRequestList :chat-requests="filteredChatRequests" />
+            </div>
+            <div
+                class="relative overflow-y-auto w-full max-h-full h-full pt-4"
+                v-if="filteredChats && filteredChats.length"
+            >
                 <ChatCard
                     v-for="chat in filteredChats"
                     :key="`${chat.chatId}-${chat.messages.length}-${
