@@ -144,7 +144,7 @@ async function handleWikiFile(req, res, info){
     if(filename.includes("__")){
         var splitted = filename.split("__")
         filename = splitted[1]
-        wikiname = splitted[0] == 'legal' ? 'legal' : `wiki_${splitted[0]}` 
+        wikiname = `wiki_${splitted[0]}` 
     }
    
 
