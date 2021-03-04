@@ -169,16 +169,16 @@ async function handleWikiFile(req, res, info){
         filename = splitted[splitted.length - 1]
     }
 
-    if(filepath.endsWith('png')){
+    if(filename.endsWith('png')){
         res.type("image/png")
         encoding = 'binary'
-    }else if(filepath.endsWith('jpg')){
+    }else if(filename.endsWith('jpg')){
         res.type("image/jpg")
         encoding = 'binary'
-    }else if(filepath.endsWith('jpeg')){
+    }else if(filename.endsWith('jpeg')){
         encoding = 'binary'
         res.type('image/jpeg')
-    }else if(filepath.endsWith('svg')){
+    }else if(filename.endsWith('svg')){
         encoding = 'binary'
         res.type('image/svg+xml')
     }else if(filename.endsWith("md") ){
