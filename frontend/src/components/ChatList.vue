@@ -1,10 +1,6 @@
 <template>
     <section class="h-full">
-        <div
-            class="relative overflow-y-auto w-full max-h-full h-full pt-4"
-            v-if="filteredChats && filteredChats.length"
-        >
-            <div class="absolute w-full pl-2">
+        <div class="absolute w-full px-2 pt-4">
                 <div v-if="filteredChatRequests.length > 0">
                     <h2 style="font-size: 1.5em">
                         You have
@@ -18,6 +14,11 @@
                     </h2>
                     <ChatRequestList :chat-requests="filteredChatRequests" />
                 </div>
+        <div
+            class="relative overflow-y-auto w-full max-h-full h-full pt-4"
+            v-if="filteredChats && filteredChats.length"
+        >
+            
                 <ChatCard
                     v-for="chat in filteredChats"
                     :key="`${chat.chatId}-${chat.messages.length}-${
