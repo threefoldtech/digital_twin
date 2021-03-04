@@ -52,12 +52,18 @@
                     </button>
                 </div>
 
-                <div class="flex" :class="showEditMessage ? '' : 'hidden'">
-                    <input v-model="reply" type="text" />
+                <div v-if="showEditMessage" class="flex">
+                    <input
+                        v-on:keyup.enter="sendReplyMessage"
+                        ref="reply"
+                        type="text"
+                        v-focus
+                    />
                     <button @click="sendReplyMessage">
                         <i class="fas fa-paper-plane"></i>
                     </button>
                 </div>
+                <span v-else class="flex"></span>
             </footer>
             <div id="replies">
                 <div v-for="reply in message.replies" :key="reply.id">
@@ -93,7 +99,7 @@ export default defineComponent({
         chatId: String,
     },
     setup(props) {
-        const reply = ref('');
+        const reply = ref(null);
 
         const toggleEditMessage = () => {
             console.log('toggleEditMessage');
@@ -109,39 +115,17 @@ export default defineComponent({
 
         const sendForwardMessage = () => {
             console.log('sendQuoteMessage');
-            // console.log('quote');
-            // if (quoteMessageValue.value !== '') {
-            //     quoteMessage.value = false;
-            //     const { user } = useAuthState();
-            //     const messageToQuote = props.message;
-            //     // from: user.id,
-            //     // to: chatId,
-            //     // timeStamp: new Date(),
-            //     // type: "STRING"
-            //     const newMessage: Message<QuoteBodyType> = {
-            //         id: uuidv4(),
-            //         from: user.id,
-            //         to: props.chatId,
-            //         body: <QuoteBodyType>{
-            //             message: quoteMessageValue.value,
-            //             quotedMessage: <Message<MessageBodyType>>messageToQuote,
-            //         },
-            //         timeStamp: new Date(),
-            //         type: 'QUOTE',
-            //         replys: [],
-            //         subject: null,
-            //     };
-            //     sendMessageObject(props.chatId, newMessage);
-            //     quoteMessageValue.value = '';
-            // }
-            // props.message.value = editMessageValue.value;
         };
 
         const showEditMessage = ref(false);
 
         const toggleSendReplyMessage = () => {
-            console.log('toggleSendReplyMessage');
+            console.log('toggleSendReplyMessage: ');
             showEditMessage.value = !showEditMessage.value;
+
+            if (!showEditMessage) {
+                // previousFocus.focus();
+            }
         };
 
         const sendReplyMessage = () => {
@@ -153,7 +137,7 @@ export default defineComponent({
                 id: uuidv4(),
                 from: user.id,
                 to: props.chatId,
-                body: <StringMessageType>reply.value,
+                body: <StringMessageType>reply.value.value,
                 timeStamp: new Date(),
                 type: 'STRING',
                 replies: [],
@@ -165,7 +149,7 @@ export default defineComponent({
             console.log('Sending new message: ', newMessage);
             sendMessageObject(props.chatId, newMessage);
             showEditMessage.value = !showEditMessage.value;
-            reply.value = '';
+            reply.value.value = '';
         };
 
         return {
