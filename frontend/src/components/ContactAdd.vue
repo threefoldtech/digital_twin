@@ -112,7 +112,6 @@
                     </div>
                 </div>
             </div>
-            {{ usersInGroup }}
             <div class="flex mt-4 justify-end w-full">
                 <button @click="$emit('closeDialog')">Cancel</button>
                 <button>Add Group</button>
