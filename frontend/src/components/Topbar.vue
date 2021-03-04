@@ -40,9 +40,9 @@
                 <button class="text-lg text-white" @click="addUser">
                     <i class="fas fa-edit"></i>
                 </button>
-                <button class="text-lg text-white">
+                <!-- <button class="text-lg text-white">
                     <i class="fas fa-search"></i>
-                </button>
+                </button> -->
                 <!-- <input class="hidden md:block" type="text"/> -->
             </slot>
         </div>
@@ -183,7 +183,7 @@
                     router.push({ name: route.meta.back });
                     return;
                 }
-                alert('Show profile');
+                showDialog.value = true
             };
 
             const selectFile = () => {

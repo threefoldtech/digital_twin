@@ -23,9 +23,9 @@
         </template>
         <template v-slot:actions>
             <div class="text-gray-500 flex items-center justify-end w-full">
-                <button class="text-lg text-white">
+                <!-- <button class="text-lg text-white">
                     <i class="fas fa-search"></i>
-                </button>
+                </button> -->
                 <div class="relative">
                     <button class="text-lg text-white" @click="showMenu = true">
                         <i class="fas fa-ellipsis-v"></i>
@@ -36,34 +36,34 @@
                         @click="showMenu = false"
                     ></div>
                     <div
-                        class="right-2 z-20 -top-2 flex flex-col bg-white shadow-sm w-40 rounded absolute py-2"
+                        class="right-2 z-20 -top-2 flex flex-col bg-white shadow-sm w-40 rounded absolute py-2 pl-2"
                         v-if="showMenu"
                     >
-                        <button @click="popupMeeting" class="flex">
-                            <div class="w-8">
+                        <button @click="popupMeeting" class="flex align-center">
+                            <div class="w-8 justify-center align-center">
                                 <i class="fas fa-video"></i>
                             </div>
-                            <span class="ml-2 text-left">Call</span>
+                            <span class="ml-1 text-left">Call</span>
                         </button>
 
                         <button @click="null" class="flex">
                             <div class="w-8">
                                 <i class="fas fa-info-circle"></i>
                             </div>
-                            <span class="ml-2 text-left">Info</span>
+                            <span class="ml-1 text-left">Info</span>
                         </button>
 
                         <button @click="blockChat" class="flex">
                             <div class="w-8">
                                 <i class="fas fa-minus-circle"></i>
                             </div>
-                            <span class="ml-2 text-left">Block chat</span>
+                            <span class="ml-1 text-left">Block chat</span>
                         </button>
                         <button @click="deleteChat" class="flex">
                             <div class="w-8">
                                 <i class="fas fa-trash"></i>
                             </div>
-                            <span class="ml-2 text-left">Delete chat</span>
+                            <span class="ml-1 text-left">Delete chat</span>
                         </button>
                     </div>
                 </div>
@@ -361,6 +361,10 @@ export default defineComponent({
 
         const deleteChat = () => {
             sendRemoveChat(chat.value.chatId);
+            const router = useRouter();
+            // router is undefined?
+            // router.push({ name: 'chat' });
+            window.location.href = "/chat"
         };
 
         const blockChat = () => {

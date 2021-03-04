@@ -1,6 +1,12 @@
 <template>
     <div class="flex">
-        <div class="flex justify-center w-18 mr-4">
+        <div 
+            class="flex justify-center "
+            :class="{
+                'w-18 mr-4': showActionButtons,
+                'w-8 mr-2': !showActionButtons,
+            }"
+        >
             <AvatarImg :id="message.from" />
         </div>
         <div class="card w-full bg-white rounded-md mb-4 overflow-hidden">

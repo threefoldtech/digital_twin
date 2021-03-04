@@ -29,7 +29,7 @@
             </h2>
             <ChatRequestList :chat-requests="filteredChatRequests" />
         </div>
-        <div v-else class="text-center">
+        <div v-if="filteredChatRequests.length == 0 && filteredChats.length == 0" class="text-center">
             <p>It feels lonely over here :(</p>
             <button
                 @click="sendUpdate(true)"
@@ -45,7 +45,7 @@
             noActions
         >
             <template v-slot:title>
-                <h1>Create a new chat {{ modelValue }}</h1>
+                <h1>Create a new chat</h1>
             </template>
             <add-contact @closeDialog="sendUpdate(false)"> </add-contact>
         </jdialog>
