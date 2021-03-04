@@ -119,138 +119,153 @@
     ></div>
 </template>
 <script lang="ts">
-    import { nextTick, ref } from 'vue';
-    import { selectedId, usechatsActions } from '@/store/chatStore';
-    import GifSelector from '@/components/GifSelector.vue';
+import { nextTick, ref } from 'vue';
+import { selectedId, usechatsActions } from '@/store/chatStore';
+import GifSelector from '@/components/GifSelector.vue';
 
-    export default {
-        name: 'ChatInput',
-        components: { GifSelector },
-        emits: ['messageSend'],
-        props: {
-            selectedid: {},
-        },
-        setup(props, { emit }) {
-            const { sendMessage, sendFile } = usechatsActions();
+export default {
+    name: 'ChatInput',
+    components: { GifSelector },
+    emits: ['messageSend'],
+    props: {
+        selectedid: {},
+    },
+    setup(props, { emit }) {
+        const { sendMessage, sendFile } = usechatsActions();
 
-            const message = ref('');
-            const messageBox = ref(null);
-            const fileinput = ref();
-            const file = ref(null);
-            const emojipicker = ref();
+        const message = ref('');
+        const messageBox = ref(null);
+        const fileinput = ref();
+        const file = ref(null);
+        const emojipicker = ref();
 
-            const stopRecording = ref(null);
-            const showEmoji = ref(false);
+        const stopRecording = ref(null);
+        const showEmoji = ref(false);
 
-            const chatsend = async e => {
-                if (message.value != '') {
-                    sendMessage(props.selectedid, message.value);
-                    message.value = '';
-                }
-                if (file.value) {
-                    sendFile(props.selectedid, file.value);
-                    removeFile();
-                }
-                emit('messageSend');
-            };
+        const chatsend = async e => {
+            if (message.value != '') {
+                sendMessage(props.selectedid, message.value);
+                message.value = '';
+            }
+            if (file.value) {
+                sendFile(props.selectedid, file.value);
+                removeFile();
+            }
+            emit('messageSend');
+        };
 
-            const selectFile = () => {
-                fileinput.value.click();
-            };
+        const selectFile = () => {
+            fileinput.value.click();
+        };
 
-            const changeFile = () => {
-                file.value = fileinput.value?.files[0];
-            };
+        const changeFile = () => {
+            file.value = fileinput.value?.files[0];
+        };
 
-            const removeFile = () => {
-                file.value = null;
-            };
+        const removeFile = () => {
+            file.value = null;
+        };
 
-            const startRecording = async () => {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    audio: true,
-                });
-
-                const mediaRecorder = new MediaRecorder(stream);
-                const audioChunks = [];
-
-                mediaRecorder.addEventListener('dataavailable', event => {
-                    audioChunks.push(event.data);
-                });
-
-                mediaRecorder.start();
-
-                stopRecording.value = () => {
-                    mediaRecorder.addEventListener('stop', async () => {
-                        const audioBlob = new Blob(audioChunks);
-                        console.log(props.selectedid);
-                        console.log(audioBlob);
-                        sendFile(props.selectedid, audioBlob, true);
-                        stopRecording.value = null;
-                    });
-
-                    mediaRecorder.stop();
-                    stream.getAudioTracks().forEach(at => at.stop());
-                };
-            };
-            const toggleEmoji = () => {
-                showEmoji.value = !showEmoji.value;
-            };
-            const hideEmoji = () => {
-                if (!showEmoji) {
-                    return;
-                }
-                showEmoji.value = false;
-            };
-
-            const showGif = ref(false);
-            const toggleGif = () => {
-                showGif.value = !showGif.value;
-            };
-            const sendGif = async gif => {
-                showGif.value = false;
-                const { sendMessage } = usechatsActions();
-                sendMessage(props.selectedid, gif, 'GIF');
-                emit('messageSend');
-            };
-            const hideGif = async gif => {
-                showGif.value = false;
-            };
-
-            nextTick(() => {
-                emojipicker.value.addEventListener('emoji-click', event => {
-                    message.value = `${message.value}${event.detail.unicode}`;
-                });
+        const startRecording = async () => {
+            const stream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
             });
-            const onPaste = (e: ClipboardEvent) => {
-                if (e.clipboardData.files.length > 0) {
-                    fileinput.value.files = e.clipboardData.files;
-                }
-            };
 
-            const collapsed = ref(true);
-            return {
-                sendMessage,
-                message,
-                chatsend,
-                changeFile,
-                selectFile,
-                fileinput,
-                file,
-                removeFile,
-                startRecording,
-                stopRecording,
-                showEmoji,
-                toggleEmoji,
-                hideEmoji,
-                emojipicker,
-                showGif,
-                toggleGif,
-                sendGif,
-                hideGif,
-                collapsed,
-                onPaste,
+            const mediaRecorder = new MediaRecorder(stream);
+            const audioChunks = [];
+
+            mediaRecorder.addEventListener('dataavailable', event => {
+                audioChunks.push(event.data);
+            });
+
+            mediaRecorder.start();
+
+            stopRecording.value = () => {
+                mediaRecorder.addEventListener('stop', async () => {
+                    const audioBlob = new Blob(audioChunks);
+                    console.log(props.selectedid);
+                    console.log(audioBlob);
+                    sendFile(props.selectedid, audioBlob, true);
+                    stopRecording.value = null;
+                });
+
+                mediaRecorder.stop();
+                stream.getAudioTracks().forEach(at => at.stop());
             };
-        },
-    };
+        };
+        const toggleEmoji = () => {
+            showEmoji.value = !showEmoji.value;
+        };
+        const hideEmoji = () => {
+            if (!showEmoji) {
+                return;
+            }
+            showEmoji.value = false;
+        };
+
+        const showGif = ref(false);
+        const toggleGif = () => {
+            showGif.value = !showGif.value;
+        };
+        const sendGif = async gif => {
+            showGif.value = false;
+            const { sendMessage } = usechatsActions();
+            sendMessage(props.selectedid, gif, 'GIF');
+            emit('messageSend');
+        };
+        const hideGif = async gif => {
+            showGif.value = false;
+        };
+
+        nextTick(() => {
+            emojipicker.value.addEventListener('emoji-click', event => {
+                message.value = `${message.value}${event.detail.unicode}`;
+            });
+        });
+        const onPaste = (e: ClipboardEvent) => {
+            if (!e.clipboardData) {
+                return;
+            }
+
+            var items = e.clipboardData.items;
+
+            if (!items) {
+                return;
+            }
+
+            for (var i = 0; i < items.length; i++) {
+                if (items[i].type.indexOf('image') == -1) {
+                    continue;
+                }
+
+                var pastedImage: File = items[i].getAsFile();
+                file.value = pastedImage;
+            }
+        };
+
+        const collapsed = ref(true);
+        return {
+            sendMessage,
+            message,
+            chatsend,
+            changeFile,
+            selectFile,
+            fileinput,
+            file,
+            removeFile,
+            startRecording,
+            stopRecording,
+            showEmoji,
+            toggleEmoji,
+            hideEmoji,
+            emojipicker,
+            showGif,
+            toggleGif,
+            sendGif,
+            hideGif,
+            collapsed,
+            onPaste,
+        };
+    },
+};
 </script>
