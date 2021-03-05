@@ -36,7 +36,7 @@
             const { user } = useAuthState();
 
             const computedUrl = computed(() => {
-                return `https://filebrowser.jimbertesting.be/auth/login/user/?username=${user}.3bot`;
+                return `https://filebrowser.jimbertesting.be/auth/login/user/?username=${user.id}.3bot`;
             });
 
             return {
