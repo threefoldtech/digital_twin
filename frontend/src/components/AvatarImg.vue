@@ -21,42 +21,42 @@
 </template>
 
 <script lang="ts">
-import { computed } from 'vue';
-import { startFetchStatusLoop, statusList } from '@/store/statusStore';
-import { calcExternalResourceLink } from '../services/urlService';
+    import { computed } from 'vue';
+    import { startFetchStatusLoop, statusList } from '@/store/statusStore';
+    import { calcExternalResourceLink } from '../services/urlService';
 
-export default {
-    name: 'AvatarImg',
-    props: {
-        id: { required: true },
-        showOnlineStatus: {
-            required: false,
-            default:true,
-            type: Boolean
+    export default {
+        name: 'AvatarImg',
+        props: {
+            id: { required: true },
+            showOnlineStatus: {
+                required: false,
+                default: true,
+                type: Boolean,
+            },
+            small: { required: false, default: false, type: Boolean },
+            xsmall: { required: false, default: false, type: Boolean },
         },
-        small: { required: false, default: false, type: Boolean },
-        xsmall: { required: false, default: false, type: Boolean },
-    },
-    setup(props) {
-        // startFetchStatusLoop(props.id)
+        setup(props) {
+            // startFetchStatusLoop(props.id)
 
-        const status = computed(() => {
-            return statusList[<string>props.id];
-        });
+            const status = computed(() => {
+                return statusList[<string>props.id];
+            });
 
-        const src = computed(() => {
-            if (!status.value || !status.value.avatar) {
-                return `https://avatars.dicebear.com/4.5/api/jdenticon/${encodeURI(
-                    <string>props.id
-                )}.svg?m=14&b=%23ffffff`;
-            }
-            return calcExternalResourceLink(status.value.avatar);
-        });
+            const src = computed(() => {
+                if (!status.value || !status.value.avatar) {
+                    return `https://avatars.dicebear.com/4.5/api/jdenticon/${encodeURI(
+                        <string>props.id
+                    )}.svg?m=14&b=%23ffffff`;
+                }
+                return calcExternalResourceLink(status.value.avatar);
+            });
 
-        return {
-            src,
-            status
-        };
-    },
-};
+            return {
+                src,
+                status,
+            };
+        },
+    };
 </script>

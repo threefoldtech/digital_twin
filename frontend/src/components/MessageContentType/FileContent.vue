@@ -8,18 +8,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { calcExternalResourceLink } from '@/services/urlService';
+    import { defineComponent } from 'vue';
+    import { calcExternalResourceLink } from '@/services/urlService';
 
-export default defineComponent({
-    name: 'FileContent',
-    props: {
-        message: { type: Object, required: true },
-    },
-    setup(props) {
-        return {
-            calcExternalResourceLink,
-        };
-    },
-});
+    export default defineComponent({
+        name: 'FileContent',
+        props: {
+            message: { type: Object, required: true },
+        },
+        setup(props) {
+            return {
+                calcExternalResourceLink,
+            };
+        },
+    });
 </script>

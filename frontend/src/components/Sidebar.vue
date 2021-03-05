@@ -26,63 +26,63 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
-import { useRouter } from 'vue-router';
+    import { defineComponent, computed } from 'vue';
+    import { useRouter } from 'vue-router';
 
-export default defineComponent({
-    name: 'Sidebar',
-    setup() {
-        const apps = [
-            {
-                name: 'chat',
-                icon: 'fas fa-comments',
-                enabled: true,
-            },
-            {
-                name: 'filebrowser',
-                icon: 'fas fa-file-alt',
-                enabled: true,
-            },
-            {
-                name: 'forum',
-                icon: 'fas fa-stream',
-                enabled: false,
-            },
-            {
-                name: 'meetings',
-                icon: 'fas fa-video',
-            },
-        ];
-        const router = useRouter();
+    export default defineComponent({
+        name: 'Sidebar',
+        setup() {
+            const apps = [
+                {
+                    name: 'chat',
+                    icon: 'fas fa-comments',
+                    enabled: true,
+                },
+                {
+                    name: 'filebrowser',
+                    icon: 'fas fa-file-alt',
+                    enabled: true,
+                },
+                {
+                    name: 'forum',
+                    icon: 'fas fa-stream',
+                    enabled: false,
+                },
+                {
+                    name: 'meetings',
+                    icon: 'fas fa-video',
+                },
+            ];
+            const router = useRouter();
 
-        const currentRoute = computed(() => router.currentRoute.value);
+            const currentRoute = computed(() => router.currentRoute.value);
 
-        const changePage = (page: any) => {
-            router.push({ name: page });
-        };
+            const changePage = (page: any) => {
+                router.push({ name: page });
+            };
 
-        return {
-            currentRoute,
-            apps,
-            changePage,
-        };
-    },
-});
+            return {
+                currentRoute,
+                apps,
+                changePage,
+            };
+        },
+    });
 </script>
 
 <style scoped>
-.active {
-    position: relative;
-}
+    .active {
+        position: relative;
+    }
 
-.active::after {
-    position: absolute;
-    content: '';
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background: #e69b5950;
-    border-left: 8px solid #e69b59;
-}
+    .active::after {
+        position: absolute;
+        content: '';
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background: #e69b5950;
+        border-left: 8px solid #e69b59;
+    }
 </style>

@@ -55,8 +55,8 @@ export const addChat = (
         {}
     );
     // @TODO clean this up
-    if(chat.chatId == config.userid){
-        return null
+    if (chat.chatId == config.userid) {
+        return null;
     }
     persistChat(chat);
     sendEventToConnectedSockets('new_chat', chat);

@@ -5,7 +5,7 @@ export const getMyLocation = (): Promise<string> => {
         //@ts-ignore
         exec(
             "yggdrasilctl  -v getSelf | sed -n -e 's/^.*IPv6 address.* //p'",
-            (error:any, stdout:any, stderr:any) => {
+            (error: any, stdout: any, stderr: any) => {
                 if (error) {
                     console.log(`error: ${error.message}`);
                     return reject();
