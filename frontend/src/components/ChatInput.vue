@@ -5,6 +5,7 @@
         style="z-index: 10000"
         v-on:close="hideGif"
     />
+
     <div
         class="md:p4 md:m-4 md:rounded-3xl flex flex-col bg-white grid grid-cols-12"
         @paste="onPaste"
@@ -63,13 +64,6 @@
                 <i v-if="collapsed" class="fas fa-chevron-up text-gray-500"></i>
                 <i v-else class="fas fa-chevron-down text-gray-500"></i>
             </button>
-            <form
-                v-if="!file"
-                class="md:col-span-10 col-span-8 py-3"
-                @submit.prevent="chatsend"
-            >
-                <input class="h-full" type="text" v-model="message" v-focus />
-            </form>
             <div
                 class="file-message md:col-span-10 col-span-8 w-full h-full pl-4 bg-blue-100"
                 v-if="file"
@@ -79,15 +73,16 @@
                     <i class="fas fa-minus-circle text-gray-500"></i>
                 </button>
             </div>
+            <form
+                class="md:col-span-10 col-span-8 py-3"
+                @submit.prevent="chatsend"
+            >
+                <input class="h-full" type="text" ref="message" v-focus />
+            </form>
             <button class="col-span-2" @click="chatsend">
                 <i class="fas fa-paper-plane"></i>
             </button>
         </div>
-        <!--    <p class="mx-6 pt-4 font-thin">-->
-        <!--      <span v-if="true"-->
-        <!--      >{{ contact.name }} is typing ...-->
-        <!--    </span>-->
-        <!--    </p>-->
     </div>
     <div
         class="overlay-emoji"
@@ -133,7 +128,7 @@
         setup(props, { emit }) {
             const { sendMessage, sendFile } = usechatsActions();
 
-            const message = ref('');
+            const message = ref(null);
             const messageBox = ref(null);
             const fileinput = ref();
             const file = ref(null);
@@ -143,9 +138,9 @@
             const showEmoji = ref(false);
 
             const chatsend = async e => {
-                if (message.value != '') {
-                    sendMessage(props.selectedid, message.value);
-                    message.value = '';
+                if (message.value.value != '') {
+                    sendMessage(props.selectedid, message.value.value);
+                    message.value.value = '';
                 }
                 if (file.value) {
                     sendFile(props.selectedid, file.value);
@@ -160,6 +155,7 @@
 
             const changeFile = () => {
                 file.value = fileinput.value?.files[0];
+                message.value.focus();
             };
 
             const removeFile = () => {
@@ -219,7 +215,7 @@
 
             nextTick(() => {
                 emojipicker.value.addEventListener('emoji-click', event => {
-                    message.value = `${message.value}${event.detail.unicode}`;
+                    message.value.value = `${message.value.value}${event.detail.unicode}`;
                 });
             });
             const onPaste = (e: ClipboardEvent) => {
@@ -240,6 +236,7 @@
 
                     var pastedImage: File = items[i].getAsFile();
                     file.value = pastedImage;
+                    message.value.focus();
                 }
             };
 
