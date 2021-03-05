@@ -86,6 +86,7 @@
             <div
                 class="block bg-gray-100 flex items-center rounded-xl w-full m-2"
                 @click="$emit('app-block')"
+                v-if="!groupChat.isGroup"
             >
                 <i class="fas fa-minus-circle m-3"></i>
                 <p class="m-3">Block user</p>
