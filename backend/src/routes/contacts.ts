@@ -44,6 +44,12 @@ router.post('/', async (req, res) => {
         true,
         contact.id
     );
+    
+    // TODO clean this up
+    if(!chat){
+        res.sendStatus(200);
+        return
+    }
 
     const url = `/api/messages`;
     const data: Message<ContactRequest> = {

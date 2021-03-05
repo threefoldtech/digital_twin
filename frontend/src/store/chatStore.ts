@@ -49,7 +49,9 @@ const addChat = (chat: Chat) => {
         const otherContact: Contact = <Contact>(
             chat.contacts.find(c => c.id !== user.id)
         );
-        startFetchStatusLoop(otherContact);
+        if(otherContact){
+            startFetchStatusLoop(otherContact);
+        }
     }
 
     if (chat.acceptedChat) {
