@@ -39,8 +39,8 @@
             class="pr-4 text-right text-gray-500 flex items-center justify-end"
         >
             <slot name="actions">
-                <button class="text-lg text-white" @click="addUser">
-                    <i class="fas fa-edit"></i>
+                <button class="text-lg text-white md-hidden" @click="addUser">
+                    <i class="fas fa-plus"></i>
                 </button>
                 <!-- <button class="text-lg text-white">
                     <i class="fas fa-search"></i>

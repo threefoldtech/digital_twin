@@ -1,6 +1,20 @@
 <template>
-    <section class="h-full">
+    <section class="h-full bg-white">
         <div class="relative w-full px-2 pt-4">
+            <div
+                @click="showAddUserDialog = true"
+                class="chatcard relative grid grid-cols-12 mb-2 py-2 bg-gray-100"
+            >
+                <div class="col-span-12 px-2">
+                    <p class="flex place-content-between">
+                        <span
+                            class="font-bold break-normal overflow-ellipsis overflow-hidden"
+                        >
+                            <i class="fas fa-plus"></i> Create new chat
+                        </span>
+                    </p>
+                </div>
+            </div>
             <div v-if="filteredChatRequests.length > 0">
                 <h2 style="font-size: 1.5em">
                     You have
@@ -73,7 +87,7 @@ import { statusList } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
 import { useRouter } from 'vue-router';
 import { mode } from 'crypto-js';
-
+import { showAddUserDialog } from '@/services/dialogService';
 export default defineComponent({
     name: 'Apps',
     props: {
@@ -156,6 +170,7 @@ export default defineComponent({
             user,
             m,
             sendUpdate,
+            showAddUserDialog,
         };
     },
 });

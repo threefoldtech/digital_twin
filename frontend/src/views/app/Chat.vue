@@ -21,6 +21,7 @@
 import appLayout from '../../layout/AppLayout.vue';
 import { defineComponent, ref, computed, onBeforeMount } from 'vue';
 import ChatList from '@/components/ChatList.vue';
+import { showAddUserDialog } from '@/services/dialogService';
 
 export default defineComponent({
     name: 'Apps',
@@ -29,7 +30,6 @@ export default defineComponent({
         ChatList,
     },
     setup({}, ctx) {
-        const showAddUserDialog = ref(false);
         return {
             showAddUserDialog,
         };

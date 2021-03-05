@@ -76,27 +76,27 @@
 
         <div class="flex items-center flex-col w-full">
             <div
-                class="call bg-green-400 flex items-center rounded-xl w-full m-3"
+                class="call bg-gray-100 flex items-center rounded-xl w-full m-2"
                 @click="$emit('app-call')"
             >
                 <i class="fas fa-video m-3"></i>
-                <p class="m-3">Call</p>
+                <p class="m-3">Join video room</p>
             </div>
 
             <div
-                class="block bg-yellow-400 flex items-center rounded-xl w-full m-3"
+                class="block bg-gray-100 flex items-center rounded-xl w-full m-2"
                 @click="$emit('app-block')"
             >
                 <i class="fas fa-minus-circle m-3"></i>
-                <p class="m-3">Block</p>
+                <p class="m-3">Block user</p>
             </div>
 
             <div
-                class="delete bg-red-400 flex items-center rounded-xl w-full m-3"
+                class="delete bg-gray-100 flex items-center rounded-xl w-full m-2"
                 @click="$emit('app-delete')"
             >
                 <i class="fas fa-trash m-3"></i>
-                <p class="m-3">Delete</p>
+                <p class="m-3">Delete conversation</p>
             </div>
         </div>
     </div>

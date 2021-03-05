@@ -31,7 +31,10 @@
                     <i class="fas fa-search"></i>
                 </button> -->
                 <div class="relative">
-                    <button class="text-lg text-white" @click="showMenu = true">
+                    <button
+                        class="text-lg text-white md:hidden"
+                        @click="showMenu = true"
+                    >
                         <i class="fas fa-ellipsis-v"></i>
                     </button>
                     <div
@@ -265,9 +268,12 @@ export default defineComponent({
     setup(props) {
         const route = useRoute();
         let selectedId = ref(<string>route.params.id);
-        watch(()=> route.params.id, (id)=>{
-            selectedId.value = <string>id
-        })
+        watch(
+            () => route.params.id,
+            id => {
+                selectedId.value = <string>id;
+            }
+        );
         const { retrievechats } = usechatsActions();
         onBeforeMount(retrievechats);
 
