@@ -96,7 +96,9 @@
                         <div class="absolute w-full mt-8 px-4">
                             <div
                                 v-for="(message, i) in chat?.messages"
-                                :key="`${message.id}-${message.type}-${message.timeStamp}`"
+                                :key="
+                                    `${message.id}-${message.type}-${message.timeStamp}`
+                                "
                             >
                                 <div
                                     v-if="showDivider(message, i)"
@@ -359,13 +361,10 @@
 
                 console.log(`str = ${str}`);
 
-                const ID = crypto.SHA1(str);
+                const id = crypto.SHA1(str);
+
                 popupCenter(
-                    'https://freeflowconnect.threefold.me/room/' +
-                        ID +
-                        '&username=' +
-                        user.id +
-                        '.3bot',
+                    `https://freeflowconnect.threefold.me/?roomName=${id}&username=${user.id}.3bot`,
                     'video chat',
                     800,
                     550
