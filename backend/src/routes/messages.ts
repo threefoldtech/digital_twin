@@ -146,13 +146,13 @@ router.put('/', async (req, res) => {
             .filter(c => c.id !== config.userid)
             .forEach(c => {
                 console.log(`group sendMessage to ${c.id}`);
-                sendMessageToApi(c.id, message);
+                sendMessageToApi(c.location, message);
             });
 
         if (message.type === <string>MessageTypes.GROUP_UPDATE) {
             handleGroupUpdate(<any>message, chat);
             //@ts-ignore
-            sendMessageToApi(message.body.contact.id, message);
+            sendMessageToApi(message.body.contact.location, message);
 
             res.json({ status: 'success' });
             return;
