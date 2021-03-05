@@ -9,6 +9,7 @@ import { parseMessage } from './messageService';
 import { sendEventToConnectedSockets } from './socketService';
 import { logger } from '../logger';
 import { getChatfromAdmin } from './apiService';
+import { config } from '../config/config';
 
 export const persistMessage = (
     chatId: IdInterface,
@@ -53,6 +54,10 @@ export const addChat = (
         adminId,
         {}
     );
+    // @TODO clean this up
+    if(chat.chatId == config.userid){
+        return null
+    }
     persistChat(chat);
     sendEventToConnectedSockets('new_chat', chat);
     return chat;
