@@ -1,4 +1,5 @@
 import { reactive } from '@vue/reactivity';
+import axios from 'axios';
 import { User } from '../types';
 
 const authState = reactive<AuthState>({
@@ -13,6 +14,11 @@ const authState = reactive<AuthState>({
         location: '@TODO implement this',
     },
 });
+
+export const myYggdrasilAddress = async () => {
+    const res = await axios.get(`${window.location.origin}/api/yggdrasil_address`)
+    return res.data
+} 
 
 export const useAuthState = () => {
     return {

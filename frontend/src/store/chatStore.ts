@@ -20,6 +20,7 @@ import { uuidv4 } from '@/common';
 import { startFetchStatusLoop } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
+import { myYggdrasilAddress } from "../store/authStore"
 
 const state = reactive<chatstate>({
     chats: [],
@@ -308,11 +309,12 @@ const readMessage = (chatId, messageId) => {
     sendMessageObject(chatId, newMessage);
 };
 
-const updateContactsInGroup = (groupId, contact: Contact, remove: boolean) => {
+const updateContactsInGroup = async (groupId, contact: Contact, remove: boolean) => {
     const { user } = useAuthState();
     const { chats } = usechatsState();
     const operation = remove ? 'REMOVEUSER' : 'ADDUSER';
     const chat = chats.value.find(chat => chat.chatId == groupId);
+    const mylocation = await myYggdrasilAddress()
     const message: Message<GroupUpdate> = {
         id: uuidv4(),
         from: user.id,
@@ -320,7 +322,7 @@ const updateContactsInGroup = (groupId, contact: Contact, remove: boolean) => {
         body: <GroupUpdate>{
             type: operation,
             contact,
-            adminLocation: user.location,
+            adminLocation: mylocation,
         },
         timeStamp: new Date(),
         type: 'GROUP_UPDATE',

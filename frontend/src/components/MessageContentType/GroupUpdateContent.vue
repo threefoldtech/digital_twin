@@ -3,7 +3,7 @@
         {{ message.body.contact.id }} has been removed from the group
     </div>
     <div v-if="message.body.type == 'ADDUSER'">
-        {{ message.body.contact.id }} has been removed from the group
+        {{ message.body.contact.id }} has been added to the group
     </div>
 </template>
 
