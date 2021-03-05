@@ -39,7 +39,7 @@
             class="pr-4 text-right text-gray-500 flex items-center justify-end"
         >
             <slot name="actions">
-                <button class="text-lg text-white md-hidden" @click="addUser">
+                <button class="text-lg text-white md:hidden" @click="addUser">
                     <i class="fas fa-plus"></i>
                 </button>
                 <!-- <button class="text-lg text-white">

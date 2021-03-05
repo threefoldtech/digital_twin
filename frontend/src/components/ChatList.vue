@@ -58,7 +58,7 @@
         </div>
 
         <jdialog
-            :modelValue="modelValue"
+            :modelValue="showAddUserDialog"
             @update:modelValue="sendUpdate"
             noActions
         >
@@ -154,7 +154,8 @@ export default defineComponent({
 
         const sendUpdate = newVal => {
             console.log('update it');
-            context.emit('update:modelValue', newVal);
+            // context.emit('update:modelValue', newVal);
+            showAddUserDialog.value = newVal;
         };
 
         return {
