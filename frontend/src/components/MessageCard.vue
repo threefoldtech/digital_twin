@@ -31,7 +31,7 @@
                     </button> -->
                 </div>
             </header>
-            <main class="px-4 pb-4">
+            <main class="px-4 pb-4 mt-2">
                 <MessageContent :message="message"></MessageContent>
             </main>
             <footer
