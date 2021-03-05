@@ -184,7 +184,7 @@
                                 <AvatarImg
                                     class="-mt-7"
                                     :id="chat.chatId"
-                                    :showOnlineStatus="true"
+                                    :showOnlineStatus="!chat.isGroup"
                                 />
                             </div>
                             <h2
@@ -194,6 +194,7 @@
                             </h2>
                             <p
                                 class="break-words w-full overflow-y-auto font-bold text-center text-gray-300"
+                                v-if="!chat.isGroup"
                             >
                                 {{ status?.status || 'No status found' }}
                             </p>
