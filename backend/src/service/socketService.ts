@@ -81,18 +81,6 @@ export const startSocketIo = (httpServer: http.Server) => {
             sendMessageToApi(location, newMessage);
         });
 
-        socket.on('slice upload', data => {
-            console.log(data);
-            var file: any = {
-                name: data.file.name,
-                type: data.file.type,
-                data: data.file.data,
-                size: data.file.size,
-            };
-            console.log(file);
-            saveFile(data.chatId, file.name, file.data);
-        });
-
         socket.on('update_message', messageData => {
             console.log('updatemsgdata', messageData);
             const newMessage: Message<MessageBodyTypeInterface> = parseMessage(

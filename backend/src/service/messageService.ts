@@ -72,7 +72,7 @@ export const parseMessage = (
                 msg?.subject
             );
         case MessageTypes.FILE_UPLOAD:
-            const url = saveFile(msg.to, msg.body.name, msg.body.parsedFile);
+            const url = saveFile(msg.to, msg.id ,msg.body.name, msg.body.parsedFile);
 
             return new Message<FileMessageType>(
                 msg.from,
