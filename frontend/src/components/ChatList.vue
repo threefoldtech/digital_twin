@@ -3,7 +3,7 @@
         <div class="relative w-full px-2 pt-4">
             <div
                 @click="showAddUserDialog = true"
-                class="chatcard relative grid grid-cols-12 mb-2 py-2 bg-gray-100"
+                class="chatcard relative grid grid-cols-12 mb-2 py-2 bg-gray-100 cursor-pointer"
             >
                 <div class="col-span-12 px-2">
                     <p class="flex place-content-between">
@@ -34,9 +34,11 @@
             >
                 <ChatCard
                     v-for="chat in filteredChats"
-                    :key="`${chat.chatId}-${chat.messages.length}-${
-                        chat.read[user.id]
-                    }`"
+                    :key="
+                        `${chat.chatId}-${chat.messages.length}-${
+                            chat.read[user.id]
+                        }`
+                    "
                     class="grid grid-cols-12 rounded-lg mb-2 py-2 cursor-pointer"
                     @click="setSelected(chat.chatId)"
                     :chat="chat"
