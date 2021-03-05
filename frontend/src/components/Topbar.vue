@@ -10,11 +10,13 @@
                     :class="{ 'md:hidden': !(route.meta && route.meta.back) }"
                 >
                     <i
-                        :class="`fas ${
-                            route.meta && route.meta.back
-                                ? 'fa-chevron-left'
-                                : 'fa-bars'
-                        }`"
+                        :class="
+                            `fas ${
+                                route.meta && route.meta.back
+                                    ? 'fa-chevron-left'
+                                    : 'fa-bars'
+                            }`
+                        "
                     ></i>
                 </button>
                 <img
@@ -49,7 +51,7 @@
             </slot>
         </div>
 
-        <jdialog v-model="showDialog" noActions>
+        <jdialog v-model="showUserConfigDialog" noActions>
             <template v-slot:title>
                 <h1>Profile settings</h1>
             </template>
@@ -139,7 +141,7 @@
                         <li
                             v-if="
                                 blockedUsers.length === 0 &&
-                                !blockedUsersLoading
+                                    !blockedUsersLoading
                             "
                         >
                             No blocked users
@@ -165,13 +167,13 @@
     import { setNewavater } from '@/store/userStore';
     import { fetchStatus } from '@/store/statusStore';
     import { useRoute, useRouter } from 'vue-router';
+    import { showUserConfigDialog } from '@/services/dialogService';
 
     export default defineComponent({
         name: 'Topbar',
         components: { AvatarImg, jdialog: Dialog },
         setup({}, ctx) {
             const { user } = useAuthState();
-            const showDialog = ref(false);
             const showEdit = ref(false);
             const showEditPic = ref(false);
             const fileinput = ref();
@@ -185,7 +187,7 @@
                     router.push({ name: route.meta.back });
                     return;
                 }
-                showDialog.value = true;
+                showUserConfigDialog.value = true;
             };
 
             const selectFile = () => {
@@ -202,7 +204,7 @@
             const sendNewAvatar = async () => {
                 const newUrl = await setNewavater(file.value);
                 await fetchStatus(user.id);
-                showDialog.value = false;
+                showUserConfigDialog.value = false;
             };
 
             const setEditStatus = (edit: boolean) => {
@@ -228,7 +230,7 @@
 
             const unblockUser = async user => {
                 await deleteBlockedEntry(user);
-                showDialog.value = false;
+                showUserConfigDialog.value = false;
             };
 
             const addUser = () => {
@@ -241,7 +243,7 @@
                 user,
                 showEditPic,
                 showEdit,
-                showDialog,
+                showUserConfigDialog,
                 fileinput,
                 file,
                 selectFile,
