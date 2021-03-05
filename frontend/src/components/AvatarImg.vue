@@ -1,5 +1,12 @@
 <template>
-    <div class="grid relative">
+    <div
+        class="grid relative"
+        :class="{
+            'h-12 w-12': !small && !xsmall,
+            'h-8 w-8': small,
+            'h-6 w-6': xsmall,
+        }"
+    >
         <div
             class="bg-icon rounded-full"
             :style="`background:url(${src}) no-repeat center/cover`"

@@ -21,6 +21,15 @@
                     </h3>
                 </div>
             </div>
+            <div class="grid place-items-end flex-grow">
+                <div
+                    class="w-20 h-20 grid cursor-pointer items-center justify-center justify-items-center"
+                    @click="showUserConfigDialog = true"
+                >
+                    <AvatarImg :id="user.id" />
+                    <!--<h3 class="truncate w-full text-sm">{{ user.id }}</h3>-->
+                </div>
+            </div>
         </div>
     </nav>
 </template>
@@ -28,9 +37,13 @@
 <script lang="ts">
     import { defineComponent, computed } from 'vue';
     import { useRouter } from 'vue-router';
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import { useAuthState } from '@/store/authStore';
+    import { showUserConfigDialog } from '@/services/dialogService';
 
     export default defineComponent({
         name: 'Sidebar',
+        components: { AvatarImg },
         setup() {
             const apps = [
                 {
@@ -61,10 +74,14 @@
                 router.push({ name: page });
             };
 
+            const { user } = useAuthState();
+
             return {
                 currentRoute,
                 apps,
                 changePage,
+                user,
+                showUserConfigDialog,
             };
         },
     });
