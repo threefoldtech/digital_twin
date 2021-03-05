@@ -4,6 +4,7 @@
 
 <script lang="ts">
     import { defineComponent } from 'vue';
+    import { showAddUserDialog } from '@/services/dialogService';
 
     console.log(`commit hash: ${process.env.VUE_APP_GIT_HASH}`);
 

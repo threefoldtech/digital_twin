@@ -8,21 +8,21 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent } from 'vue';
-import { calcExternalResourceLink } from '@/services/urlService';
+    import { computed, defineComponent } from 'vue';
+    import { calcExternalResourceLink } from '@/services/urlService';
 
-export default defineComponent({
-    name: 'AudioContent',
-    props: {
-        message: { type: Object, required: true },
-    },
-    setup(props) {
-        const url = computed(() => {
-            return;
-        });
-        return {
-            calcExternalResourceLink,
-        };
-    },
-});
+    export default defineComponent({
+        name: 'AudioContent',
+        props: {
+            message: { type: Object, required: true },
+        },
+        setup(props) {
+            const url = computed(() => {
+                return;
+            });
+            return {
+                calcExternalResourceLink,
+            };
+        },
+    });
 </script>

@@ -76,93 +76,92 @@
 
         <div class="flex items-center flex-col w-full">
             <div
-                class="call bg-green-400 flex items-center rounded-xl w-full m-3"
+                class="call bg-gray-100 flex items-center rounded-xl w-full m-2"
                 @click="$emit('app-call')"
             >
                 <i class="fas fa-video m-3"></i>
-                <p class="m-3">Call</p>
+                <p class="m-3">Join video room</p>
             </div>
 
             <div
-                class="block bg-yellow-400 flex items-center rounded-xl w-full m-3"
+                class="block bg-gray-100 flex items-center rounded-xl w-full m-2"
                 @click="$emit('app-block')"
             >
                 <i class="fas fa-minus-circle m-3"></i>
-                <p class="m-3">Block</p>
+                <p class="m-3">Block user</p>
             </div>
 
             <div
-                class="delete bg-red-400 flex items-center rounded-xl w-full m-3"
+                class="delete bg-gray-100 flex items-center rounded-xl w-full m-2"
                 @click="$emit('app-delete')"
             >
                 <i class="fas fa-trash m-3"></i>
-                <p class="m-3">Delete</p>
+                <p class="m-3">Delete conversation</p>
             </div>
         </div>
     </div>
 </template>
 <script lang="ts">
-import { computed } from 'vue';
-import { statusList } from '@/store/statusStore';
-import { GroupChat } from '../types/index';
-import AvatarImg from '@/components/AvatarImg.vue';
-import { usechatsActions } from '../store/chatStore';
-import { useContactsState } from '../store/contactStore';
-import { useAuthState } from '../store/authStore';
-export default {
-    name: 'GroupManagementBlock',
-    props: {
-        groupChat: { required: true },
-    },
-    components: { AvatarImg },
-    setup(props) {
-        const { contacts } = useContactsState();
-        const removeFromGroup = contact => {
-            const { updateContactsInGroup } = usechatsActions();
-            //@ts-ignore
-            updateContactsInGroup(props.groupChat.chatId, contact, true);
-        };
-        const addToGroup = contact => {
-            const { updateContactsInGroup } = usechatsActions();
-            //@ts-ignore
-            updateContactsInGroup(props.groupChat.chatId, contact, false);
-        };
-        const filteredContacts = computed(() => {
-            return contacts.filter(
+    import { computed } from 'vue';
+    import { statusList } from '@/store/statusStore';
+    import { GroupChat } from '../types/index';
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import { usechatsActions } from '../store/chatStore';
+    import { useContactsState } from '../store/contactStore';
+    import { useAuthState } from '../store/authStore';
+    export default {
+        name: 'GroupManagementBlock',
+        props: {
+            groupChat: { required: true },
+        },
+        components: { AvatarImg },
+        setup(props) {
+            const { contacts } = useContactsState();
+            const removeFromGroup = contact => {
+                const { updateContactsInGroup } = usechatsActions();
                 //@ts-ignore
-                c => !props.groupChat.contacts.map(x => x.id).includes(c.id)
-            );
-        });
+                updateContactsInGroup(props.groupChat.chatId, contact, true);
+            };
+            const addToGroup = contact => {
+                const { updateContactsInGroup } = usechatsActions();
+                //@ts-ignore
+                updateContactsInGroup(props.groupChat.chatId, contact, false);
+            };
+            const filteredContacts = computed(() => {
+                return contacts.filter(
+                    //@ts-ignore
+                    c => !props.groupChat.contacts.map(x => x.id).includes(c.id)
+                );
+            });
 
-        const iAmAdmin = computed(() => {
-            const { user } = useAuthState();
-            //@ts-ignore
-            return props.groupChat.adminId == user.id;
-        });
+            const iAmAdmin = computed(() => {
+                const { user } = useAuthState();
+                //@ts-ignore
+                return props.groupChat.adminId == user.id;
+            });
 
-        return {
-            groupChat: props.groupChat,
-            status: statusList,
-            removeFromGroup,
-            contacts: filteredContacts,
-            addToGroup,
-            iAmAdmin,
-        };
-    },
-};
+            return {
+                groupChat: props.groupChat,
+                status: statusList,
+                removeFromGroup,
+                contacts: filteredContacts,
+                addToGroup,
+                iAmAdmin,
+            };
+        },
+    };
 </script>
 
-
 <style scoped>
-.call,
-.block,
-.delete {
-    border: 2px solid transparent;
-}
+    .call,
+    .block,
+    .delete {
+        border: 2px solid transparent;
+    }
 
-.call:hover,
-.block:hover,
-.delete:hover {
-    border: 2px solid black;
-}
+    .call:hover,
+    .block:hover,
+    .delete:hover {
+        border: 2px solid black;
+    }
 </style>

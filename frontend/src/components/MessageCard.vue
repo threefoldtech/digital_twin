@@ -90,102 +90,102 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, ref, watch } from 'vue';
-import moment from 'moment';
-import AvatarImg from '@/components/AvatarImg.vue';
-import MessageContent from '@/components/MessageContent.vue';
-import { Message, StringMessageType } from '@/types';
-import { uuidv4 } from '@/common';
-import { useAuthState } from '@/store/authStore';
-import { usechatsActions } from '@/store/chatStore';
+    import { computed, defineComponent, ref, watch } from 'vue';
+    import moment from 'moment';
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import MessageContent from '@/components/MessageContent.vue';
+    import { Message, StringMessageType } from '@/types';
+    import { uuidv4 } from '@/common';
+    import { useAuthState } from '@/store/authStore';
+    import { usechatsActions } from '@/store/chatStore';
 
-export default defineComponent({
-    name: 'MessageCard',
-    components: { MessageContent, AvatarImg },
-    props: {
-        message: Object,
-        showActionButtons: {
-            type: Boolean,
-            default: true,
+    export default defineComponent({
+        name: 'MessageCard',
+        components: { MessageContent, AvatarImg },
+        props: {
+            message: Object,
+            showActionButtons: {
+                type: Boolean,
+                default: true,
+            },
+            chatId: String,
         },
-        chatId: String,
-    },
-    setup(props) {
-        const reply = ref(null);
-
-        const { user } = useAuthState();
-
-        const toggleEditMessage = () => {
-            console.log('toggleEditMessage');
-        };
-
-        const editMessage = () => {
-            console.log('editMessage');
-        };
-
-        const toggleSendForwardMessage = () => {
-            console.log('toggleSendForwardMessage');
-        };
-
-        const sendForwardMessage = () => {
-            console.log('sendQuoteMessage');
-        };
-
-        const showEditMessage = ref(false);
-
-        const toggleSendReplyMessage = () => {
-            console.log('toggleSendReplyMessage: ');
-            showEditMessage.value = !showEditMessage.value;
-
-            if (!showEditMessage) {
-                // previousFocus.focus();
-            }
-        };
-
-        const sendReplyMessage = () => {
-            console.log('sendReplyMessage');
+        setup(props) {
+            const reply = ref(null);
 
             const { user } = useAuthState();
 
-            const newMessage: Message<StringMessageType> = {
-                id: uuidv4(),
-                from: user.id,
-                to: props.chatId,
-                body: <StringMessageType>reply.value.value,
-                timeStamp: new Date(),
-                type: 'STRING',
-                replies: [],
-                subject: props.message.id,
+            const toggleEditMessage = () => {
+                console.log('toggleEditMessage');
             };
 
-            const { sendMessageObject } = usechatsActions();
+            const editMessage = () => {
+                console.log('editMessage');
+            };
 
-            console.log('Sending new message: ', newMessage);
-            sendMessageObject(props.chatId, newMessage);
-            showEditMessage.value = !showEditMessage.value;
-            reply.value.value = '';
-        };
+            const toggleSendForwardMessage = () => {
+                console.log('toggleSendForwardMessage');
+            };
 
-        return {
-            moment,
-            toggleSendForwardMessage,
-            sendReplyMessage,
-            toggleSendReplyMessage,
-            toggleEditMessage,
-            showEditMessage,
-            reply,
-            user,
-        };
-    },
-});
+            const sendForwardMessage = () => {
+                console.log('sendQuoteMessage');
+            };
+
+            const showEditMessage = ref(false);
+
+            const toggleSendReplyMessage = () => {
+                console.log('toggleSendReplyMessage: ');
+                showEditMessage.value = !showEditMessage.value;
+
+                if (!showEditMessage) {
+                    // previousFocus.focus();
+                }
+            };
+
+            const sendReplyMessage = () => {
+                console.log('sendReplyMessage');
+
+                const { user } = useAuthState();
+
+                const newMessage: Message<StringMessageType> = {
+                    id: uuidv4(),
+                    from: user.id,
+                    to: props.chatId,
+                    body: <StringMessageType>reply.value.value,
+                    timeStamp: new Date(),
+                    type: 'STRING',
+                    replies: [],
+                    subject: props.message.id,
+                };
+
+                const { sendMessageObject } = usechatsActions();
+
+                console.log('Sending new message: ', newMessage);
+                sendMessageObject(props.chatId, newMessage);
+                showEditMessage.value = !showEditMessage.value;
+                reply.value.value = '';
+            };
+
+            return {
+                moment,
+                toggleSendForwardMessage,
+                sendReplyMessage,
+                toggleSendReplyMessage,
+                toggleEditMessage,
+                showEditMessage,
+                reply,
+                user,
+            };
+        },
+    });
 </script>
 <style lang="css">
-.text-message * {
-    word-wrap: break-word;
-    max-width: 100%;
-    white-space: pre-wrap;
-}
-.hover:hover {
-    text-decoration: underline;
-}
+    .text-message * {
+        word-wrap: break-word;
+        max-width: 100%;
+        white-space: pre-wrap;
+    }
+    .hover:hover {
+        text-decoration: underline;
+    }
 </style>

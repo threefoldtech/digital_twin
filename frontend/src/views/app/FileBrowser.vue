@@ -23,28 +23,27 @@
 </template>
 
 <script lang="ts">
-import appLayout from '../../layout/AppLayout.vue';
-import { defineComponent, ref, computed, onBeforeMount } from 'vue';
-import { useAuthState } from '../../store/authStore';
+    import appLayout from '../../layout/AppLayout.vue';
+    import { defineComponent, ref, computed, onBeforeMount } from 'vue';
+    import { useAuthState } from '../../store/authStore';
 
-export default defineComponent({
-    name: 'Apps',
-    components: {
-        appLayout,
-    },
-    setup() {
-        const { user } = useAuthState();
+    export default defineComponent({
+        name: 'Apps',
+        components: {
+            appLayout,
+        },
+        setup() {
+            const { user } = useAuthState();
 
-        const computedUrl = computed(() => {
-            return `https://filebrowser.jimbertesting.be/auth/login/user/?username=${user}.3bot`;
-        });
+            const computedUrl = computed(() => {
+                return `https://filebrowser.jimbertesting.be/auth/login/user/?username=${user}.3bot`;
+            });
 
-        return {
-            computedUrl,
-        };
-    },
-});
+            return {
+                computedUrl,
+            };
+        },
+    });
 </script>
 
-<style scoped type="text/css">
-</style>
+<style scoped type="text/css"></style>

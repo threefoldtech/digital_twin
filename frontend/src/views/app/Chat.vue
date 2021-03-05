@@ -18,35 +18,35 @@
 </template>
 
 <script lang="ts">
-import appLayout from '../../layout/AppLayout.vue';
-import { defineComponent, ref, computed, onBeforeMount } from 'vue';
-import ChatList from '@/components/ChatList.vue';
+    import appLayout from '../../layout/AppLayout.vue';
+    import { defineComponent, ref, computed, onBeforeMount } from 'vue';
+    import ChatList from '@/components/ChatList.vue';
+    import { showAddUserDialog } from '@/services/dialogService';
 
-export default defineComponent({
-    name: 'Apps',
-    components: {
-        appLayout,
-        ChatList,
-    },
-    setup({}, ctx) {
-        const showAddUserDialog = ref(false);
-        return {
-            showAddUserDialog,
-        };
-    },
-});
+    export default defineComponent({
+        name: 'Apps',
+        components: {
+            appLayout,
+            ChatList,
+        },
+        setup({}, ctx) {
+            return {
+                showAddUserDialog,
+            };
+        },
+    });
 </script>
 
 <style scoped type="text/css">
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
 
-@layer utilities {
-    @variants responsive {
-        .customgrid {
-            grid-template-columns: 400px 1fr;
+    @layer utilities {
+        @variants responsive {
+            .customgrid {
+                grid-template-columns: 400px 1fr;
+            }
         }
     }
-}
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div class="chatcard relative grid grid-cols-12 rounded-lg mb-2 py-2">
+    <div class="chatcard relative grid grid-cols-12 mb-2 py-2 bg-gray-100">
         <!-- <div
       v-if="newMessages >= 1"
       class="h-5 w-5 bg-accent rounded-full absolute -top-2 -right-2 transition-all z-10 grid place-items-center text-xs text-white"

@@ -39,8 +39,8 @@
             class="pr-4 text-right text-gray-500 flex items-center justify-end"
         >
             <slot name="actions">
-                <button class="text-lg text-white" @click="addUser">
-                    <i class="fas fa-edit"></i>
+                <button class="text-lg text-white md:hidden" @click="addUser">
+                    <i class="fas fa-plus"></i>
                 </button>
                 <!-- <button class="text-lg text-white">
                     <i class="fas fa-search"></i>
@@ -152,125 +152,125 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onBeforeMount, ref } from 'vue';
-import { useAuthState } from '../store/authStore';
-import { useSocketActions } from '../store/socketStore';
-import Dialog from './Dialog.vue';
-import AvatarImg from '@/components/AvatarImg.vue';
-import {
-    deleteBlockedEntry,
-    getBlockList,
-    initBlocklist,
-} from '@/store/blockStore';
-import { setNewavater } from '@/store/userStore';
-import { fetchStatus } from '@/store/statusStore';
-import { useRoute, useRouter } from 'vue-router';
+    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+    import { useAuthState } from '../store/authStore';
+    import { useSocketActions } from '../store/socketStore';
+    import Dialog from './Dialog.vue';
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import {
+        deleteBlockedEntry,
+        getBlockList,
+        initBlocklist,
+    } from '@/store/blockStore';
+    import { setNewavater } from '@/store/userStore';
+    import { fetchStatus } from '@/store/statusStore';
+    import { useRoute, useRouter } from 'vue-router';
 
-export default defineComponent({
-    name: 'Topbar',
-    components: { AvatarImg, jdialog: Dialog },
-    setup({}, ctx) {
-        const { user } = useAuthState();
-        const showDialog = ref(false);
-        const showEdit = ref(false);
-        const showEditPic = ref(false);
-        const fileinput = ref();
-        const file = ref();
-        const userStatus = ref('');
-        const isEditingStatus = ref(false);
-        const router = useRouter();
-        const route = useRoute();
-        const backOrMenu = () => {
-            if (route.meta && route.meta.back) {
-                router.push({ name: route.meta.back });
-                return;
-            }
-            showDialog.value = true;
-        };
+    export default defineComponent({
+        name: 'Topbar',
+        components: { AvatarImg, jdialog: Dialog },
+        setup({}, ctx) {
+            const { user } = useAuthState();
+            const showDialog = ref(false);
+            const showEdit = ref(false);
+            const showEditPic = ref(false);
+            const fileinput = ref();
+            const file = ref();
+            const userStatus = ref('');
+            const isEditingStatus = ref(false);
+            const router = useRouter();
+            const route = useRoute();
+            const backOrMenu = () => {
+                if (route.meta && route.meta.back) {
+                    router.push({ name: route.meta.back });
+                    return;
+                }
+                showDialog.value = true;
+            };
 
-        const selectFile = () => {
-            fileinput.value.click();
-        };
-        const changeFile = () => {
-            file.value = fileinput.value?.files[0];
-            sendNewAvatar();
-        };
-        const removeFile = () => {
-            file.value = null;
-        };
+            const selectFile = () => {
+                fileinput.value.click();
+            };
+            const changeFile = () => {
+                file.value = fileinput.value?.files[0];
+                sendNewAvatar();
+            };
+            const removeFile = () => {
+                file.value = null;
+            };
 
-        const sendNewAvatar = async () => {
-            const newUrl = await setNewavater(file.value);
-            await fetchStatus(user.id);
-            showDialog.value = false;
-        };
+            const sendNewAvatar = async () => {
+                const newUrl = await setNewavater(file.value);
+                await fetchStatus(user.id);
+                showDialog.value = false;
+            };
 
-        const setEditStatus = (edit: boolean) => {
-            console.log(edit);
-            isEditingStatus.value = edit;
-            userStatus.value = user.status;
-        };
-        const sendNewStatus = async () => {
-            const { sendSocketUserStatus } = useSocketActions();
-            sendSocketUserStatus(userStatus.value);
-            user.status = userStatus.value;
-            isEditingStatus.value = false;
-        };
+            const setEditStatus = (edit: boolean) => {
+                console.log(edit);
+                isEditingStatus.value = edit;
+                userStatus.value = user.status;
+            };
+            const sendNewStatus = async () => {
+                const { sendSocketUserStatus } = useSocketActions();
+                sendSocketUserStatus(userStatus.value);
+                user.status = userStatus.value;
+                isEditingStatus.value = false;
+            };
 
-        const blockedUsers = computed(() => {
-            return getBlockList();
-        });
-        // @todo: config
+            const blockedUsers = computed(() => {
+                return getBlockList();
+            });
+            // @todo: config
 
-        onBeforeMount(() => {
-            initBlocklist();
-        });
+            onBeforeMount(() => {
+                initBlocklist();
+            });
 
-        const unblockUser = async user => {
-            await deleteBlockedEntry(user);
-            showDialog.value = false;
-        };
+            const unblockUser = async user => {
+                await deleteBlockedEntry(user);
+                showDialog.value = false;
+            };
 
-        const addUser = () => {
-            ctx.emit('addUser');
-        };
+            const addUser = () => {
+                ctx.emit('addUser');
+            };
 
-        return {
-            addUser,
-            backOrMenu,
-            user,
-            showEditPic,
-            showEdit,
-            showDialog,
-            fileinput,
-            file,
-            selectFile,
-            changeFile,
-            removeFile,
-            sendNewAvatar,
-            sendNewStatus,
-            userStatus,
-            setEditStatus,
-            isEditingStatus,
-            blockedUsers,
-            unblockUser,
-            route,
-        };
-    },
-});
+            return {
+                addUser,
+                backOrMenu,
+                user,
+                showEditPic,
+                showEdit,
+                showDialog,
+                fileinput,
+                file,
+                selectFile,
+                changeFile,
+                removeFile,
+                sendNewAvatar,
+                sendNewStatus,
+                userStatus,
+                setEditStatus,
+                isEditingStatus,
+                blockedUsers,
+                unblockUser,
+                route,
+            };
+        },
+    });
 </script>
 
 <style scoped>
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
 
-@layer utilities {
-    @variants responsive {
-        .topgrid {
-            display: grid !important;
-            grid-template-columns: 500px 2fr 1fr !important;
+    @layer utilities {
+        @variants responsive {
+            .topgrid {
+                display: grid !important;
+                grid-template-columns: 500px 2fr 1fr !important;
+            }
         }
     }
-}
 </style>
