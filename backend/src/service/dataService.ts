@@ -80,10 +80,13 @@ export const persistUserdata = (userData: UserInterface) => {
 
 export const saveFile = (
     chatId: IdInterface,
+    messageId: string,
     fileName: string,
     fileBuffer: Buffer
 ) => {
-    const path = `${config.baseDir}chats/${chatId}/files/${fileName}`;
+    let path = `${config.baseDir}chats/${chatId}/files/${messageId}`;
+    fs.mkdirSync(path)
+    path = `${path}/${fileName}`
     fs.writeFileSync(path, fileBuffer);
     return path;
 };

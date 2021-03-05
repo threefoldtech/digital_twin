@@ -14,9 +14,9 @@ import { getMyLocation } from '../service/locationService';
 
 const router = Router();
 
-router.get('/:chatid/:name', async (req, res) => {
+router.get('/:chatid/:messageid/:name', async (req, res) => {
     // @TODO fix this security
-    const path = `${config.baseDir}chats/${req.params.chatid}/files/${req.params.name}`;
+    const path = `${config.baseDir}chats/${req.params.chatid}/files/${req.params.messageid}/${req.params.name}`;
 
     console.log('Path: ', path);
 
@@ -27,7 +27,7 @@ router.post('/:chatid/:messageid', async (req, resp) => {
     const chatId = req.params.chatid;
     const messageId = req.params.messageid;
     const fileToSave = <UploadedFile>req.files.file;
-    saveFile(chatId, fileToSave.name, fileToSave.data);
+    saveFile(chatId, messageId,fileToSave.name, fileToSave.data);
     let myLocation = await getMyLocation();
     const message: Message<FileMessageType> = {
         from: config.userid,
@@ -35,7 +35,7 @@ router.post('/:chatid/:messageid', async (req, resp) => {
             filename: fileToSave.name,
             url: getFullIPv6ApiLocation(
                 myLocation,
-                `/files/${chatId}/${fileToSave.name}`
+                `/files/${chatId}/${messageId}/${fileToSave.name}`
             ),
         },
         id: messageId,
