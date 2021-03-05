@@ -7,9 +7,15 @@
                 'w-8 mr-2': !showActionButtons,
             }"
         >
-            <AvatarImg :id="message.from" :showOnlineStatus=false />
+            <AvatarImg :id="message.from" :showOnlineStatus="false" />
         </div>
-        <div class="card w-full bg-white rounded-md mb-4 overflow-hidden">
+        <div
+            class="card w-full rounded-md mb-4 overflow-hidden"
+            :class="{
+                'bg-green-100': message.from === user.id,
+                'bg-white': message.from !== user.id,
+            }"
+        >
             <header class="flex justify-between pl-2 pt-2 text-xs items-center">
                 <div class="title">
                     <div class="name inline-block pr-5">
@@ -107,6 +113,8 @@ export default defineComponent({
     setup(props) {
         const reply = ref(null);
 
+        const { user } = useAuthState();
+
         const toggleEditMessage = () => {
             console.log('toggleEditMessage');
         };
@@ -166,6 +174,7 @@ export default defineComponent({
             toggleEditMessage,
             showEditMessage,
             reply,
+            user,
         };
     },
 });
