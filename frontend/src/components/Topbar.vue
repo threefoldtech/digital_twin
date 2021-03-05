@@ -26,7 +26,9 @@
                 />
             </div>
 
-            <div class="h-5 flex items-center col-span-3 md:col-span-1">
+            <div
+                class="h-5 flex items-center col-span-3 md:col-span-1 md:hidden"
+            >
                 <slot>
                     <img
                         src="/TFN.svg"
@@ -38,8 +40,20 @@
         </div>
 
         <div
-            class="pr-4 text-right text-gray-500 flex items-center justify-end"
+            class="pr-4 text-right text-gray-500 flex items-center justify-begin"
         >
+            <div
+                class="h-5 md:flex text-black items-center col-span-3 md:col-span-1 hidden"
+            >
+                <slot>
+                    <img
+                        src="/TFN.svg"
+                        alt="TF-Logo"
+                        class="md:hidden md:ml-4 h-full"
+                    />
+                </slot>
+            </div>
+
             <slot name="actions">
                 <button class="text-lg text-white md:hidden" @click="addUser">
                     <i class="fas fa-plus"></i>
