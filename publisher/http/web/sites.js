@@ -7,10 +7,6 @@ async function update(req) {
     var info = req.info
     var repo = info.repo
 
-    if(info.status != 200){
-        return res.status(info.status).json({"err": info.err});
-    }
-
     var spawn = require('child_process').spawn;
     var prc = spawn('publishtools',  ['pull', '--repo', repo]);
     
@@ -26,21 +22,22 @@ async function update(req) {
         console.log('process exit code ' + code);
     });
     
-
+    spawn2 = require('child_process').spawn;
+    
     if (repo.startsWith("www")){
-        prc = spawn('publishtools',  ['build', '--repo', repo, '--pathprefix']);
+        var prc2 = spawn('publishtools',  ['build', '--repo', repo, '--pathprefix']);
     }else{
-        prc = spawn('publishtools',  ['flatten', '--repo', repo, '--pathprefix']);
+        var prc2 = spawn('publishtools',  ['flatten', '--repo', repo, '--pathprefix']);
     }
     //noinspection JSUnresolvedFunction
-    prc.stdout.setEncoding('utf8');
-    prc.stdout.on('data', function (data) {
+    prc2.stdout.setEncoding('utf8');
+    prc2.stdout.on('data', function (data) {
         var str = data.toString()
         var lines = str.split(/(\r?\n)/g);
         console.log(lines.join(""));
     });
 
-    prc.on('close', function (code) {
+    prc2.on('close', function (code) {
         console.log('process exit code ' + code);
     });
 
@@ -236,6 +233,11 @@ router.get('/', asyncHandler(async (req, res) =>  {
 }))
 
 router.get('/:website', asyncHandler(async (req, res) =>  {
+     if(req.params.website == 'update'){
+        await update(req)
+        return res.redirect('/')
+     }
+
      var info = req.info
      var driveObj = info.drive
      var dir = info.dir
