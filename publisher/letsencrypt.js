@@ -6,7 +6,7 @@ async function process(){
     var letsencrypt = {}
 
     for(var domain in config.domains){
-        letsencrypt[domain] = {"renewAt": 1, "altnames": []}
+        letsencrypt[domain] = {"renewAt": 1, "altnames": [domain]}
     }
 
 
@@ -14,7 +14,7 @@ async function process(){
 
     var c = {}
     try{
-        let c = JSON.parse(fs.readFileSync('greenlock.d/config.json'));
+        c = JSON.parse(fs.readFileSync('greenlock.d/config.json'));
     }catch(e){
         console.log(chalk.red(`X (Let'sEncrypt) Failed to read config file greenlock.d/config.json`))
         p.exit(1)
@@ -35,6 +35,10 @@ async function process(){
     
     var newSites = []
     for(item in letsencrypt){
+        if(item == "localhost" || item == "127.0.0.1"){
+            continue
+        }
+
         var obj = {}
         obj.subject = item
         obj.altnames = letsencrypt[item].altnames

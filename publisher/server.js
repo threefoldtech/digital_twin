@@ -44,10 +44,10 @@ async function main(){
             console.log(chalk.red(`✓ ALL Closed `));
         })
     })
+    const app = require('./http/app.js')
 
     if (!config.nodejs.production){
       var port = config.http.port
-      const app = require('./http/app.js')
       server = app.listen(port, "localhost", () => {	
         console.log(chalk.green(`✓ (HTTP Server) : http://localhost:${port}`));
       })

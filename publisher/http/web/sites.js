@@ -173,6 +173,13 @@ router.get('/publishtools/list', asyncHandler(async (req, res) =>  {
                     continue
                 }
             }
+
+            if (config.nodejs.production){
+                if(domain == 'localhost' || domain  == '127.0.0.1'){
+                    continue
+                }
+            }
+
             var wikis = new Set()
             var sites = new Set()
 
@@ -286,10 +293,6 @@ router.get('/:website/flexsearch', asyncHandler(async (req, res) => {
 // Wiki errors
 router.get('/info/:wiki/errors', asyncHandler(async (req, res) => {
     var info = await req.info
-
-    if(info.status != 200){
-        return res.status(info.status).json({"err": info.err});
-    }
 
     var driveObj = info.drive
     var wikiname = info.dir.substring(1)
