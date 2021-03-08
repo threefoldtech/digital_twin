@@ -28,4 +28,4 @@ build
 package-lock.json
 .greenlockrci
 
-greenlock.d/config.json
+greenlock.d/*
