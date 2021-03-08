@@ -37,19 +37,18 @@ async function main(){
     }
 
     // HTTP(s) Server
+    var server = null
     process.on('SIGINT', () => {
         cleanup()
         server.close(() => {
-            console.log(chalk.green(`✓ (HTTP Server)  http://localhost:${config.http.port}`));
-            console.log(chalk.green(`✓ (DNS Server) : ${config.dns.port}`));
-            console.log(chalk.red(`\t✓ closed`));
+            console.log(chalk.red(`✓ ALL Closed `));
         })
     })
 
     if (!config.nodejs.production){
       var port = config.http.port
       const app = require('./http/app.js')
-      const server = app.listen(port, "localhost", () => {	
+      server = app.listen(port, "localhost", () => {	
         console.log(chalk.green(`✓ (HTTP Server) : http://localhost:${port}`));
       })
     }else{

@@ -164,25 +164,49 @@ async function handleWikiFile(req, res, info){
 // Home (list of wikis and sites)
 router.get('/publishtools/list', asyncHandler(async (req, res) =>  {
         var info = req.info
-        var wikis = new Set()
-        var sites = new Set()
-        for (var item in cache.domains){
-            if(item == "localhost" || item == "127.0.0.1"){
-                continue;
-            }
-            var alias  = cache.domains[item].alias
+        
+        var domains = []
 
-            var isWebsite = cache.domains[item].isWebSite
-            
-            if (!isWebsite){
-                wikis.add(alias)
-            }else{
-                sites.add(alias)
+        for (var domain in config.domains){
+            if (!config.nodejs.production){
+                if(domain != 'localhost'){
+                    continue
+                }
             }
+            var wikis = new Set()
+            var sites = new Set()
+
+            for(var w in config.domains[domain].websites){
+                var item = config.domains[domain].websites[w]
+                var d = `${domain}`
+                if(info.port != 80 && info.port != 443){
+                    d = `${d}:${info.port}`
+                }
+                if(w == '/'){
+                    w = ""
+                }
+
+                sites.add({"name": item.alias, "url": `${d}/${w}`})
+            }
+
+            for(var w in config.domains[domain].wikis){
+                var item = config.domains[domain].wikis[w]
+                var d = `${domain}`
+                if(info.port != 80 && info.port != 443){
+                    d = `${d}:${info.port}`
+                }
+                if(w == '/'){
+                    w = ""
+                }
+
+                wikis.add({"name": item.alias, "url": `${d}/info/${w}`})
+            }
+
+            domains.push({"domain": domain, "websites": Array.from(sites), "wikis": Array.from(wikis)})
         }
+
         res.render('sites/home.mustache', {
-            sites : Array.from(sites),
-            wikis: Array.from(wikis),
+            domains : domains,
             port: info.port
         });       
     }

@@ -99,6 +99,7 @@ app.use(function (req, res, next) {
   }
   req.info = info
   req.info.host = host
+  req.info.port = port
 
   if(req.info.login){
     if(!req.session.authorized){
