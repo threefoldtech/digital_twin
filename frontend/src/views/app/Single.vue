@@ -95,48 +95,20 @@
                     >
                         <div class="absolute w-full mt-8 px-4">
                             <div
-                                v-for="(message, i) in chat?.messages"
-                                :key="
-                                    `${message.id}-${message.type}-${message.timeStamp}`
-                                "
+                                v-for="(messageBlock,
+                                i) in getMessagesSortedByUser"
+                                :key="`${messageBlock.user}`"
                             >
-                                <div
-                                    v-if="showDivider(message, i)"
-                                    class="text-center px-4"
-                                >
-                                    <span class="font-thin">
-                                        {{ m(message.timeStamp).fromNow() }}
-                                    </span>
-                                </div>
                                 <MessageCard
                                     :isread="i <= lastRead"
                                     :isreadbyme="i <= lastReadByMe"
-                                    :message="message"
+                                    :messageBlock="messageBlock"
+                                    :message="messageBlock"
                                     :chatId="chat.chatId"
                                     :isGroup="chat.isGroup"
-                                    :isMine="message.from === user.id"
+                                    :isMine="messageBlock.user === user.id"
                                     v-on:scroll="scrollToBottom"
                                 />
-                                <div
-                                    class="font-thin text-right align-middle"
-                                    v-if="reads[message.id]"
-                                >
-                                    <div
-                                        class="inline-block justify-end align-bottom"
-                                        v-for="(value, key) in reads[
-                                            message.id
-                                        ].slice(0, 3)"
-                                        :key="key"
-                                    >
-                                        <AvatarImg
-                                            xsmall
-                                            :id="value"
-                                        ></AvatarImg>
-                                    </div>
-                                    <span v-if="reads[message.id].length > 3">
-                                        + {{ reads[message.id].length - 3 }}
-                                    </span>
-                                </div>
                             </div>
 
                             <div
@@ -151,6 +123,22 @@
                                 "
                             ></div>
                         </div>
+                    </div>
+                    <div
+                        v-if="messageToReplyTo"
+                        class="flex justify-between m-2 p-4 bg-white rounded-xl"
+                    >
+                        <div>
+                            <b>Replying: </b>
+                            <div>
+                                {{ messageToReplyTo.from }}
+                                {{ messageToReplyTo.body }}
+                            </div>
+                        </div>
+
+                        <button @click="messageToReplyTo = null">
+                            <i class="fas fa-times"></i>
+                        </button>
                     </div>
                     <ChatInput
                         class="chatInput"
@@ -255,6 +243,7 @@
     import * as crypto from 'crypto-js';
     import { useIntersectionObserver } from '@/lib/intersectionObserver';
     import { useRoute, useRouter } from 'vue-router';
+    import { messageToReplyTo } from '@/services/replyService';
 
     export default defineComponent({
         name: 'ChatView',
@@ -277,6 +266,7 @@
                     selectedId.value = <string>id;
                 }
             );
+
             const { retrievechats } = usechatsActions();
             onBeforeMount(retrievechats);
 
@@ -331,7 +321,32 @@
                 });
             };
 
+            const getMessagesSortedByUser = computed(() => {
+                let chatBlockIndex = 0;
+
+                return chat.value.messages.reduce((acc: any, message) => {
+                    if (
+                        acc[chatBlockIndex] &&
+                        acc[chatBlockIndex].user === <string>message.from
+                    ) {
+                        acc[chatBlockIndex].messages.push(message);
+                        return acc;
+                    } else {
+                        chatBlockIndex++;
+                    }
+
+                    acc[chatBlockIndex] = {
+                        user: <string>message.from,
+                        messages: [],
+                    };
+                    acc[chatBlockIndex].messages.push(message);
+
+                    return acc;
+                }, {});
+            });
+
             const message = ref('');
+            const replyTo = ref(null);
 
             const chat = computed(() => {
                 return chats.value.find(c => c.chatId == selectedId.value);
@@ -434,10 +449,20 @@
                 });
             });
 
+            const replyMessage = event => {
+                if (event) {
+                    console.log('event: ', event);
+                    replyTo.value = event;
+                } else {
+                    replyTo.value = null;
+                }
+            };
+
             return {
                 chats,
                 selectedId,
                 chat,
+                getMessagesSortedByUser,
                 truncate,
                 message,
                 file,
@@ -459,6 +484,7 @@
                 reads,
                 showDialog,
                 showMenu,
+                messageToReplyTo,
                 ...propRefs,
             };
         },

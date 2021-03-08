@@ -18,6 +18,11 @@ export interface Tab {
     icon: string;
 }
 
+export interface userMessagesContainer {
+    id: DtId;
+    messages: Message<MessageBodyType>[];
+}
+
 export interface Message<T> {
     id: Id;
     from: DtId;

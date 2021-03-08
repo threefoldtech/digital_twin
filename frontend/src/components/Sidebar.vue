@@ -1,13 +1,36 @@
 <template>
     <nav>
         <div class="flex flex-col h-full items-center mx-2">
+            <div class="mb-4 grid text-center text-white cursor-pointer">
+                <div
+                    class="h-20 w-20 rounded-full grid place-items-center mb-1"
+                    style="position: relative"
+                    @click="changePage('chat')"
+                >
+                    <img
+                        src="../../public/logo.png"
+                        width="50"
+                        alt="Threefold logo"
+                    />
+
+                    <!-- <h3>
+                        Threefold
+                    </h3> -->
+                </div>
+            </div>
             <div
                 v-for="app in apps"
                 :key="app.name"
-                class="mb-4 grid text-center text-white"
+                class="mb-4 grid text-center"
                 :class="{
                     'text-gray-300': !app?.enabled,
                     'cursor-pointer': app.enabled,
+                    'text-white': !router.currentRoute?.value.path.includes(
+                        app.name
+                    ),
+                    selected: router.currentRoute?.value.path.includes(
+                        app.name
+                    ),
                 }"
             >
                 <div
@@ -82,6 +105,7 @@
                 changePage,
                 user,
                 showUserConfigDialog,
+                router,
             };
         },
     });
@@ -101,5 +125,9 @@
         height: 100%;
         background: #e69b5950;
         border-left: 8px solid #e69b59;
+    }
+
+    .selected {
+        color: rgb(159, 241, 215);
     }
 </style>

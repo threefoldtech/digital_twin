@@ -1,7 +1,7 @@
 <template>
     <div class="bg-gray-100 h-full overflow-hidden relative">
         <div class="pl-0 relative h-full w-full maingrid md:bigmaingrid">
-            <div class="top h-20">
+            <div class="top h-20 md:hidden">
                 <Topbar @addUser="addUser">
                     <template v-slot:default>
                         <slot name="top"> </slot>

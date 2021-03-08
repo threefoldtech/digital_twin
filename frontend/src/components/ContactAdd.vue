@@ -138,7 +138,6 @@
     import autoComplete from './AutoComplete.vue';
     import { uuidv4 } from '@/common';
     import AvatarImg from '@/components/AvatarImg.vue';
-    
 
     export default defineComponent({
         name: 'ContactAdd',
@@ -224,7 +223,7 @@
                         "The name can't contain more than 20 characters";
                     return;
                 }
-                const mylocation = await myYggdrasilAddress()
+                const mylocation = await myYggdrasilAddress();
                 usersInGroup.value.push({
                     id: user.id,
                     location: mylocation,

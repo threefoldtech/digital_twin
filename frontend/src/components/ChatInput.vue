@@ -7,7 +7,7 @@
     />
 
     <div
-        class="md:p4 md:m-4 md:rounded-3xl flex flex-col bg-white grid grid-cols-12"
+        class="md:p-2 md:m-2 md:rounded-3xl bg-white grid grid-cols-12"
         @paste="onPaste"
     >
         <div
@@ -114,9 +114,13 @@
     ></div>
 </template>
 <script lang="ts">
-    import { nextTick, ref } from 'vue';
+    import { nextTick, ref, watch } from 'vue';
     import { selectedId, usechatsActions } from '@/store/chatStore';
     import GifSelector from '@/components/GifSelector.vue';
+    import { messageToReplyTo } from '@/services/replyService';
+    import { useAuthState } from '@/store/authStore';
+    import { Message, StringMessageType } from '@/types';
+    import { uuidv4 } from '@/common';
 
     export default {
         name: 'ChatInput',
@@ -137,7 +141,36 @@
             const stopRecording = ref(null);
             const showEmoji = ref(false);
 
+            watch(messageToReplyTo, () => {
+                if (messageToReplyTo.value) {
+                    console.log('Selecting chat ...');
+                    message.value.focus();
+                }
+            });
+
             const chatsend = async e => {
+                if (messageToReplyTo.value) {
+                    const { user } = useAuthState();
+
+                    const newMessage: Message<StringMessageType> = {
+                        id: uuidv4(),
+                        from: user.id,
+                        to: <string>props.selectedid,
+                        body: <StringMessageType>message.value.value,
+                        timeStamp: new Date(),
+                        type: 'STRING',
+                        replies: [],
+                        subject: messageToReplyTo.value.id,
+                    };
+
+                    const { sendMessageObject } = usechatsActions();
+
+                    sendMessageObject(props.selectedid, newMessage);
+                    messageToReplyTo.value = null;
+
+                    return;
+                }
+
                 if (message.value.value != '') {
                     sendMessage(props.selectedid, message.value.value);
                     message.value.value = '';

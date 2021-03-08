@@ -1,5 +1,6 @@
 <template>
     <img
+        width="450"
         :src="calcExternalResourceLink(message.body.url)"
         @load="imageLoaded"
     />
