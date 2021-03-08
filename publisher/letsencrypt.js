@@ -16,17 +16,14 @@ async function process(){
      try{
         fs.statSync('greenlock.d/config.json')
      }catch(e){
-        fs.copyFile('greenlock.d/config.json.bak', 'greenlock.d/config.json', (err) => {
-            if (err) throw err;
-            console.log(chalk.green(`(Let'sEncrypt) copy config.json.bak to config.json`))
-          });
+        fs.copyFileSync('greenlock.d/config.json.bak', 'greenlock.d/config.json');
      }
     var c = {}
     try{
         c = JSON.parse(fs.readFileSync('greenlock.d/config.json'));
     }catch(e){
         console.log(chalk.red(`X (Let'sEncrypt) Failed to read config file greenlock.d/config.json`))
-        p.exit(1)
+        c = JSON.parse(fs.readFileSync('greenlock.d/config.json'));
     }
 
     var currentDomains = {}
