@@ -1,12 +1,10 @@
 var express = require('express');
 var router = express.Router();
 const asyncHandler = require('express-async-handler')
-
-var drive = require('../../drive.js')
-var cache = require('../../cache');
+const config = require('../../config')
 
 async function update(req) {
-    var info = await getRequestInfo(req)
+    var info = req.info
     var repo = info.repo
 
     if(info.status != 200){
@@ -28,10 +26,11 @@ async function update(req) {
         console.log('process exit code ' + code);
     });
     
+
     if (repo.startsWith("www")){
-        prc = spawn('publishtools',  ['build', '--repo', repo]);
+        prc = spawn('publishtools',  ['build', '--repo', repo, '--pathprefix']);
     }else{
-        prc = spawn('publishtools',  ['flatten', '--repo', repo]);
+        prc = spawn('publishtools',  ['flatten', '--repo', repo, '--pathprefix']);
     }
     //noinspection JSUnresolvedFunction
     prc.stdout.setEncoding('utf8');
@@ -45,64 +44,6 @@ async function update(req) {
         console.log('process exit code ' + code);
     });
 
-}
-
-async function getRequestInfo(req){
-    var port = 443
-    var host = ""
-    var err = ""
-    var driveObj = null
-    var status = 200
-    var dir = ""
-    var repo = ""
-
-    if (req.headers.host){
-        host = req.headers.host
-        var splitted = req.headers.host.split(':')
-        if (splitted.length > 1){
-            port = splitted[1]
-            host = splitted[0]
-        }
-    }
-
-    if (host === ""){
-        status = 500
-        err = "Host is missing from headers"
-    }
-
-    var isWebsite = 'website' in req.params? true : false
-    var alias = 'website' in req.params? req.params.website : req.params.wiki
-
-    driveObj = null
-    dir = ""
-    repo = ""
-   
-    for(var item in cache.domains){
-        if(cache.domains[item].alias == alias && cache.domains[item].isWebSite == isWebsite){
-            var obj = cache.domains[item]
-            driveObj = await drive.get(obj.drive)
-            dir = obj.dir
-            repo = obj.repo
-            break
-        }
-    }
-
-    if(!driveObj){
-        status = 404
-        err = "NOT FOUND"
-    }
-    
-    return {
-        "status" : status,
-        "err": err,
-        "port": port,
-        "host": host,
-        "drive": driveObj,
-        "dir" : dir,
-        "repo": repo,
-        "alias": alias,
-        "isWebsite": isWebsite
-    }
 }
 
 async function handleWebsiteFile(req, res, info){
@@ -156,8 +97,7 @@ async function handleWikiFile(req, res, info){
         filename = splitted[1]
         wikiname = `wiki_${splitted[0]}` 
     }
-   
-
+ 
     var encoding = 'utf-8'  
     
     if (filename == "_sidebar.md"){
@@ -187,16 +127,10 @@ async function handleWikiFile(req, res, info){
 
     filepath = `/${wikiname}/${filename}`
     driveObj = null
-
-    var domains = cache.domains
-    for(var key in domains){
-        var item = domains[key]
+    for(var alias in config.domains[req.info.host].wikis){
+        var item = config.domains[req.info.host].wikis[alias]
         if(item.dir == `/${wikiname}`){
-            try{
-                driveObj =  await drive.get(item.drive)
-            }catch(e){
-
-            }
+            driveObj =  item.drive
         }
     }
 
@@ -228,9 +162,8 @@ async function handleWikiFile(req, res, info){
 }
 
 // Home (list of wikis and sites)
-router.get('/', asyncHandler(async (req, res) =>  {
-
-        var info = await getRequestInfo(req)
+router.get('/publishtools/list', asyncHandler(async (req, res) =>  {
+        var info = req.info
         var wikis = new Set()
         var sites = new Set()
         for (var item in cache.domains){
@@ -255,8 +188,24 @@ router.get('/', asyncHandler(async (req, res) =>  {
     }
 ))
 
+router.get('/', asyncHandler(async (req, res) =>  {
+    var info = req.info
+     var driveObj = info.drive
+     var dir = info.dir
+     var filepath = `${dir}/index.html`
+     var entry = null
+     try {
+         entry = await driveObj.promises.stat(filepath)
+         var content = await  driveObj.promises.readFile(filepath, 'utf8');
+         return res.send(content)
+     } catch (e) {
+         console.log(e)
+         return res.status(404).json('');
+     }    
+}))
+
 router.get('/:website', asyncHandler(async (req, res) =>  {
-     var info = await getRequestInfo(req)
+     var info = req.info
      var driveObj = info.drive
      var dir = info.dir
      var filepath = `${dir}/index.html`
@@ -272,7 +221,7 @@ router.get('/:website', asyncHandler(async (req, res) =>  {
 }))
 
 router.get('/info/:wiki', asyncHandler(async (req, res) =>  {
-    var info = await getRequestInfo(req)
+    var info = req.info
     var driveObj = info.drive
     var dir = info.dir
     var filepath = `${dir}/index.html`
@@ -290,7 +239,7 @@ router.get('/info/:wiki', asyncHandler(async (req, res) =>  {
 
 
 router.get('/:website/flexsearch', asyncHandler(async (req, res) => {
-    var info = await getRequestInfo(req)
+    var info = req.info
 
     if(info.status != 200){
         return res.status(info.status).json({"err": info.err});
@@ -312,7 +261,7 @@ router.get('/:website/flexsearch', asyncHandler(async (req, res) => {
 
 // Wiki errors
 router.get('/info/:wiki/errors', asyncHandler(async (req, res) => {
-    var info = await getRequestInfo(req)
+    var info = await req.info
 
     if(info.status != 200){
         return res.status(info.status).json({"err": info.err});
@@ -361,22 +310,16 @@ router.get('/:website/update', asyncHandler(async (req, res) => {
 
 // wiki files
 router.get('/info/:wiki/*', asyncHandler(async (req, res) => {
-    var info = await getRequestInfo(req)
-    if(info.status != 200){
-        return res.status(info.status).json({"err": info.err});
-    }
+    var info = req.info
     return handleWikiFile(req, res, info)
 }))
 
 // website files
 router.get('/:website/*', asyncHandler(async (req, res) => {
-    var info = await getRequestInfo(req)
-
-    if(info.status != 200){
-        return res.status(info.status).json({"err": info.err});
-    }
+    var info = req.info
     return handleWebsiteFile(req, res, info)
 }))
+
 
 
 

@@ -1,58 +1,56 @@
 
 const chalk = require('chalk');
+const process = require('process');
 
 const config = require('./config')
-const app = require('./http/app.js')
-const process = require('process');
+const localDrive = require('./drive/local')
+const hyperdrive = require('./drive/hyperdrive');
+const utils = require('./drive/utils')
 const dnsserver = require("./servers/dns")
+
 const letsencrypt = require('./letsencrypt')
-const groups = require('./groups') // load groups
-const acls = require('./acls')
 
 async function init(){
-    const drive = require('./drive.js');
-    const {_, cleanup } = await drive.ensureHyperSpace();
-    await drive.load();
-    await groups.load();
-    await acls.load();
-    return {_, cleanup }
+    var domainsList = []
+
+    await config.load()
+    domainsList.push(...await localDrive.load())
+    
+    var cleanup = function () {}
+
+    if(config.hyperdrive.enabled){
+      const {_, cleanup } = await hyperdrive.start();
+      domainsList.push(...await hyperdrive.load())
+    }
+    var domains = await utils.reduce(domainsList)
+    config.domains = domains
+    return cleanup
 }
 
 async function main(){
-    var host = config.http.host;
-    var port = config.http.port
-    var httpport = config.http.port;
-    var httpsport = config.http.httpsPort;
-    var dnsport = config.dns.port
+  
+    const cleanup = await init().catch((e)=>{console.log(e);process.exit(1)})
 
-    // S
-
-    const {_, cleanup } = await init().catch((e)=>{console.log(e);process.exit(1)})
-
-
-    // DNS (5352)
-
-    if (!config.development){
-      dnsport = 53
+    if(config.dns.enabled){
+      console.log(chalk.green(`✓ (DNS Server) : ${config.dns.port}`));
+      dnsserver.listen(config.dns.port);
     }
-    
-    dnsserver.listen(dnsport);
-    console.log(chalk.green(`✓ (DNS Server) : ${dnsport}`));
-    
+
     // HTTP(s) Server
     process.on('SIGINT', () => {
         cleanup()
         server.close(() => {
-            console.log(chalk.green(`✓ (HTTP Server) http://${host}:${httpport}`));
-            console.log(chalk.green(`✓ (HTTPS Server) https://${host}:${httpsport}`));
-            console.log(chalk.green(`✓ (DNS Server) : ${dnsport}`));
+            console.log(chalk.green(`✓ (HTTP Server)  http://localhost:${config.http.port}`));
+            console.log(chalk.green(`✓ (DNS Server) : ${config.dns.port}`));
             console.log(chalk.red(`\t✓ closed`));
         })
     })
 
-    if (config.development){
-      const server = app.listen(port, host, () => {	
-        console.log(chalk.green(`✓ (HTTP Server) : http://${host}:${port}`));
+    if (!config.nodejs.production){
+      var port = config.http.port
+      const app = require('./http/app.js')
+      const server = app.listen(port, "localhost", () => {	
+        console.log(chalk.green(`✓ (HTTP Server) : http://localhost:${port}`));
       })
     }else{
       

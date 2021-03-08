@@ -1,60 +1,36 @@
-const cache = require("./cache");
 const fs = require('fs')
-
+const p = require('process')
+const config = require("./config");
 
 async function process(){
-    var websites = {}
-
-    for(var domain in cache.domains){
-        var value = cache.domains[domain]
-        var dir = value.dir
-        if(!(dir in websites)){
-            websites[dir] = []
-        }
-        websites[dir].push(domain)
-    }
-
     var letsencrypt = {}
 
-    for (var dir in websites){
-        if (dir == ""){
-            continue
-        }
-        var domains = websites[dir]
-        if (domains.length > 0){
-            var subject = domains[0]
-            letsencrypt[subject] = {}
-            letsencrypt[subject].renewAt = 1
-            if (domains.length > 0){
-                letsencrypt[subject]["altnames"] = domains
-            }
-        }
+    for(var domain in config.domains){
+        letsencrypt[domain] = {"renewAt": 1, "altnames": []}
     }
 
-    // //{ "sites": [{ "subject": "example.com", "altnames": ["example.com"] }] }
 
-    let config = JSON.parse(fs.readFileSync('greenlock.d/config.json'));
-    var domains = {}
-    config.sites.forEach(element => {
-        domains[element.subject] = element.renewAt || 1
+     // //{ "sites": [{ "subject": "example.com", "altnames": ["example.com"] }] }
+
+    var c = {}
+    try{
+        let c = JSON.parse(fs.readFileSync('greenlock.d/config.json'));
+    }catch(e){
+        console.log(chalk.red(`X (Let'sEncrypt) Failed to read config file greenlock.d/config.json`))
+        p.exit(1)
+    }
+
+    var currentDomains = {}
+    c.sites.forEach(element => {
+        currentDomains[element.subject] = element.renewAt || 1
     });
-
-    // force one domain for now
-    var d = require('process').env.DOMAIN
-    if (!d){
-        throw new Error("DOMAIN env variable is required in production")
-    }
-    letsencrypt = {}
-
-    letsencrypt[d] = {"altnames": [d], "renewAt": 1}
     
-    for(var item in domains){
+    for(var item in currentDomains){
         if (!(item in letsencrypt)){
             continue
         }else{
-            letsencrypt[item]["renewAt"] = domains[item]
+            letsencrypt[item]["renewAt"] = currentDomains[item]
         }
-        
     }
     
     var newSites = []
@@ -65,11 +41,14 @@ async function process(){
         obj.renewAt = letsencrypt[item].renewAt
         newSites.push(obj)
     }
-    config.sites = newSites
-    fs.writeFileSync('greenlock.d/config.json', JSON.stringify(config, null, 4), {flag: 'w'})
-
+    c.sites = newSites
+    try{
+        fs.writeFileSync('greenlock.d/config.json', JSON.stringify(c, null, 4), {flag: 'w'})
+    }catch(e){
+        console.log(chalk.red(`X (Let'sEncrypt) Failed to write config file greenlock.d/config.json`))
+        p.exit(1)
+    }
 }
-
 
 module.exports = {
     process : process

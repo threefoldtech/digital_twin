@@ -1,11 +1,8 @@
 const path = require('path')
-const fs = require('fs')
-const config = require('./config')
+const chalk = require('chalk');
 
 class Groups{
-    constructor(root){
-
-        this.root = root
+    constructor(){
         this._groups = {}
 
         // flatten group
@@ -33,8 +30,23 @@ class Groups{
             return res
         }  
         
-        this.load = async function(){
-            this._groups = JSON.parse(fs.readFileSync(path.join(this.root, ".groups.json")));
+        this.load = async function(drive){
+            var groupsfilepath = path.join("/", '.groups.json')
+            try{
+                await drive.promises.stat(groupsfilepath)
+                
+            }catch(e){
+                console.log(chalk.red(`    ✓ (Drive (${drive.name}) does not contain .groups file exiting`))
+                process.exit(1)
+            }
+
+            try{
+                this._groups =  await JSON.parse( await drive.promises.readFile(path.join("/", ".groups.json")));
+            }catch(e){
+                console.log(chalk.red(`    ✓ (Drive (${drive.name}) can not read .groups file`))
+                process.exit(1)
+            }
+            
             for(var item in this._groups){
                 var g = this._groups[item]
                 // make sure subgroups exis
@@ -51,18 +63,27 @@ class Groups{
             return this
         }
 
-        this.save = function(){
-            fs.writeFileSync(path.join(this.root, ".groups.json"), JSON.stringify(this._groups, null, 4), {flag: 'w'})
-        }
-
-        this.get =  function(name){
+        this.get =  async function(name){
             if(!name in this._groups){
                 throw new Error("Not found")
             }
             return this._groups[name]
         }
+
+        this.parseAcl = async function (aclData) {
+            var users = new Set()
+            aclData.users.forEach((u)=>{users.add(u)})
+            await aclData.groups.forEach(async (g)=>{
+                try{
+                    var groupObj = await this.get(g)
+                    groupObj._allUsers.forEach((u)=>{users.add(u)})
+                }catch(e){
+                    console.log(chalk.red(`    ✓ (Group (${g}) can not be found .. ignoring`))
+                }
+            })
+            return Array.from(users)
+        }
     }
 }
 
-var g = new Groups(config.filesystem.path)
-module.exports = g
+module.exports = new Groups()
