@@ -40,6 +40,7 @@ async function main(){
     var server = null
     process.on('SIGINT', () => {
         cleanup()
+        dnsserver.close()
         server.close(() => {
             console.log(chalk.red(`✓ ALL Closed `));
         })
