@@ -1,5 +1,7 @@
 const fs = require('fs')
 const p = require('process')
+const chalk = require('chalk');
+
 const config = require("./config");
 
 async function process(){
@@ -11,7 +13,14 @@ async function process(){
 
 
      // //{ "sites": [{ "subject": "example.com", "altnames": ["example.com"] }] }
-
+     try{
+        fs.statSync('greenlock.d/config.json')
+     }catch(e){
+        fs.copyFile('greenlock.d/config.json.bak', 'greenlock.d/config.json', (err) => {
+            if (err) throw err;
+            console.log(chalk.green(`(Let'sEncrypt) copy config.json.bak to config.json`))
+          });
+     }
     var c = {}
     try{
         c = JSON.parse(fs.readFileSync('greenlock.d/config.json'));
