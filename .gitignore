@@ -27,5 +27,4 @@ build
 *.lock
 package-lock.json
 .greenlockrci
-
-greenlock.d/*
+publisher/greenlock.d/config.json*
