@@ -166,7 +166,9 @@
                     const { sendMessageObject } = usechatsActions();
 
                     sendMessageObject(props.selectedid, newMessage);
+
                     messageToReplyTo.value = null;
+                    message.value.value = '';
 
                     return;
                 }

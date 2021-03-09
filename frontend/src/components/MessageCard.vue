@@ -25,11 +25,11 @@
                 }"
             >
                 <div
-                    class="flex rounded-xl mb-1 overflow-hidden pr-4"
+                    class="flex rounded-xl mb-1 overflow-hidden pr-4 border-2"
                     :class="{
                         'bg-gray-200': messageBlock.user === user?.id,
                         'bg-white': messageBlock.user !== user?.id,
-                        'bg-red-200': messageToReplyTo?.id === message?.id,
+                        'border-black': messageToReplyTo?.id === message?.id,
                     }"
                 >
                     <main
@@ -44,9 +44,10 @@
 
                 <div
                     style="margin-top: auto;"
-                    class="actions pb-4 pl-4"
+                    class="actions pb-4 pl-4 flex"
                     :class="{
                         hidden: showActionButtons !== true,
+                        'flex-row-reverse': messageBlock.user === user?.id,
                     }"
                 >
                     <div class="pr-4 text-gray-600 date inline-block text-xs">
@@ -64,27 +65,73 @@
             </div>
 
             <div
-                v-for="reply in message.replies"
-                :key="reply.id"
-                class="flex flex-col"
+                class="flex flex-col mb-4"
+                :class="{
+                    'mr-4 border-r-2 pr-2': messageBlock.user === user?.id,
+                    'ml-4 border-l-2 pl-2': messageBlock.user !== user?.id,
+                }"
+                v-if="message.replies.length > 0"
             >
-                <!-- <div
-                        class="flex justify-start pt-4 pb-2"
-                        :class="{
-                            'w-18 mr-4': showActionButtons,
-                            'w-8 mr-2': !showActionButtons,
-                        }"
-                    >
-                        <AvatarImg :id="reply.from" :showOnlineStatus="false" />
-                    </div> -->
-                <!-- <MessageContent :message="reply"></MessageContent> -->
                 <div
+                    class="text-gray-400"
                     :class="{
-                        'ml-auto': messageBlock.user === user?.id,
+                        'self-end': messageBlock.user === user?.id,
+                        'self-start': messageBlock.user !== user?.id,
+                    }"
+                >
+                    Replies:
+                </div>
+                <div
+                    v-for="reply in message.replies"
+                    :key="reply.id"
+                    class="card flex"
+                    :class="{
+                        'ml-auto flex-row-reverse':
+                            messageBlock.user === user?.id,
                         'mr-auto': messageBlock.user !== user?.id,
                     }"
                 >
-                    {{ reply.body }}
+                    <AvatarImg
+                        :class="{
+                            'ml-4': messageBlock.user === user?.id,
+                            'mr-4': messageBlock.user !== user?.id,
+                        }"
+                        :id="reply.from"
+                        :showOnlineStatus="false"
+                    />
+
+                    <div
+                        class="flex rounded-xl mb-1 overflow-hidden pr-4"
+                        :class="{
+                            'bg-gray-200': reply.from === user?.id,
+                            'bg-white': reply.from !== user?.id,
+                        }"
+                    >
+                        <main
+                            class="flex justify-between pt-2 pl-4 pb-2"
+                            :class="{
+                                'flex-row-reverse':
+                                    messageBlock.user === user?.id,
+                            }"
+                        >
+                            <MessageContent :message="reply"></MessageContent>
+                        </main>
+                    </div>
+
+                    <div
+                        style="margin-top: auto;"
+                        class="actions pb-4 pl-4 flex"
+                        :class="{
+                            hidden: showActionButtons !== true,
+                            'flex-row-reverse': messageBlock.user === user?.id,
+                        }"
+                    >
+                        <div
+                            class="pr-4 text-gray-600 date inline-block text-xs"
+                        >
+                            {{ moment(message.timeStamp).fromNow() }}
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -194,6 +241,7 @@
         visibility: hidden;
     }
 
+    .card:hover > .actions,
     .card:hover > .actions {
         visibility: visible;
     }
