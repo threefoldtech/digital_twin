@@ -15,7 +15,7 @@ function resolveHome(filepath) {
     return filepath;
 }
 
-if(process.env.NODE_ENV == "production"){
+if(process.env.NODE_ENV == "production") {
     config.development = false
 
     var passPhrase = process.env.THREEBOT_PHRASE
@@ -24,9 +24,12 @@ if(process.env.NODE_ENV == "production"){
     }
     config.threebot.passPhrase = passPhrase
 
-}else{
+} else {
     config.development = true
 }
+
+if(process.env.PORT)
+    config.http.port = parseInt(process.env.PORT)
 
 console.log(chalk.green('✓ (Config) loaded'))
 
