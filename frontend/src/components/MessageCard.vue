@@ -32,7 +32,7 @@
                         'border-black': messageToReplyTo?.id === message?.id,
                     }"
                 >
-                    <main
+                    <mainx
                         class="msgcard flex justify-between pt-2 pl-4 pb-2"
                         :class="{
                             'flex-row-reverse': messageBlock.user === user?.id,
@@ -50,10 +50,6 @@
                         'flex-row-reverse': messageBlock.user === user?.id,
                     }"
                 >
-                    <div class="pr-4 text-gray-600 date inline-block text-xs">
-                        {{ moment(message.timeStamp).fromNow() }}
-                        <!-- {{ message }} -->
-                    </div>
                     <span
                         class="reply text-xs pr-4"
                         @click="toggleSendReplyMessage(message)"
@@ -61,6 +57,10 @@
                         <i class="fa fa-reply"></i>
                         <span class="text-gray-600"> Reply</span>
                     </span>
+                    <div class="pr-4 text-gray-600 date inline-block text-xs">
+                        {{ moment(message.timeStamp).fromNow() }}
+                        <!-- {{ message }} -->
+                    </div>
                 </div>
             </div>
 
