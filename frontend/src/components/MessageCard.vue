@@ -32,7 +32,7 @@
                         'border-black': messageToReplyTo?.id === message?.id,
                     }"
                 >
-                    <mainx
+                    <main
                         class="msgcard flex justify-between pt-2 pl-4 pb-2"
                         :class="{
                             'flex-row-reverse': messageBlock.user === user?.id,
