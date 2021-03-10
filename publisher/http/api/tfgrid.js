@@ -252,6 +252,18 @@ router.delete('/nodes/:id', (req, res, next) => {
     .catch(next)
 })
 
+router.post('/nodes/:id/reports', (req, res, next) => {
+  const { params } = req
+  const { id } = params
+
+  // console.log(req.body)
+  clusters.saveReport(id, req.body)
+  res.json({})
+})
+
+
+
+
 //
 // gateway
 //

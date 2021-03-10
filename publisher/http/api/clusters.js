@@ -1,6 +1,7 @@
 const fs = require('fs').promises
 const path = require('path')
 const rootpath = '/tmp/clusters'
+const reports = '/root/reports'
 const httpError = require('http-errors')
 
 async function list (cpath) {
@@ -66,4 +67,24 @@ async function findByName (cpath, name) {
   return values.filter(value => value.name === name)
 }
 
-module.exports = { rootpath, list, get, remove, put, findByName }
+async function saveReport(id, report) {
+  const target = path.resolve(reports, id)
+
+  try {
+    await fs.mkdir(target, {recursive: true})
+  } catch (err) {
+    throw httpError(400, 'could not save report')
+  }
+
+  const file = path.resolve(target, Date.now().toString())
+  console.log("Saving report:", file)
+
+  try {
+    await fs.writeFile(file, JSON.stringify(report))
+  } catch (err) {
+    console.log(`${err}`)
+    throw httpError(400, 'could not write report')
+  }
+}
+
+module.exports = { rootpath, list, get, remove, put, findByName, saveReport }
