@@ -80,8 +80,10 @@ function jsonError (res, msg) {
 router.post('/entities', validateBodyMiddleware('entity-create'), (req, res, next) => {
   const { body } = req
   const { name, country, city } = body
+  const sig = tfclient.signEntityCreation(name, country, city)
+  const target = tfclient.address
 
-  tfclient.createEntity(name, country, city, content => events(content, res, 201))
+  tfclient.createEntity(target, name, country, city, sig, content => events(content, res, 201))
     .catch(next)
 })
 
