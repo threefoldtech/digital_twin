@@ -1,8 +1,11 @@
 const TfgridApiClient = require('tfgrid-api-client')
 
 const url = 'wss://explorer.devnet.grid.tf/ws'
-const mnemo = 'maid major gossip speak thank disagree blame museum slide canvas trash submit'
 const botipv6 = '200:b57d:d1f0:aad3:71f3:bf:232:9c4'
+let mnemo = 'maid major gossip speak thank disagree blame museum slide canvas trash submit'
+
+if(process.env.THREEBOT_MNEMONIC)
+    mnemo = process.env.THREEBOT_MNEMONIC
 
 function getClient (url, mnemonic) {
   const cli = new TfgridApiClient(url, mnemonic)
