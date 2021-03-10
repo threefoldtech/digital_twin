@@ -1,5 +1,7 @@
 <template>
-    <component class="" :is="contentComponent" :message="message" />
+    <suspense>
+        <component class="" :is="contentComponent" :message="message" />
+    </suspense>
 </template>
 
 <script lang="ts">

@@ -47,7 +47,7 @@
             <div class="grid place-items-end flex-grow">
                 <div
                     class="w-20 h-20 grid cursor-pointer items-center justify-center justify-items-center"
-                    @click="showUserConfigDialog = true"
+                    @click="toggleShowUserConfigDialog"
                 >
                     <AvatarImg :id="user.id" />
                     <!--<h3 class="truncate w-full text-sm">{{ user.id }}</h3>-->
@@ -99,6 +99,14 @@
 
             const { user } = useAuthState();
 
+            const toggleShowUserConfigDialog = () => {
+                console.log("Showing user config dialog: ", showUserConfigDialog.value)
+                showUserConfigDialog.value = !showUserConfigDialog.value;
+
+                console.log("Showing user config dialog: ", showUserConfigDialog.value)
+
+            }
+
             return {
                 currentRoute,
                 apps,
@@ -106,6 +114,7 @@
                 user,
                 showUserConfigDialog,
                 router,
+                toggleShowUserConfigDialog,
             };
         },
     });

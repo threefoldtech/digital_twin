@@ -1,4 +1,7 @@
 <template>
+    <suspense>
+        <UserConfigDialog></UserConfigDialog>
+    </suspense>
     <div class="bg-gray-100 h-full overflow-hidden relative">
         <div class="pl-0 relative h-full w-full maingrid md:bigmaingrid">
             <div class="top h-20 md:hidden">
@@ -32,11 +35,12 @@
 <script lang="ts">
     import { defineComponent } from 'vue';
     import Sidebar from '@/components/Sidebar.vue';
+    import UserConfigDialog from '@/components/UserConfigDialog.vue';
     import Topbar from '@/components/Topbar.vue';
 
     export default defineComponent({
         name: 'AppLayout',
-        components: { Sidebar, Topbar },
+        components: { Sidebar, Topbar, UserConfigDialog },
         setup({}, ctx) {
             const addUser = () => {
                 ctx.emit('addUser');

@@ -19,13 +19,13 @@
         <div v-for="message in messageBlock.messages" :key="message">
             <div
                 style="position: relative;"
-                class="card flex flex-row"
+                class="card flex flex-row flex-wrap"
                 :class="{
                     'flex-row-reverse': messageBlock.user === user?.id,
                 }"
             >
                 <div
-                    class="flex rounded-xl mb-1 overflow-hidden pr-4 border-2"
+                    class="flex rounded-xl mb-1 pr-4 border-2"
                     :class="{
                         'bg-gray-200': messageBlock.user === user?.id,
                         'bg-white': messageBlock.user !== user?.id,
@@ -108,7 +108,7 @@
                         }"
                     >
                         <main
-                            class="flex justify-between pt-2 pl-4 pb-2"
+                            class="replymsg flex justify-between pt-2 pl-4 pb-2"
                             :class="{
                                 'flex-row-reverse':
                                     messageBlock.user === user?.id,
@@ -226,7 +226,7 @@
         },
     });
 </script>
-<style lang="css">
+<style lang="css" scoped>
     .text-message * {
         word-wrap: break-word;
         max-width: 100%;
@@ -249,5 +249,10 @@
     .reply:hover {
         text-decoration: underline;
         cursor: pointer;
+    }
+
+    .msgcard, .replymsg {
+        max-width: 500px;
+        word-break: break-word;
     }
 </style>

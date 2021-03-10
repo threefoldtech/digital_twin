@@ -11,13 +11,16 @@
         @paste="onPaste"
     >
         <div
-            class="btns md:col-span-4 col-span-full md:grid grid-cols-4 md:bg-transparent bg-gray-200"
+            class="md:col-span-4 col-span-full md:grid grid-cols-4 md:bg-transparent"
             :class="{ hidden: collapsed, grid: !collapsed }"
         >
-            <button @click="toggleGif"><h2>GIF</h2></button>
-            <button class="px-2 md:py-8 py-2" @click.stop="selectFile">
+            <button class="action-btn" @click="toggleGif"><h2>GIF</h2></button>
+            <button
+                class="action-btn px-2 md:py-8 py-2"
+                @click.stop="selectFile"
+            >
                 <i
-                    class="fas fa-paperclip text-gray-500 transform"
+                    class="fas fa-paperclip  transform"
                     style="--tw-rotate: -225deg"
                 ></i>
             </button>
@@ -29,14 +32,14 @@
                 @change="changeFile"
             />
             <button
-                class="px-2 md:py-8 py-2"
+                class="action-btn px-2 md:py-8 py-2"
                 @click.stop="startRecording"
                 v-if="!stopRecording"
             >
-                <i class="fas fa-microphone text-gray-500"></i>
+                <i class="fas fa-microphone "></i>
             </button>
             <button
-                class="px-2 md:py-8 py-2"
+                class="action-btn px-2 md:py-8 py-2"
                 @click.stop="stopRecording"
                 v-else
             >
@@ -48,7 +51,7 @@
                 style="position: absolute; bottom: 140px; z-index: 10000"
             ></emoji-picker>
             <button
-                class="px-2 md:py-8 py-2"
+                class="action-btn px-2 md:py-8 py-2"
                 @click.stop="toggleEmoji"
                 v-if="!file"
             >
@@ -57,20 +60,23 @@
         </div>
         <div class="input md:col-span-8 col-span-full grid grid-cols-12">
             <button
-                class="col-span-2 md:hidden"
+                class="action-btn col-span-2 md:hidden"
                 @click="collapsed = !collapsed"
                 :key="collapsed.toString()"
             >
-                <i v-if="collapsed" class="fas fa-chevron-up text-gray-500"></i>
-                <i v-else class="fas fa-chevron-down text-gray-500"></i>
+                <i v-if="collapsed" class="fas fa-chevron-up "></i>
+                <i v-else class="fas fa-chevron-down "></i>
             </button>
             <div
                 class="file-message md:col-span-10 col-span-8 w-full h-full pl-4 bg-blue-100"
                 v-if="file"
             >
                 <span> {{ file.name }}</span>
-                <button class="px-2 md:py-8 py-2" @click.stop="removeFile">
-                    <i class="fas fa-minus-circle text-gray-500"></i>
+                <button
+                    class="action-btn px-2 md:py-8 py-2"
+                    @click.stop="removeFile"
+                >
+                    <i class="fas fa-minus-circle "></i>
                 </button>
             </div>
             <form
@@ -79,8 +85,20 @@
             >
                 <input class="h-full" type="text" ref="message" v-focus />
             </form>
-            <button class="col-span-2" @click="chatsend">
+            <button class="action-btn col-span-1" @click="chatsend">
                 <i class="fas fa-paper-plane"></i>
+            </button>
+
+            <button
+                v-if="showSideBar"
+                class="action-btn col-span-1 hidden md:block"
+                @click="toggleSideBar"
+            >
+                <i class="fas fa-chevron-right"></i>
+            </button>
+
+            <button v-else class="action-btn col-span-1 hidden md:block" @click="toggleSideBar">
+                <i class="fas fa-chevron-left"></i>
             </button>
         </div>
     </div>
@@ -121,6 +139,8 @@
     import { useAuthState } from '@/store/authStore';
     import { Message, StringMessageType } from '@/types';
     import { uuidv4 } from '@/common';
+    import { useScrollActions } from '@/store/scrollStore';
+    import { showSideBar } from '@/services/sidebarService';
 
     export default {
         name: 'ChatInput',
@@ -141,12 +161,19 @@
             const stopRecording = ref(null);
             const showEmoji = ref(false);
 
+            const toggleSideBar = () => {
+                console.log('Toggling: ', showSideBar.value);
+                showSideBar.value = !showSideBar.value;
+            };
+
             watch(messageToReplyTo, () => {
                 if (messageToReplyTo.value) {
                     console.log('Selecting chat ...');
                     message.value.focus();
                 }
             });
+
+            const { addScrollEvent } = useScrollActions();
 
             const chatsend = async e => {
                 if (messageToReplyTo.value) {
@@ -169,6 +196,8 @@
 
                     messageToReplyTo.value = null;
                     message.value.value = '';
+
+                    addScrollEvent();
 
                     return;
                 }
@@ -243,6 +272,7 @@
                 const { sendMessage } = usechatsActions();
                 sendMessage(props.selectedid, gif, 'GIF');
                 emit('messageSend');
+                addScrollEvent();
             };
             const hideGif = async gif => {
                 showGif.value = false;
@@ -297,7 +327,15 @@
                 hideGif,
                 collapsed,
                 onPaste,
+                showSideBar,
+                toggleSideBar,
             };
         },
     };
 </script>
+
+<style scoped>
+    .action-btn:hover {
+        color: rgb(68, 166, 135);
+    }
+</style>

@@ -79,9 +79,13 @@
 
         <template v-slot:default>
             <div
-                class="grid grid-cols-1 md:singleGrid relative h-full w-full"
+                class="grid grid-cols-1  relative h-full w-full"
                 v-if="chat"
                 :key="chat.id + selectedId"
+                :class="{
+                    'md:singleGrid': showSideBar,
+                    'md:twoGrid': !showSideBar,
+                }"
             >
                 <div
                     class="hidden md:block relative h-full flex-col overflow-y-auto"
@@ -130,9 +134,9 @@
                     >
                         <div>
                             <b>Replying: </b>
-                            <div>
-                                {{ messageToReplyTo.from }}
-                                {{ messageToReplyTo.body }}
+                            <div class="replymsg">
+                                <span>{{ messageToReplyTo.from }}</span>
+                                <p>{{ messageToReplyTo.body }}</p>
                             </div>
                         </div>
 
@@ -167,7 +171,11 @@
                     </jdialog>
                 </div>
                 <aside
-                    class="hidden md:flex relative h-full flex-col overflow-y-auto"
+                    class="hidden relative h-full flex-col overflow-y-auto"
+                    :class="{
+                        'md:flex': showSideBar,
+                        'md:hidden': !showSideBar,
+                    }"
                 >
                     <div class="absolute max-w-full w-full p-4 pt-8">
                         <div
@@ -244,6 +252,7 @@
     import { useIntersectionObserver } from '@/lib/intersectionObserver';
     import { useRoute, useRouter } from 'vue-router';
     import { messageToReplyTo } from '@/services/replyService';
+    import { showSideBar } from '@/services/sidebarService';
 
     export default defineComponent({
         name: 'ChatView',
@@ -317,6 +326,10 @@
                 }
 
                 nextTick(() => {
+                    if (!messageBox.value) {
+                        return;
+                    }
+
                     messageBox.value.scrollTo(0, messageBox.value.scrollHeight);
                 });
             };
@@ -485,6 +498,7 @@
                 showDialog,
                 showMenu,
                 messageToReplyTo,
+                showSideBar,
                 ...propRefs,
             };
         },
@@ -499,8 +513,17 @@
     @layer utilities {
         @variants responsive {
             .singleGrid {
-                grid-template-columns: 400px 2fr 1fr;
+                grid-template-columns: 400px 1fr 400px;
+            }
+
+            .twoGrid {
+                grid-template-columns: 400px 1fr;
             }
         }
+    }
+
+    .replymsg {
+        max-width: 750px;
+        word-break: break-word;
     }
 </style>

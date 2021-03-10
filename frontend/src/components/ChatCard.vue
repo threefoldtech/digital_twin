@@ -1,5 +1,11 @@
 <template>
-    <div class="chatcard relative grid grid-cols-12 mb-2 py-2 bg-gray-100">
+    <div
+        class="chatcard relative grid grid-cols-12 mb-2 py-2"
+        :class="{
+            'bg-gray-50': !router.currentRoute?.value.path.includes(chat.name),
+            'bg-gray-200': router.currentRoute?.value.path.includes(chat.name),
+        }"
+    >
         <!-- <div
       v-if="newMessages >= 1"
       class="h-5 w-5 bg-accent rounded-full absolute -top-2 -right-2 transition-all z-10 grid place-items-center text-xs text-white"
@@ -36,6 +42,7 @@
     import moment from 'moment';
     import { statusList } from '@/store/statusStore';
     import AvatarImg from '@/components/AvatarImg.vue';
+    import { useRouter } from 'vue-router';
 
     export default defineComponent({
         name: 'ChatCard',
@@ -43,7 +50,7 @@
         props: {
             chat: Object,
         },
-        setup(props) {
+        async setup(props) {
             const { user } = useAuthState();
 
             const lastReadByMe = computed(() => {
@@ -72,6 +79,9 @@
                 return statusList[props.chat.chatId];
             });
 
+            const router = useRouter();
+            const currentRoute = computed(() => router.currentRoute.value);
+
             const lastMessageBody = computed(() => {
                 const lstmsg = lastMessage.value;
                 switch (lstmsg.type) {
@@ -99,7 +109,16 @@
                 lastMessage,
                 lastMessageBody,
                 timeAgo,
+                router,
+                user,
+                currentRoute,
             };
         },
     });
 </script>
+
+<style scoped>
+    .chatcard:hover {
+        background-color: lightgray;
+    }
+</style>

@@ -164,5 +164,6 @@
     .block:hover,
     .delete:hover {
         border: 2px solid black;
+        cursor: pointer;
     }
 </style>
