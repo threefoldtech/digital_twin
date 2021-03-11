@@ -4,8 +4,9 @@ const url = 'wss://explorer.devnet.grid.tf/ws'
 const botipv6 = '200:b57d:d1f0:aad3:71f3:bf:232:9c4'
 let mnemo = 'maid major gossip speak thank disagree blame museum slide canvas trash submit'
 
-if(process.env.THREEBOT_MNEMONIC)
-    mnemo = process.env.THREEBOT_MNEMONIC
+if (process.env.THREEBOT_MNEMONIC) {
+  mnemo = process.env.THREEBOT_MNEMONIC
+}
 
 function getClient (url, mnemonic) {
   const cli = new TfgridApiClient(url, mnemonic)
@@ -77,10 +78,10 @@ function jsonError (res, msg) {
 //
 // entities
 //
-router.post('/entities', validateBodyMiddleware('entity-create'), (req, res, next) => {
+router.post('/entities', validateBodyMiddleware('entity-create'), async (req, res, next) => {
   const { body } = req
   const { name, country, city } = body
-  const sig = tfclient.signEntityCreation(name, country, city)
+  const sig = await tfclient.signEntityCreation(name, country, city)
   const target = tfclient.address
 
   tfclient.createEntity(target, name, country, city, sig, content => events(content, res, 201))
@@ -266,9 +267,6 @@ router.post('/nodes/:id/reports', (req, res, next) => {
   res.json({})
 })
 
-
-
-
 //
 // gateway
 //
@@ -326,16 +324,17 @@ router.get('/debug/cluster/:name', (req, res, next) => {
 // node configuration
 //
 
-router.post('/debug/config', function(req, res) {
-    let config = {
-        type: "macvlan",
-        ipv4: "1.2.3.4",
-        ipv6: "::1",
-        gw4: "1.2.3.4",
-        gw6: "::1",
-    };
+router.post('/debug/config', function (req, res) {
+  const config = {
+    type: 'macvlan',
+    ipv4: '1.2.3.4',
+    ipv6: '::1',
+    gw4: '1.2.3.4',
+    gw6: '::1'
+  }
 
-    // node /api/v1/network/config/public
+  res.json(config)
+  // node /api/v1/network/config/public
 })
 
 //
@@ -410,6 +409,13 @@ function events (content, res, okcode) {
 
   const { events = [], status } = content
   console.log(`Current status is ${status.type}`)
+
+  if (status.type === 'Invalid') {
+    res.status(400).send({
+      success: false,
+      message: 'the transaction is evaluated as invalid'
+    })
+  }
   let code = okcode
 
   let result = null
@@ -420,8 +426,6 @@ function events (content, res, okcode) {
     // Loop through Vec<EventRecord> to display all events
     events.forEach(({ phase, event: { data, method, section } }) => {
       console.log(`>> ${phase}: ${section}.${method}:: ${data}`)
-
-      console.log(data)
 
       // skip if result is already set
       if (result) return
