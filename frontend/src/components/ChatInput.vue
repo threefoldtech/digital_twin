@@ -45,11 +45,19 @@
             >
                 <i class="fas fa-circle text-red-600"></i>
             </button>
-            <emoji-picker
+            <!-- <emoji-picker
                 ref="emojipicker"
                 :class="{ hidden: !showEmoji }"
                 style="position: absolute; bottom: 140px; z-index: 10000"
-            ></emoji-picker>
+            ></emoji-picker> -->
+
+            <unicode-emoji-picker
+                ref="emojipicker"
+                :class="{ hidden: !showEmoji }"
+                style="position: absolute; bottom: 140px; z-index: 10000"
+            >
+            </unicode-emoji-picker>
+
             <button
                 class="action-btn px-2 md:py-8 py-2"
                 @click.stop="toggleEmoji"
@@ -97,7 +105,11 @@
                 <i class="fas fa-chevron-right"></i>
             </button>
 
-            <button v-else class="action-btn col-span-1 hidden md:block" @click="toggleSideBar">
+            <button
+                v-else
+                class="action-btn col-span-1 hidden md:block"
+                @click="toggleSideBar"
+            >
                 <i class="fas fa-chevron-left"></i>
             </button>
         </div>
@@ -141,10 +153,11 @@
     import { uuidv4 } from '@/common';
     import { useScrollActions } from '@/store/scrollStore';
     import { showSideBar } from '@/services/sidebarService';
+    import { EmojiPickerElement } from 'unicode-emoji-picker';
 
     export default {
         name: 'ChatInput',
-        components: { GifSelector },
+        components: { GifSelector, EmojiPickerElement },
         emits: ['messageSend'],
         props: {
             selectedid: {},
@@ -198,7 +211,6 @@
                     message.value.value = '';
 
                     addScrollEvent();
-
                     return;
                 }
 
@@ -211,6 +223,8 @@
                     removeFile();
                 }
                 emit('messageSend');
+
+                showEmoji.value = false;
             };
 
             const selectFile = () => {
@@ -279,8 +293,18 @@
             };
 
             nextTick(() => {
-                emojipicker.value.addEventListener('emoji-click', event => {
-                    message.value.value = `${message.value.value}${event.detail.unicode}`;
+                // console.log('Registering event listener: ', emojipicker.value);
+                // emojipicker.value.addEventListener('emoji-click', (event) => {
+                //     console.log('Clicked an emoji: ', event);
+                //     // message.value.value = `${message.value.value}${event.detail.unicode}`;
+                // });
+                const emojiPicker = document.querySelector(
+                    'unicode-emoji-picker'
+                );
+                emojiPicker.addEventListener('emoji-pick', event => {
+                    // console.log(event.detail.emoji);
+                    message.value.value = `${message.value.value}${event.detail.emoji}`;
+                    message.value.focus();
                 });
             });
             const onPaste = (e: ClipboardEvent) => {

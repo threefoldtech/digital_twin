@@ -118,7 +118,7 @@
     export default defineComponent({
         name: 'UserConfigDialog',
         components: { AvatarImg, jdialog: Dialog },
-        async setup(_, ctx) {
+        async setup({}, ctx) {
             const { user } = useAuthState();
             const myStatus = await getMyStatus();
             const showEdit = ref(false);
