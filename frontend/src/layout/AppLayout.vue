@@ -33,60 +33,66 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent } from 'vue';
-    import Sidebar from '@/components/Sidebar.vue';
-    import UserConfigDialog from '@/components/UserConfigDialog.vue';
-    import Topbar from '@/components/Topbar.vue';
+import { defineComponent, watch } from 'vue';
+import Sidebar from '@/components/Sidebar.vue';
+import UserConfigDialog from '@/components/UserConfigDialog.vue';
+import Topbar from '@/components/Topbar.vue';
+import { useSocketState } from '../store/socketStore';
 
-    export default defineComponent({
-        name: 'AppLayout',
-        components: { Sidebar, Topbar, UserConfigDialog },
-        setup({}, ctx) {
-            const addUser = () => {
-                ctx.emit('addUser');
-            };
+export default defineComponent({
+    name: 'AppLayout',
+    components: { Sidebar, Topbar, UserConfigDialog },
+    setup({}, ctx) {
+        const addUser = () => {
+            ctx.emit('addUser');
+        };
 
-            return {
-                addUser,
-            };
-        },
-    });
+        const { notification } = useSocketState();
+        watch(notification, ((newNot:any, oldNot:any) => {
+            new Audio(`/${newNot.sound}`).play()
+        }));
+
+        return {
+            addUser,
+        };
+    },
+});
 </script>
 
 <style scoped>
-    @tailwind base;
-    @tailwind components;
-    @tailwind utilities;
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-    @layer utilities {
-        @variants responsive {
-            .bigmaingrid {
-                display: grid;
-                grid-template-areas:
-                    'top top'
-                    'side content'
-                    'side content';
-                grid-template-columns: 100px 1fr;
-                grid-template-rows: auto 1fr;
-            }
+@layer utilities {
+    @variants responsive {
+        .bigmaingrid {
+            display: grid;
+            grid-template-areas:
+                'top top'
+                'side content'
+                'side content';
+            grid-template-columns: 100px 1fr;
+            grid-template-rows: auto 1fr;
         }
     }
+}
 
-    .maingrid {
-        display: grid;
-        grid-template-areas:
-            'top'
-            'content'
-            'content';
-        grid-template-rows: auto 1fr;
-    }
-    .top {
-        grid-area: top;
-    }
-    .side {
-        grid-area: side;
-    }
-    .content {
-        grid-area: content;
-    }
+.maingrid {
+    display: grid;
+    grid-template-areas:
+        'top'
+        'content'
+        'content';
+    grid-template-rows: auto 1fr;
+}
+.top {
+    grid-area: top;
+}
+.side {
+    grid-area: side;
+}
+.content {
+    grid-area: content;
+}
 </style>

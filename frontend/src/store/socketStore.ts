@@ -1,6 +1,6 @@
 import { DtId, Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
-import { inject } from 'vue';
+import { inject, toRefs } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
 import { useContactsActions, useContactsState } from './contactStore';
 import { useAuthState } from '@/store/authStore';
@@ -8,7 +8,18 @@ import { addUserToBlockList } from '@/store/blockStore';
 
 const state = reactive<State>({
     socket: '',
+    notification: {
+        id:'',
+        sound: ''
+    },
 });
+
+const notify = ({id, sound = 'beep.mp3'}) => {
+    state.notification = {
+        id,
+        sound
+    }
+}
 
 const initializeSocket = (username: string) => {
     state.socket = inject('socket');
@@ -27,10 +38,13 @@ const initializeSocket = (username: string) => {
         addUserToBlockList(chatId);
     });
     state.socket.on('message', message => {
+        // TODO show desktop notification
         if (message.type === 'READ') {
             handleRead(message);
-
             return;
+        }
+        if (message.type !== 'SYSTEM' || message.type !== 'EDIT' || message.type !== 'DELETE') {
+            notify({id: message.id});
         }
         const { addMessage } = usechatsActions();
 
@@ -94,9 +108,17 @@ export const useSocketActions = () => {
         initializeSocket,
         sendSocketMessage,
         sendSocketUserStatus,
+        notify,
+    };
+};
+
+export const useSocketState = () => {
+    return {
+        ...toRefs(state)
     };
 };
 
 interface State {
     socket: any;
+    notification: object
 }
