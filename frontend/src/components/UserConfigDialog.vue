@@ -72,7 +72,7 @@
                 <h2>Blocked Users</h2>
                 <ul class="max-h-28 overflow-y-auto">
                     <template v-for="blockedUser in blockedUsers">
-                        <li>
+                        <li :key="blockedUser">
                             {{ blockedUser }}
                             <button
                                 class="px-4 py-2 text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:border-blue-700 active:bg-blue-700 ease-in-out duration-150 cursor-pointer uppercase"
@@ -118,7 +118,7 @@
     export default defineComponent({
         name: 'UserConfigDialog',
         components: { AvatarImg, jdialog: Dialog },
-        async setup(ctx) {
+        async setup(_, ctx) {
             const { user } = useAuthState();
             const myStatus = await getMyStatus();
             const showEdit = ref(false);
