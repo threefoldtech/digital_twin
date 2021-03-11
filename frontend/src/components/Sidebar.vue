@@ -8,7 +8,7 @@
                     @click="changePage('chat')"
                 >
                     <img
-                        src="../../public/logo.png"
+                        src="../../public/TF-small.svg"
                         width="50"
                         alt="Threefold logo"
                     />
