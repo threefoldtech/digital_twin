@@ -31,9 +31,11 @@
             >
                 <ChatCard
                     v-for="chat in filteredChats"
-                    :key="`${chat.chatId}-${chat.messages.length}-${
-                        chat.read[user.id]
-                    }`"
+                    :key="
+                        `${chat.chatId}-${chat.messages.length}-${
+                            chat.read[user.id]
+                        }`
+                    "
                     class="grid grid-cols-12 rounded-lg mb-2 py-2 cursor-pointer"
                     @click="setSelected(chat.chatId)"
                     :chat="chat"
@@ -68,108 +70,112 @@
 </template>
 
 <script lang="ts">
-import moment from 'moment';
-import { useSocketActions } from '@/store/socketStore';
-import { defineComponent, ref, computed, onBeforeMount, watch } from 'vue';
-import { usechatsState, usechatsActions } from '@/store/chatStore';
-import { useAuthState, useAuthActions } from '@/store/authStore';
-import addContact from '@/components/ContactAdd.vue';
-import AvatarImg from '@/components/AvatarImg.vue';
-import ChatRequestList from '@/components/ChatRequestList.vue';
-import Dialog from '@/components/Dialog.vue';
-// import contactpopup from "@/components/ContactPopup.vue";
-import ChatCard from '@/components/ChatCard.vue';
-import { startFetchStatusLoop } from '@/store/statusStore';
-import { statusList } from '@/store/statusStore';
-import { uniqBy } from 'lodash';
-import { useRouter } from 'vue-router';
-import { mode } from 'crypto-js';
-import { showAddUserDialog } from '@/services/dialogService';
-export default defineComponent({
-    name: 'Apps',
-    props: {
-        modelValue: {
-            type: Boolean,
-            default: false,
+    import moment from 'moment';
+    import { useSocketActions } from '@/store/socketStore';
+    import { defineComponent, ref, computed, onBeforeMount, inject } from 'vue';
+    import { usechatsState, usechatsActions } from '@/store/chatStore';
+    import { useAuthState, useAuthActions } from '@/store/authStore';
+    import addContact from '@/components/ContactAdd.vue';
+    import AvatarImg from '@/components/AvatarImg.vue';
+    import ChatRequestList from '@/components/ChatRequestList.vue';
+    import Dialog from '@/components/Dialog.vue';
+    import ChatCard from '@/components/ChatCard.vue';
+    import { startFetchStatusLoop } from '@/store/statusStore';
+    import { statusList } from '@/store/statusStore';
+    import { uniqBy } from 'lodash';
+    import { useRouter } from 'vue-router';
+    import { showAddUserDialog } from '@/services/dialogService';
+
+    export default defineComponent({
+        name: 'Apps',
+        props: {
+            modelValue: {
+                type: Boolean,
+                default: false,
+            },
         },
-    },
-    components: {
-        addContact,
-        jdialog: Dialog,
-        ChatCard,
-        AvatarImg,
-        ChatRequestList,
-    },
-    setup(props, context) {
-        const { chats, chatRequests } = usechatsState();
-        const { retrievechats } = usechatsActions();
-        let selectedId = ref('');
-        const status = computed(() => {
-            return statusList[selectedId.value];
-        });
-        const { initializeSocket } = useSocketActions();
-        const { user } = useAuthState();
+        components: {
+            addContact,
+            jdialog: Dialog,
+            ChatCard,
+            AvatarImg,
+            ChatRequestList,
+        },
+        emits: ['closeDialog'],
+        setup(props, context) {
+            const { chats, chatRequests } = usechatsState();
+            const { retrievechats } = usechatsActions();
 
-        const m = val => moment(val);
-        const searchValue = ref('');
-        let showContacts = ref(false);
+            let selectedId = ref('');
 
-        const router = useRouter();
+            const status = computed(() => {
+                return statusList[selectedId.value];
+            });
 
-        const setSelected = id => {
-            router.push({ name: 'single', params: { id } });
-        };
+            const { user } = useAuthState();
 
-        const filteredChats = computed(() => {
-            if (searchValue.value == '') {
-                return chats.value;
-            }
-            console.log('filtered', chats.value);
-            return chats.value.filter(c =>
-                c.name.toLowerCase().includes(searchValue.value.toLowerCase())
-            );
-        });
-        onBeforeMount(() => {
-            initializeSocket(user.id.toString());
-        });
-        onBeforeMount(retrievechats);
+            const m = val => moment(val);
+            const searchValue = ref('');
+            let showContacts = ref(false);
 
-        const selectedChat = computed(() =>
-            chats.value.find(chat => chat.chatId == selectedId.value)
-        );
+            const router = useRouter();
 
-        startFetchStatusLoop(user);
+            const setSelected = id => {
+                router.push({ name: 'single', params: { id } });
+            };
 
-        const filteredChatRequests = computed(() => {
-            const filteredChats = chatRequests.value.filter(
-                cr => !chats.value.find(c => c.chatId === cr.chatId)
+            const filteredChats = computed(() => {
+                if (searchValue.value == '') {
+                    return chats.value;
+                }
+                console.log('filtered', chats.value);
+                return chats.value.filter(c =>
+                    c.name
+                        .toLowerCase()
+                        .includes(searchValue.value.toLowerCase())
+                );
+            });
+            onBeforeMount(() => {
+                const { initializeSocket } = useSocketActions();
+                initializeSocket(user.id.toString());
+                retrievechats();
+            });
+
+            const selectedChat = computed(() =>
+                chats.value.find(chat => chat.chatId == selectedId.value)
             );
 
-            //@ts-ignore
-            return uniqBy(filteredChats, c => c.chatId);
-        });
+            startFetchStatusLoop(user);
 
-        const sendUpdate = newVal => {
-            console.log('update it');
-            // context.emit('update:modelValue', newVal);
-            showAddUserDialog.value = newVal;
-        };
+            const filteredChatRequests = computed(() => {
+                const filteredChats = chatRequests.value.filter(
+                    cr => !chats.value.find(c => c.chatId === cr.chatId)
+                );
 
-        return {
-            status,
-            selectedId,
-            selectedChat,
-            setSelected,
-            chats,
-            filteredChatRequests,
-            searchValue,
-            filteredChats,
-            showContacts,
-            user,
-            m,
-            sendUpdate,
-            showAddUserDialog,
-        };
-    },
-});
+                //@ts-ignore
+                return uniqBy(filteredChats, c => c.chatId);
+            });
+
+            const sendUpdate = newVal => {
+                console.log('update it');
+                showAddUserDialog.value = newVal;
+            };
+
+            return {
+                status,
+                selectedId,
+                selectedChat,
+                setSelected,
+                chats,
+                filteredChatRequests,
+                searchValue,
+                filteredChats,
+                showContacts,
+                user,
+                m,
+                sendUpdate,
+                showAddUserDialog,
+            };
+        },
+    });
 </script>

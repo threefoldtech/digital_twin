@@ -73,7 +73,7 @@
                 default: '',
             },
         },
-
+        emits: ['update:modelValue', 'clicked'],
         setup(props, { emit }) {
             const showOptions = ref(false);
             const chosenOption = ref('');

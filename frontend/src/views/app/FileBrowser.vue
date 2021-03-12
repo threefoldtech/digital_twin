@@ -24,7 +24,7 @@
 
 <script lang="ts">
     import appLayout from '../../layout/AppLayout.vue';
-    import { defineComponent, ref, computed, onBeforeMount } from 'vue';
+    import { defineComponent, computed } from 'vue';
     import { useAuthState } from '../../store/authStore';
 
     export default defineComponent({

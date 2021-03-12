@@ -50,7 +50,7 @@
         props: {
             chat: Object,
         },
-        async setup(props) {
+        setup(props) {
             const { user } = useAuthState();
 
             const lastReadByMe = computed(() => {

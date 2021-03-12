@@ -114,6 +114,7 @@
         props: {
             groupChat: { required: true },
         },
+        emits: ['app-call', 'app-block', 'app-delete'],
         components: { AvatarImg },
         setup(props) {
             const { contacts } = useContactsState();

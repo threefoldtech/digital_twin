@@ -32,6 +32,7 @@
 
     export default {
         name: 'GifSelector',
+        emits: ['close'],
         setup(props) {
             const gifs = ref([]);
             const searchTerm = ref('');

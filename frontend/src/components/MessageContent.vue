@@ -1,6 +1,6 @@
 <template>
     <suspense>
-        <component class="" :is="contentComponent" :message="message" />
+        <component :is="contentComponent" :message="message" />
     </suspense>
 </template>
 

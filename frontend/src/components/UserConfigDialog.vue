@@ -86,14 +86,14 @@
                         </li>
                     </template>
 
-                    <li v-if="blockedUsers.length === 0 && blockedUsersLoading">
+                    <!-- <li v-if="blockedUsers.length === 0 && blockedUsersLoading">
                         ...
                     </li>
                     <li
                         v-if="blockedUsers.length === 0 && !blockedUsersLoading"
                     >
                         No blocked users
-                    </li>
+                    </li> -->
                 </ul>
             </div>
         </div>
@@ -101,7 +101,13 @@
 </template>
 
 <script lang="ts">
-    import { computed, defineComponent, onBeforeMount, ref } from 'vue';
+    import {
+        computed,
+        defineComponent,
+        onBeforeMount,
+        onMounted,
+        ref,
+    } from 'vue';
     import { useAuthState, getMyStatus } from '../store/authStore';
     import { useSocketActions } from '../store/socketStore';
     import Dialog from '@/components/Dialog.vue';
@@ -121,9 +127,12 @@
     export default defineComponent({
         name: 'UserConfigDialog',
         components: { AvatarImg, jdialog: Dialog },
+        emits: ['addUser'],
+        created: () => {
+            initBlocklist();
+        },
         async setup({}, ctx) {
             const { user } = useAuthState();
-            const myStatus = await getMyStatus();
             const showEdit = ref(false);
             const showEditPic = ref(false);
             const fileinput = ref();
@@ -132,6 +141,8 @@
             const isEditingStatus = ref(false);
             const router = useRouter();
             const route = useRoute();
+            const myStatus = await getMyStatus();
+
             const backOrMenu = () => {
                 if (route.meta && route.meta.back) {
                     router.push({ name: <any>route.meta.back });
@@ -173,10 +184,6 @@
                 return getBlockList();
             });
             // @todo: config
-
-            onBeforeMount(() => {
-                initBlocklist();
-            });
 
             const unblockUser = async user => {
                 await deleteBlockedEntry(user);

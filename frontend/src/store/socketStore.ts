@@ -1,28 +1,29 @@
-import { DtId, Id, Message } from '@/types';
+import { Id, Message } from '@/types';
 import { reactive } from '@vue/reactivity';
-import { inject, toRefs } from 'vue';
+import { toRefs, inject } from 'vue';
 import { handleRead, removeChat, usechatsActions } from './chatStore';
-import { useContactsActions, useContactsState } from './contactStore';
+import { useContactsState } from './contactStore';
 import { useAuthState } from '@/store/authStore';
 import { addUserToBlockList } from '@/store/blockStore';
 
 const state = reactive<State>({
     socket: '',
     notification: {
-        id:'',
-        sound: ''
+        id: '',
+        sound: '',
     },
 });
 
-const notify = ({id, sound = 'beep.mp3'}) => {
+const notify = ({ id, sound = 'beep.mp3' }) => {
     state.notification = {
         id,
-        sound
-    }
-}
+        sound,
+    };
+};
 
 const initializeSocket = (username: string) => {
     state.socket = inject('socket');
+
     state.socket.on('connect', () => {
         console.log('connected');
     });
@@ -43,8 +44,12 @@ const initializeSocket = (username: string) => {
             handleRead(message);
             return;
         }
-        if (message.type !== 'SYSTEM' || message.type !== 'EDIT' || message.type !== 'DELETE') {
-            notify({id: message.id});
+        if (
+            message.type !== 'SYSTEM' ||
+            message.type !== 'EDIT' ||
+            message.type !== 'DELETE'
+        ) {
+            notify({ id: message.id });
         }
         const { addMessage } = usechatsActions();
 
@@ -75,7 +80,6 @@ const sendSocketMessage = async (
     message: Message<any>,
     isUpdate = false
 ) => {
-    // console.log("sending ", message);
     const data = {
         chatId,
         message,
@@ -114,11 +118,11 @@ export const useSocketActions = () => {
 
 export const useSocketState = () => {
     return {
-        ...toRefs(state)
+        ...toRefs(state),
     };
 };
 
 interface State {
     socket: any;
-    notification: object
+    notification: object;
 }

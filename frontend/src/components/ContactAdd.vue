@@ -142,6 +142,7 @@
     export default defineComponent({
         name: 'ContactAdd',
         components: { AvatarImg, autoComplete },
+        emits: ['closeDialog'],
         setup(props, { emit }) {
             const { contacts } = useContactsState();
             let addGroup = ref(false);

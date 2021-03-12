@@ -54,11 +54,7 @@
                 </slot>
             </div>
 
-            <slot name="actions">
-                <button class="text-lg text-white md:hidden" @click="addUser">
-                    <i class="fas fa-plus"></i>
-                </button>
-            </slot>
+            <slot name="actions"></slot>
         </div>
     </div>
 </template>
@@ -82,6 +78,7 @@
     export default defineComponent({
         name: 'Topbar',
         components: { AvatarImg, jdialog: Dialog },
+        emits: ['addUser'],
         setup({}, ctx) {
             const { user } = useAuthState();
             const showEdit = ref(false);
@@ -94,7 +91,7 @@
             const route = useRoute();
             const backOrMenu = () => {
                 if (route.meta && route.meta.back) {
-                    router.push({ name: <any>(route.meta.back) });
+                    router.push({ name: <any>route.meta.back });
                     return;
                 }
 

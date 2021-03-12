@@ -6,10 +6,7 @@
 
 <script lang="ts">
     import { defineComponent } from 'vue';
-    import { showAddUserDialog } from '@/services/dialogService';
-
     console.log(`commit hash: ${process.env.VUE_APP_GIT_HASH}`);
-
     export default defineComponent({
         name: 'App',
     });
@@ -25,10 +22,4 @@
         margin-top: 0;
         margin-bottom: 0;
     }
-    /* #app h1 {
-  font-size: 32px;
-}
-#app h2 {
-  font-size: 24px;
-} */
 </style>

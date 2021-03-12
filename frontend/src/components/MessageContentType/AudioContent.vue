@@ -16,6 +16,7 @@
         props: {
             message: { type: Object, required: true },
         },
+        emits: ['scroll'],
         setup(props) {
             const url = computed(() => {
                 return;

@@ -1,8 +1,4 @@
 import { MessageTypes } from '@/types';
-import SystemContent from '@/components/MessageContentType/SystemContent.vue';
-import FileContent from '@/components/MessageContentType/FileContent.vue';
-import AudioContent from '@/components/MessageContentType/AudioContent.vue';
-import ImageContent from '@/components/MessageContentType/ImageContent.vue';
 
 const isImage = filename => {
     return (
@@ -12,9 +8,11 @@ const isImage = filename => {
         filename.indexOf('.jpeg') !== -1
     );
 };
+
 const isAudio = filename => {
     return filename.indexOf('.mp3') !== -1 || filename.indexOf('.WebM') !== -1;
 };
+
 export const getComponentForType = message => {
     switch (message.type) {
         case MessageTypes.STRING:

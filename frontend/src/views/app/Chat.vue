@@ -1,5 +1,5 @@
 <template>
-    <app-layout @addUser="showAddUserDialog = true">
+    <app-layout>
         <div class="relative h-full w-full grid md:customgrid">
             <chat-list v-model="showAddUserDialog" />
             <div class="hidden w-full h-full md:grid place-items-center">
@@ -19,7 +19,7 @@
 
 <script lang="ts">
     import appLayout from '../../layout/AppLayout.vue';
-    import { defineComponent, ref, computed, onBeforeMount } from 'vue';
+    import { defineComponent } from 'vue';
     import ChatList from '@/components/ChatList.vue';
     import { showAddUserDialog } from '@/services/dialogService';
 

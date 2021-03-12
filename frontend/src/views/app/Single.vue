@@ -145,7 +145,6 @@
                         </button>
                     </div>
                     <ChatInput
-                        class="chatInput"
                         :selectedid="chat.chatId"
                         @messageSend="scrollToBottom(true)"
                     />
@@ -231,7 +230,6 @@
         nextTick,
         computed,
         onBeforeMount,
-        watchEffect,
     } from 'vue';
     import { findLastIndex, each } from 'lodash';
 
@@ -330,6 +328,7 @@
                         return;
                     }
 
+                    console.log('Scrolling to bottom;');
                     messageBox.value.scrollTo(0, messageBox.value.scrollHeight);
                 });
             };

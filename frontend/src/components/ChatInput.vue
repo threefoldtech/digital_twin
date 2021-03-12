@@ -45,18 +45,14 @@
             >
                 <i class="fas fa-circle text-red-600"></i>
             </button>
-            <!-- <emoji-picker
-                ref="emojipicker"
-                :class="{ hidden: !showEmoji }"
-                style="position: absolute; bottom: 140px; z-index: 10000"
-            ></emoji-picker> -->
 
-            <unicode-emoji-picker
+            <span
                 ref="emojipicker"
                 :class="{ hidden: !showEmoji }"
                 style="position: absolute; bottom: 140px; z-index: 10000"
             >
-            </unicode-emoji-picker>
+                <unicode-emoji-picker v-pre></unicode-emoji-picker>
+            </span>
 
             <button
                 class="action-btn px-2 md:py-8 py-2"
@@ -145,7 +141,7 @@
 </template>
 <script lang="ts">
     import { nextTick, ref, watch } from 'vue';
-    import { selectedId, usechatsActions } from '@/store/chatStore';
+    import { usechatsActions } from '@/store/chatStore';
     import GifSelector from '@/components/GifSelector.vue';
     import { messageToReplyTo } from '@/services/replyService';
     import { useAuthState } from '@/store/authStore';
@@ -157,12 +153,17 @@
 
     export default {
         name: 'ChatInput',
-        components: { GifSelector, EmojiPickerElement },
+        components: {
+            GifSelector,
+        },
         emits: ['messageSend'],
         props: {
             selectedid: {},
         },
         setup(props, { emit }) {
+            // Not actually a vue component but CustomElement ShadowRoot. I know vue doesnt really like it and gives a warning.
+            new EmojiPickerElement();
+
             const { sendMessage, sendFile } = usechatsActions();
 
             const message = ref(null);

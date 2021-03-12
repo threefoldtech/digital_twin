@@ -5,7 +5,7 @@
     <div class="bg-gray-100 h-full overflow-hidden relative">
         <div class="pl-0 relative h-full w-full maingrid md:bigmaingrid">
             <div class="top h-20 md:hidden">
-                <Topbar @addUser="addUser">
+                <Topbar>
                     <template v-slot:default>
                         <slot name="top"> </slot>
                     </template>
@@ -33,66 +33,61 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watch } from 'vue';
-import Sidebar from '@/components/Sidebar.vue';
-import UserConfigDialog from '@/components/UserConfigDialog.vue';
-import Topbar from '@/components/Topbar.vue';
-import { useSocketState } from '../store/socketStore';
+    import { defineComponent, watch } from 'vue';
+    import Sidebar from '@/components/Sidebar.vue';
+    import UserConfigDialog from '@/components/UserConfigDialog.vue';
+    import Topbar from '@/components/Topbar.vue';
+    import { useSocketState } from '../store/socketStore';
 
-export default defineComponent({
-    name: 'AppLayout',
-    components: { Sidebar, Topbar, UserConfigDialog },
-    setup({}, ctx) {
-        const addUser = () => {
-            ctx.emit('addUser');
-        };
+    export default defineComponent({
+        name: 'AppLayout',
+        components: { Sidebar, Topbar, UserConfigDialog },
+        setup({}, ctx) {
+            const { notification } = useSocketState();
 
-        const { notification } = useSocketState();
-        watch(notification, ((newNot:any, oldNot:any) => {
-            new Audio(`/${newNot.sound}`).play()
-        }));
+            watch(notification, (newNot: any, oldNot: any) => {
+                new Audio(`/${newNot.sound}`).play();
+            });
 
-        return {
-            addUser,
-        };
-    },
-});
+            return {};
+        },
+    });
 </script>
 
 <style scoped>
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+    @tailwind base;
+    @tailwind components;
+    @tailwind utilities;
 
-@layer utilities {
-    @variants responsive {
-        .bigmaingrid {
-            display: grid;
-            grid-template-areas:
-                'top top'
-                'side content'
-                'side content';
-            grid-template-columns: 100px 1fr;
-            grid-template-rows: auto 1fr;
+    @layer utilities {
+        @variants responsive {
+            .bigmaingrid {
+                display: grid;
+                grid-template-areas:
+                    'top top'
+                    'side content'
+                    'side content';
+                grid-template-columns: 100px 1fr;
+                grid-template-rows: auto 1fr;
+            }
         }
     }
-}
 
-.maingrid {
-    display: grid;
-    grid-template-areas:
-        'top'
-        'content'
-        'content';
-    grid-template-rows: auto 1fr;
-}
-.top {
-    grid-area: top;
-}
-.side {
-    grid-area: side;
-}
-.content {
-    grid-area: content;
-}
+    .maingrid {
+        display: grid;
+        grid-template-areas:
+            'top'
+            'content'
+            'content';
+        grid-template-rows: auto 1fr;
+    }
+    .top {
+        grid-area: top;
+    }
+    .side {
+        grid-area: side;
+    }
+    .content {
+        grid-area: content;
+    }
 </style>

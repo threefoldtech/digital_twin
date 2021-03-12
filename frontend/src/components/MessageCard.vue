@@ -6,13 +6,7 @@
             'items-end': messageBlock.user === user?.id,
         }"
     >
-        <div
-            class="flex justify-start pt-4 pb-2"
-            :class="{
-                'w-18 mr-4': showActionButtons,
-                'w-8 mr-2': !showActionButtons,
-            }"
-        >
+        <div class="flex justify-start pt-4 pb-2 w-18 mr-4">
             <AvatarImg :id="messageBlock.user" :showOnlineStatus="false" />
         </div>
 
@@ -46,7 +40,6 @@
                     style="margin-top: auto;"
                     class="actions pb-4 pl-4 flex"
                     :class="{
-                        hidden: showActionButtons !== true,
                         'flex-row-reverse': messageBlock.user === user?.id,
                     }"
                 >
@@ -122,7 +115,6 @@
                         style="margin-top: auto;"
                         class="actions pb-4 pl-4 flex"
                         :class="{
-                            hidden: showActionButtons !== true,
                             'flex-row-reverse': messageBlock.user === user?.id,
                         }"
                     >
@@ -139,7 +131,7 @@
 </template>
 
 <script lang="ts">
-    import { computed, defineComponent, ref, watch } from 'vue';
+    import { defineComponent, ref } from 'vue';
     import moment from 'moment';
     import AvatarImg from '@/components/AvatarImg.vue';
     import MessageContent from '@/components/MessageContent.vue';
@@ -155,11 +147,11 @@
         props: {
             message: Object,
             messageBlock: Object,
-            showActionButtons: {
-                type: Boolean,
-                default: true,
-            },
             chatId: String,
+            isMine: Boolean,
+            isGroup: Boolean,
+            isreadbyme: Boolean,
+            isread: Boolean,
         },
         setup(props) {
             const { user } = useAuthState();
@@ -200,7 +192,6 @@
                     id: uuidv4(),
                     from: user.id,
                     to: props.chatId,
-                    // body: <StringMessageType>reply.value.value,
                     body: <StringMessageType>null,
                     timeStamp: new Date(),
                     type: 'STRING',
@@ -251,7 +242,8 @@
         cursor: pointer;
     }
 
-    .msgcard, .replymsg {
+    .msgcard,
+    .replymsg {
         max-width: 500px;
         word-break: break-word;
     }
