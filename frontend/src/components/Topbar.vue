@@ -95,7 +95,6 @@
                     return;
                 }
 
-                console.log('here? ', showUserConfigDialog.value);
                 showUserConfigDialog.value = true;
             };
 
@@ -117,7 +116,6 @@
             };
 
             const setEditStatus = (edit: boolean) => {
-                console.log(edit);
                 isEditingStatus.value = edit;
                 userStatus.value = user.status;
             };

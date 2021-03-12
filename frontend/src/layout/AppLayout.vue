@@ -46,6 +46,12 @@
             const { notification } = useSocketState();
 
             watch(notification, (newNot: any, oldNot: any) => {
+                var focused = document.hasFocus();
+
+                if (focused) {
+                    return;
+                }
+
                 new Audio(`/${newNot.sound}`).play();
             });
 

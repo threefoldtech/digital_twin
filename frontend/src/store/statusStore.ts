@@ -33,7 +33,6 @@ export const startFetchStatusLoop = (contact: Contact) => {
     if (watchingUsers.find(wu => wu === contact.id)) {
         return;
     }
-    console.log('pushing', contact.id);
     watchingUsers.push(contact.id);
     watchingUsers[<string>contact.id] = {
         location: contact.location,

@@ -20,7 +20,7 @@ import { uuidv4 } from '@/common';
 import { startFetchStatusLoop } from '@/store/statusStore';
 import { uniqBy } from 'lodash';
 import { useScrollActions } from './scrollStore';
-import { myYggdrasilAddress } from "../store/authStore"
+import { myYggdrasilAddress } from '../store/authStore';
 
 const state = reactive<chatstate>({
     chats: [],
@@ -33,7 +33,6 @@ const retrievechats = async () => {
     const response = await axios
         .get(`${config.baseUrl}api/chats`)
         .then(response => {
-            console.log('retreived chats: ', response.data);
             const incommingchats = response.data;
 
             // debugger
@@ -139,7 +138,6 @@ function getMessage(chat: Chat, id) {
 }
 
 const addMessage = (chatId, message) => {
-    console.log('Adding message: ', { chatId, message });
     if (message.type === 'READ') {
         const chat: Chat = state.chats.find(chat => chat.chatId == chatId);
 
@@ -155,21 +153,14 @@ const addMessage = (chatId, message) => {
         }
 
         chat.read = { ...chat.read, [<string>message.from]: message.body };
-
         return;
     }
 
     if (message.type === 'REMOVEUSER' || message.type === 'ADDUSER') {
-        //@todo
         return;
     }
 
-    console.log('in addmessage chatid', chatId);
-    // console.log('in addmessage message', message);
-
     const chat: Chat = state.chats.find(chat => chat.chatId == chatId);
-
-    console.log('Chat: ', chat);
 
     if (message.subject) {
         const subjectMessageIndex = chat.messages.findIndex(
@@ -184,16 +175,14 @@ const addMessage = (chatId, message) => {
 
     const index = chat.messages.findIndex(mes => mes.id == message.id);
     if (index !== -1) {
-        console.log('edit chat');
         chat.messages[index] = message;
         return;
     }
-    chat.messages.push(message);
-    sortChats();
-    console.log('before setLastmessage');
-    setLastMessage(chatId, message);
 
-    // Add event to scroll.
+    chat.messages.push(message);
+
+    sortChats();
+    setLastMessage(chatId, message);
 
     const { addScrollEvent } = useScrollActions();
     addScrollEvent();
@@ -273,7 +262,6 @@ const sendFile = async (chatId, selectedFile, isBlob = false) => {
 };
 
 const setLastMessage = (chatId: string, message: Message<String>) => {
-    console.log('here', state.chats, chatId);
     if (!state.chats) return;
     const chat = state.chats.find(c => c.chatId == chatId);
     if (!chat) return;
@@ -309,12 +297,16 @@ const readMessage = (chatId, messageId) => {
     sendMessageObject(chatId, newMessage);
 };
 
-const updateContactsInGroup = async (groupId, contact: Contact, remove: boolean) => {
+const updateContactsInGroup = async (
+    groupId,
+    contact: Contact,
+    remove: boolean
+) => {
     const { user } = useAuthState();
     const { chats } = usechatsState();
     const operation = remove ? 'REMOVEUSER' : 'ADDUSER';
     const chat = chats.value.find(chat => chat.chatId == groupId);
-    const mylocation = await myYggdrasilAddress()
+    const mylocation = await myYggdrasilAddress();
     const message: Message<GroupUpdate> = {
         id: uuidv4(),
         from: user.id,

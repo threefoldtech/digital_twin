@@ -25,7 +25,7 @@ const initializeSocket = (username: string) => {
     state.socket = inject('socket');
 
     state.socket.on('connect', () => {
-        console.log('connected');
+        console.log('connected with socket.');
     });
     state.socket.emit('identify', {
         name: username,
@@ -39,7 +39,6 @@ const initializeSocket = (username: string) => {
         addUserToBlockList(chatId);
     });
     state.socket.on('message', message => {
-        // TODO show desktop notification
         if (message.type === 'READ') {
             handleRead(message);
             return;

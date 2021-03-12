@@ -328,7 +328,6 @@
                         return;
                     }
 
-                    console.log('Scrolling to bottom;');
                     messageBox.value.scrollTo(0, messageBox.value.scrollHeight);
                 });
             };
