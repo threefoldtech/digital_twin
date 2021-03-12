@@ -71,8 +71,11 @@
             <div>
                 <h2>Blocked Users</h2>
                 <ul class="max-h-28 overflow-y-auto">
-                    <template v-for="blockedUser in blockedUsers">
-                        <li :key="blockedUser">
+                    <template
+                        v-for="blockedUser in blockedUsers"
+                        :key="blockedUser"
+                    >
+                        <li>
                             {{ blockedUser }}
                             <button
                                 class="px-4 py-2 text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-500 focus:border-blue-700 active:bg-blue-700 ease-in-out duration-150 cursor-pointer uppercase"
@@ -131,7 +134,7 @@
             const route = useRoute();
             const backOrMenu = () => {
                 if (route.meta && route.meta.back) {
-                    router.push({ name: route.meta.back });
+                    router.push({ name: <any>route.meta.back });
                     return;
                 }
                 showUserConfigDialog.value = true;

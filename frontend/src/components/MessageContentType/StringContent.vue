@@ -1,9 +1,12 @@
 <template>
-    <span>{{ message.body }}</span>
+    <span v-html="computedMessage"></span>
 </template>
 
 <script lang="ts">
-    import { defineComponent } from 'vue';
+    // Disclaimer: This is not yet proven to be SAFE, this might contain XSS. Use with caution!
+    import { computed, defineComponent } from 'vue';
+
+    const regularExpression = /((http|https):\/\/([a-zA-Z0-9.\/?=&\[\]:\_\-\;\%]+))/g;
 
     export default defineComponent({
         name: 'StringContent',
@@ -11,7 +14,38 @@
             message: { type: Object, required: true },
         },
         setup(props) {
-            return {};
+            const escapeHtml = (unsafeHtml: string) => {
+                return unsafeHtml
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            };
+
+            const computedMessage = computed(() => {
+                let escapedHtml = escapeHtml(props.message.body);
+                const matches = escapedHtml.match(regularExpression);
+
+                if (matches === null) {
+                    return escapedHtml;
+                }
+
+                escapedHtml = escapedHtml.replace(
+                    regularExpression,
+                    `<a href='$1' target='_BLANK'>$1</a>`
+                );
+
+                return escapedHtml;
+            });
+
+            return { computedMessage };
         },
     });
 </script>
+
+<style>
+    a:hover {
+        text-decoration: underline !important;
+    }
+</style>

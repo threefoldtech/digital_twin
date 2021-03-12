@@ -93,11 +93,8 @@
             const router = useRouter();
             const route = useRoute();
             const backOrMenu = () => {
-                console.log('Showing dialog ...');
-                console.log('Showing dialog ...', route.meta);
-                console.log('Showing dialog ...', route.meta.back);
                 if (route.meta && route.meta.back) {
-                    router.push({ name: route.meta.back });
+                    router.push({ name: <any>(route.meta.back) });
                     return;
                 }
 
