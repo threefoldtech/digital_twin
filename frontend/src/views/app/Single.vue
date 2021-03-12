@@ -27,9 +27,6 @@
 
         <template v-slot:actions>
             <div class="">
-                <!-- <button class="text-lg text-white">
-                    <i class="fas fa-search"></i>
-                </button> -->
                 <div class="relative">
                     <button
                         class="text-lg text-white md:hidden"
@@ -217,7 +214,7 @@
 </template>
 
 <script lang="ts">
-    import { useScrollActions, useScrollState } from '@/store/scrollStore';
+    import { useScrollState } from '@/store/scrollStore';
 
     import appLayout from '../../layout/AppLayout.vue';
     import moment from 'moment';
@@ -230,14 +227,13 @@
         nextTick,
         computed,
         onBeforeMount,
+        onUpdated,
     } from 'vue';
-    import { findLastIndex, each } from 'lodash';
 
+    import { findLastIndex, each } from 'lodash';
     import { statusList } from '@/store/statusStore';
     import { usechatsState, usechatsActions } from '@/store/chatStore';
     import { sendBlockChat, sendRemoveChat } from '@/store/socketStore';
-    import { Contact } from '@/types/index';
-    import { useContactsState } from '@/store/contactStore';
     import { useAuthState } from '@/store/authStore';
     import { popupCenter } from '@/services/popupService';
     import MessageCard from '@/components/MessageCard.vue';
@@ -263,7 +259,6 @@
             GroupManagement,
             ChatList,
         },
-
         setup(props) {
             const route = useRoute();
             let selectedId = ref(<string>route.params.id);
@@ -278,9 +273,8 @@
             onBeforeMount(retrievechats);
 
             const { chats } = usechatsState();
-            const { sendMessage, sendFile } = usechatsActions();
+            const { sendMessage } = usechatsActions();
             const { user } = useAuthState();
-            const { contacts } = useContactsState();
             const m = val => moment(val);
             const messageBox = ref(null);
             const showMenu = ref(false);
@@ -357,13 +351,18 @@
             });
 
             const message = ref('');
-            const replyTo = ref(null);
 
             const chat = computed(() => {
                 return chats.value.find(c => c.chatId == selectedId.value);
             });
 
             onMounted(() => {
+                nextTick(() => {
+                    scrollToBottom(true);
+                });
+            });
+
+            onUpdated(() => {
                 nextTick(() => {
                     scrollToBottom(true);
                 });
@@ -407,10 +406,6 @@
 
             const blockChat = () => {
                 showDialog.value = true;
-                // const confirmed = confirm(`do you really want to block ${chat.value.name}?`);
-                // if (confirmed == true) {
-                // sendBlockChat(chat.value.chatId)
-                // }
             };
             const doBlockChat = () => {
                 showDialog.value = false;
@@ -460,14 +455,11 @@
                 });
             });
 
-            const replyMessage = event => {
-                if (event) {
-                    console.log('event: ', event);
-                    replyTo.value = event;
-                } else {
-                    replyTo.value = null;
-                }
-            };
+            onMounted(() => {
+                nextTick(() => {
+                    scrollToBottom(true);
+                });
+            });
 
             return {
                 chats,

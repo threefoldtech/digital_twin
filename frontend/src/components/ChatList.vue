@@ -85,6 +85,7 @@
     import { uniqBy } from 'lodash';
     import { useRouter } from 'vue-router';
     import { showAddUserDialog } from '@/services/dialogService';
+    import { useScrollActions } from '@/store/scrollStore';
 
     export default defineComponent({
         name: 'Apps',

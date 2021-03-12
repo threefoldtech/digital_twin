@@ -218,6 +218,7 @@
                 if (message.value.value != '') {
                     sendMessage(props.selectedid, message.value.value);
                     message.value.value = '';
+                    console.log('MESSAGE: ', message.value.value);
                 }
                 if (file.value) {
                     sendFile(props.selectedid, file.value);
@@ -294,16 +295,10 @@
             };
 
             nextTick(() => {
-                // console.log('Registering event listener: ', emojipicker.value);
-                // emojipicker.value.addEventListener('emoji-click', (event) => {
-                //     console.log('Clicked an emoji: ', event);
-                //     // message.value.value = `${message.value.value}${event.detail.unicode}`;
-                // });
                 const emojiPicker = document.querySelector(
                     'unicode-emoji-picker'
                 );
                 emojiPicker.addEventListener('emoji-pick', event => {
-                    // console.log(event.detail.emoji);
                     message.value.value = `${message.value.value}${event.detail.emoji}`;
                     message.value.focus();
                 });

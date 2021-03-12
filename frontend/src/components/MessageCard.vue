@@ -131,7 +131,7 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref } from 'vue';
+    import { defineComponent, onMounted, ref } from 'vue';
     import moment from 'moment';
     import AvatarImg from '@/components/AvatarImg.vue';
     import MessageContent from '@/components/MessageContent.vue';
@@ -140,6 +140,7 @@
     import { useAuthState } from '@/store/authStore';
     import { usechatsActions } from '@/store/chatStore';
     import { messageToReplyTo } from '@/services/replyService';
+    import { useScrollActions } from '@/store/scrollStore';
 
     export default defineComponent({
         name: 'MessageCard',
@@ -204,6 +205,12 @@
                 sendMessageObject(props.chatId, newMessage);
                 messageToReplyTo.value = null;
             };
+
+            const { addScrollEvent } = useScrollActions();
+
+            onMounted(() => {
+                addScrollEvent();
+            });
 
             return {
                 moment,

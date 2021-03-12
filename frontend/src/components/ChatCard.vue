@@ -6,12 +6,6 @@
             'bg-gray-200': router.currentRoute?.value.path.includes(chat.name),
         }"
     >
-        <!-- <div
-      v-if="newMessages >= 1"
-      class="h-5 w-5 bg-accent rounded-full absolute -top-2 -right-2 transition-all z-10 grid place-items-center text-xs text-white"
-    >
-      {{ newMessages }}
-    </div> -->
         <div class="col-span-2 place-items-center grid relative">
             <AvatarImg :id="chat.chatId" :showOnlineStatus="!chat.isGroup" />
         </div>
