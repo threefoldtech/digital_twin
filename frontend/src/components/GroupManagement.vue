@@ -105,7 +105,6 @@
 <script lang="ts">
     import { computed } from 'vue';
     import { statusList } from '@/store/statusStore';
-    import { GroupChat } from '../types/index';
     import AvatarImg from '@/components/AvatarImg.vue';
     import { usechatsActions } from '../store/chatStore';
     import { useContactsState } from '../store/contactStore';
@@ -142,7 +141,6 @@
             });
 
             return {
-                groupChat: props.groupChat,
                 status: statusList,
                 removeFromGroup,
                 contacts: filteredContacts,
