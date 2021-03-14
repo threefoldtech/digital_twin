@@ -31,5 +31,7 @@
 
     "environments": ["staging", "production"],
 
-    "domains": {}
+    "aliases": {},
+
+    "homeAlias": {"alias": "tf", "isWebsite": true}
 }

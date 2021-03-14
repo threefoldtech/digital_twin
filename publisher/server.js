@@ -7,6 +7,7 @@ const localDrive = require('./drive/local')
 const hyperdrive = require('./drive/hyperdrive');
 const utils = require('./drive/utils')
 const dnsserver = require("./servers/dns")
+var rewrite = require('./rewrite')
 
 const letsencrypt = require('./letsencrypt')
 
@@ -14,6 +15,8 @@ async function init(){
     var domainsList = []
 
     await config.load()
+    await rewrite.load()
+
     domainsList.push(...await localDrive.load())
     
     var cleanup = function () {}
@@ -22,8 +25,9 @@ async function init(){
       const {_, cleanup } = await hyperdrive.start();
       domainsList.push(...await hyperdrive.load())
     }
-    var domains = await utils.reduce(domainsList)
-    config.domains = domains
+    var aliases = await utils.reduce(domainsList)
+    
+    config.aliases = aliases
     return cleanup
 }
 

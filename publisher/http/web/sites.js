@@ -3,6 +3,23 @@ var router = express.Router();
 const asyncHandler = require('express-async-handler')
 const config = require('../../config')
 
+const rewrite = require('../../rewrite')
+
+async function rewriteRoles(content, info){
+    
+    var scheme = info.secure ? 'https' : 'http'
+
+    host = `${scheme}://${info.host}`
+    if(info.port != 80 && info.port != 443){
+        host = `${scheme}://${info.host}:${info.port}`
+    }
+    var res = content
+    for(var item in rewrite){
+        res = res.replace(new RegExp(item, "g"), `${host}${rewrite[item]}`)
+    }
+    return res
+}
+
 async function update(req) {
     var info = req.info
     var repo = info.repo
@@ -78,6 +95,8 @@ async function handleWebsiteFile(req, res, info){
         }
 
         var content = await  driveObj.promises.readFile(filepath, encoding);
+        if(encoding != 'binary')
+            content = await(rewriteRoles(content, info))
         return res.send(content)
     } catch (e) {
         console.log(e)
@@ -124,8 +143,8 @@ async function handleWikiFile(req, res, info){
 
     filepath = `/${wikiname}/${filename}`
     driveObj = null
-    for(var alias in config.domains[req.info.host].wikis){
-        var item = config.domains[req.info.host].wikis[alias]
+    for(var alias in config.aliases.wikis){
+        var item = config.aliases.wikis[alias]
         if(item.dir == `/${wikiname}`){
             driveObj =  item.drive
         }
@@ -140,6 +159,8 @@ async function handleWikiFile(req, res, info){
     try {
         entry = await driveObj.promises.stat(filepath)
         var content = await  driveObj.promises.readFile(filepath, encoding);
+        if(encoding != 'binary')
+            content = await(rewriteRoles(content, info))
         return res.send(content)
        
     } catch (e) {
@@ -148,6 +169,7 @@ async function handleWikiFile(req, res, info){
             try{
                 entry = await driveObj.promises.stat(filepath)
                 var content = await  driveObj.promises.readFile(filepath, encoding);
+                content = await(rewriteRoles(content, info))
                 return res.send(content)
             }catch(e){
                 var content =`# ${wikiname}`
@@ -161,53 +183,39 @@ async function handleWikiFile(req, res, info){
 // Home (list of wikis and sites)
 router.get('/publishtools/list', asyncHandler(async (req, res) =>  {
         var info = req.info
-        
+        console.log
         var domains = []
 
-        for (var domain in config.domains){
-            if (!config.nodejs.production){
-                if(domain != 'localhost'){
-                    continue
-                }
+        var wikis = new Set()
+        var sites = new Set()
+
+        for(var w in config.aliases.websites){
+            var item = config.aliases.websites[w]
+            var d = `${info.host}`
+            if(info.port != 80 && info.port != 443){
+                d = `${d}:${info.port}`
+            }
+            if(w == '/'){
+                w = ""
             }
 
-            if (config.nodejs.production){
-                if(domain == 'localhost' || domain  == '127.0.0.1'){
-                    continue
-                }
-            }
-
-            var wikis = new Set()
-            var sites = new Set()
-
-            for(var w in config.domains[domain].websites){
-                var item = config.domains[domain].websites[w]
-                var d = `${domain}`
-                if(info.port != 80 && info.port != 443){
-                    d = `${d}:${info.port}`
-                }
-                if(w == '/'){
-                    w = ""
-                }
-
-                sites.add({"name": item.alias, "url": `${d}/${w}`})
-            }
-
-            for(var w in config.domains[domain].wikis){
-                var item = config.domains[domain].wikis[w]
-                var d = `${domain}`
-                if(info.port != 80 && info.port != 443){
-                    d = `${d}:${info.port}`
-                }
-                if(w == '/'){
-                    w = ""
-                }
-
-                wikis.add({"name": item.alias, "url": `${d}/info/${w}`})
-            }
-
-            domains.push({"domain": domain, "websites": Array.from(sites), "wikis": Array.from(wikis)})
+            sites.add({"name": item.alias, "url": `${d}/${w}`})
         }
+
+        for(var w in config.aliases.wikis){
+            var item = config.aliases.wikis[w]
+            var d = `${info.host}`
+            if(info.port != 80 && info.port != 443){
+                d = `${d}:${info.port}`
+            }
+            if(w == '/'){
+                w = ""
+            }
+
+            wikis.add({"name": item.alias, "url": `${d}/info/${w}`})
+        }
+
+        domains.push({"domain": info.host, "websites": Array.from(sites), "wikis": Array.from(wikis)})
 
         res.render('sites/home.mustache', {
             domains : domains,
@@ -225,6 +233,7 @@ router.get('/', asyncHandler(async (req, res) =>  {
      try {
          entry = await driveObj.promises.stat(filepath)
          var content = await  driveObj.promises.readFile(filepath, 'utf8');
+         content = await(rewriteRoles(content, info))
          return res.send(content)
      } catch (e) {
          console.log(e)
@@ -246,6 +255,7 @@ router.get('/:website', asyncHandler(async (req, res) =>  {
      try {
          entry = await driveObj.promises.stat(filepath)
          var content = await  driveObj.promises.readFile(filepath, 'utf8');
+         content = await(rewriteRoles(content, info))
          return res.send(content)
      } catch (e) {
          console.log(e)
@@ -262,6 +272,7 @@ router.get('/info/:wiki', asyncHandler(async (req, res) =>  {
     try {
         entry = await driveObj.promises.stat(filepath)
         var content = await  driveObj.promises.readFile(filepath, 'utf8');
+        content = await(rewriteRoles(content, info))
         return res.send(content)
     } catch (e) {
         console.log(e)

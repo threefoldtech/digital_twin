@@ -15,7 +15,7 @@ class LocalDrive{
                 process.exit(1)
             }
             console.log(chalk.green(`✓ (LocalDrive Drive) loaded @${this.base}`))
-            return await utils.loadDomains(this)
+            return await utils.loadAliases(this)
         }
     }
 }

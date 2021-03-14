@@ -1,5 +1,7 @@
 const process = require('process')
 const path = require('path')
+var rewrite = require('./rewrite')
+
 
 // Resolve path with ~
 async function resolvePath(filepath){
@@ -9,9 +11,28 @@ async function resolvePath(filepath){
     return filepath;
 }
 
+async function addRewriteRuleForDomains(domain, alias, isWebsite){
+
+  
+    const config = require('./config')
+    if (alias == `/${config.homeAlias.alias}` && config.homeAlias.isWebsite == isWebsite){
+        alias = '/'
+    }
+    
+    rewrite[`https://${domain}`] = alias    
+    
+    rewrite[`http://${domain}`] = alias    
+    if(domain.startsWith('www')){
+        var d = domain.replace('www.', '')
+        rewrite[`https://${d}`] = alias    
+        rewrite[`http://${d}`] = alias    
+    }
+}
+
 class Utils{
     constructor(){
         this.resolvePath = resolvePath
+        this.addRewriteRuleForDomains = addRewriteRuleForDomains
     }
 }
 

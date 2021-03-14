@@ -43,11 +43,7 @@ app.use(function (req, res, next) {
   }
 
   if (host === ""){
-      return res.status(400).json('Header is missing');
-  }
-
-  if(!(host in config.domains)){
-    return res.status(400).json('Bad domain');
+      return res.status(400).json('Host Header is missing');
   }
 
   if(req.url.startsWith('/threebot')){
@@ -60,18 +56,18 @@ app.use(function (req, res, next) {
 
   var info = null
 
-  for (var alias in config.domains[host].websites){
+  for (var alias in config.aliases.websites){
     if (alias == '/'){
-      info = config.domains[host].websites['/']
+      info = config.aliases.websites['/']
       break
     }
   }
   
   if(req.url == '/'){
     if(!info){
-      for (var alias in config.domains[host].wikis){
+      for (var alias in config.aliases.wikis){
         if (alias == '/'){
-          info = config.domains[host].wikis['/']
+          info = config.aliases.wikis['/']
           break
         }
       }
@@ -79,16 +75,16 @@ app.use(function (req, res, next) {
 
 
   }else{
-    for (var alias in config.domains[host].websites){
+    for (var alias in config.aliases.websites){
       if (req.url.startsWith(`/${alias}`)){
-        info = config.domains[host].websites[alias]
+        info = config.aliases.websites[alias]
         break
       }
     }
 
-    for (var alias in config.domains[host].wikis){
+    for (var alias in config.aliases.wikis){
       if (req.url.startsWith(`/info/${alias}`)){
-        info = config.domains[host].wikis[alias]
+        info = config.aliases.wikis[alias]
         break
       }
     }
@@ -100,6 +96,7 @@ app.use(function (req, res, next) {
   req.info = info
   req.info.host = host
   req.info.port = port
+  req.info.secure = req.secure
 
   if(req.info.login){
     if(!req.session.authorized){

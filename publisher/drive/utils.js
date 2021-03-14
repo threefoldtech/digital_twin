@@ -2,9 +2,12 @@ var path = require('path')
 const chalk = require('chalk');
 const groups = require('./groups')
 var config = require ('../config')
+var utils = require('../utils')
+
 
 async function process(drive, dir){
-    var domains = {}
+    var aliases = {"websites": {}, "wikis": {}}
+
     var p = path.join("/", dir)
     var dirs = await drive.promises.readdir(p)
     var groupObj = await groups.load(drive)
@@ -39,8 +42,6 @@ async function process(drive, dir){
             continue
         }
 
-
-
         var domainInfo = {}
         try{
             var domainData = await  drive.promises.readFile(domainfilepath, 'utf8');
@@ -71,47 +72,30 @@ async function process(drive, dir){
             continue
         }
         var isWebSite = repoInfo["repo"].startsWith("www")
-        var standalone= domainInfo.standalone
         
         var item =  isWebSite? "websites" : "wikis"
 
-        var err = false
-        for (var domain in domainInfo.domains){
-            if(!(domain in domains)){
-                domains[domain] = {"websites": {}, "wikis": {}}
-            }
-
-            var alias = standalone? "/" : repoInfo["alias"]
-            if (alias == "/" && "/" in domains[domain][item]){
-                console.log(chalk.red(`    ✓ (Drive (${drive.name}) Ignoring path: ${dir} can not have multiple standalone domains`))
-                err = true
-                break
-
-            }else if (alias in domains[domain][item]){
-                console.log(chalk.red(`    ✓ (Drive (${drive.name}) Ignoring path: ${dir} duplicated alias`))
-                err = true
-                break
-            }
-
-            domains[domain][item][alias] = {
-                "drive": drive,
-                "dir": dir,
-                "repo": repoInfo["repo"],
-                "alias": repoInfo["alias"],
-                "isWebSite": isWebSite,
-                "users": users,
-                "login": acl.login
-            }
-        }
-
-        if(err){
+        var alias = repoInfo["alias"]
+        if (alias in aliases[item]){
+            console.log(chalk.red(`    ✓ (Drive (${drive.name}) Ignoring path: ${dir} duplicated alias`))
             continue
         }
+
+        aliases[item][alias] = {
+            "drive": drive,
+            "dir": dir,
+            "repo": repoInfo["repo"],
+            "alias": repoInfo["alias"],
+            "isWebSite": isWebSite,
+            "users": users,
+            "login": acl.login,
+            "domains": domainInfo.domains
+        }
     }
-    return domains
+    return aliases
 }
 
-async function loadDomains(drive){
+async function loadAliases(drive){
     var dirs = await drive.promises.readdir("/")
     dirs = dirs.filter((item) => {if(!item.startsWith(".")){return item}}).sort()
     var items = []
@@ -127,46 +111,56 @@ async function loadDomains(drive){
 }
 
 async function reduce(items){
-    var res = {}
+    var res = {"websites": {}, "wikis": {}}
 
     for(var i=0; i<items.length; i++){
         var obj = items[i]
-        for(var domain in obj){
-            if(!(domain in res)){
-                res[domain] = obj[domain]
+        for(var alias in obj["websites"]){
+            if(alias in res["websites"]){
+                var driv = res["websites"][alias].drive
+                var dir = res["websites"][alias].dir
+                console.log(chalk.red(`    ✓ (Drive (${driv.name}) Ignoring path: ${dir} duplicate alias for domain ${domain}`))
+                continue
             }else{
-                for(var alias in obj[domain]["websites"]){
-                    if(alias in res[domain]["websites"]){
-                        var driv = res[domain]["websites"][alias].drive
-                        var dir = res[domain]["websites"][alias].dir
-                        console.log(chalk.red(`    ✓ (Drive (${driv.name}) Ignoring path: ${dir} duplicate alias for domain ${domain}`))
-                        continue
-                    }else{
-                        res[domain]["websites"][alias] = obj[domain]["websites"][alias]
-                    }
-  
+                
+                if(alias == config.homeAlias.alias && config.homeAlias.isWebsite){
+                    res["websites"]["/"] = obj["websites"][alias]
+                }else{
+                    res["websites"][alias] =  obj["websites"][alias]
                 }
-                for(var alias in obj[domain]["wikis"]){
-                    if(alias in res[domain]["wikis"]){
-                        var driv = res[domain]["websites"][alias].drive
-                        var dir = res[domain]["websites"][alias].dir
-                        console.log(chalk.red(`    ✓ (Drive (${driv.name}) Ignoring path: ${dir} duplicate alias for domain ${domain}`))
-                        continue
-                    }else{
-                        res[domain]["wikis"][alias] = obj[domain]["wikis"][alias]
-                    }
+                var domains = obj["websites"][alias].domains
+                for(var j=0; j< domains.length; j++){
+                    var domain = domains[j]
+                    prefix = obj["websites"][alias].isWebSite? "/" : "/info/"
+                    await utils.addRewriteRuleForDomains(domain, prefix+alias, true)
                 }
             }
         }
-    }
-    for(var domain in res){
-        res["localhost"] = res[domain]
-        res["127.0.0.1"] = res[domain]
+        for(var alias in obj["wikis"]){
+            if(alias in res["wikis"]){
+                var driv = res["websites"][alias].drive
+                var dir = res["websites"][alias].dir
+                console.log(chalk.red(`    ✓ (Drive (${driv.name}) Ignoring path: ${dir} duplicate alias for domain ${domain}`))
+                continue
+            }else{
+                if(obj["wikis"][alias] == config.homeAlias.alias && !config.homeAlias.isWebSite){
+                    res["wikis"]["/"] = obj["wikis"][alias]
+                }else{
+                    res["wikis"][alias] =  obj["wikis"][alias]
+                }
+                var domains = obj["wikis"][alias].domains
+                for(var j=0; j< domains.length; j++){
+                    var domain = domains[j]
+                    prefix = obj["wikis"][alias].isWebSite? "/" : "/info/"
+                    await utils.addRewriteRuleForDomains(domain, prefix+alias, false)
+                }
+            }
+        }
     }
     return res
 }
 
 module.exports = {
-    loadDomains: loadDomains,
+    loadAliases: loadAliases,
     reduce: reduce
 }
