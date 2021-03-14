@@ -84,6 +84,9 @@ async function handleWebsiteFile(req, res, info){
             res.type("text/css");
     }else if (filepath.endsWith("json")){
         res.type("application/json");
+    }else if(filename.endsWith('pdf')){
+        encoding = 'binary'
+        res.type('application/pdf')
     }
 
     var entry = null
@@ -137,6 +140,9 @@ async function handleWikiFile(req, res, info){
     }else if(filename.endsWith('svg')){
         encoding = 'binary'
         res.type('image/svg+xml')
+    }else if(filename.endsWith('pdf')){
+            encoding = 'binary'
+            res.type('application/pdf')
     }else if(filename.endsWith("md") ){
         encoding = 'utf-8'  
     }
@@ -272,7 +278,6 @@ router.get('/info/:wiki', asyncHandler(async (req, res) =>  {
     try {
         entry = await driveObj.promises.stat(filepath)
         var content = await  driveObj.promises.readFile(filepath, 'utf8');
-        content = await(rewriteRoles(content, info))
         return res.send(content)
     } catch (e) {
         console.log(e)
