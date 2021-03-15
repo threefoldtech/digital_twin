@@ -92,7 +92,7 @@ async function handleWebsiteFile(req, res, info){
             res.type("text/css");
     }else if (filepath.endsWith("json")){
         res.type("application/json");
-    }else if(filename.endsWith('pdf')){
+    }else if(filepath.endsWith('pdf')){
         encoding = 'binary'
         res.type('application/pdf')
     }
