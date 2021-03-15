@@ -31,7 +31,7 @@
             >
                 <slot>
                     <img
-                        src="/TFN.svg"
+                        src="/digitaltwin.svg"
                         alt="TF-Logo"
                         class="md:hidden md:ml-4 h-full"
                     />

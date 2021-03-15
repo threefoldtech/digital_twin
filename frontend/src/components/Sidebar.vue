@@ -13,9 +13,15 @@
                         alt="Threefold logo"
                     />
 
-                    <!-- <h3>
-                        Threefold
-                    </h3> -->
+                    <img
+                        src="../../public/digitaltwin.png"
+                        width="100"
+                        alt="Threefold logo"
+                    />
+                    <!-- <div class="text-sm">
+                        <strong>digital </strong>
+                        <span>twin</span>
+                    </div> -->
                 </div>
             </div>
             <div
@@ -100,12 +106,17 @@
             const { user } = useAuthState();
 
             const toggleShowUserConfigDialog = () => {
-                console.log("Showing user config dialog: ", showUserConfigDialog.value)
+                console.log(
+                    'Showing user config dialog: ',
+                    showUserConfigDialog.value
+                );
                 showUserConfigDialog.value = !showUserConfigDialog.value;
 
-                console.log("Showing user config dialog: ", showUserConfigDialog.value)
-
-            }
+                console.log(
+                    'Showing user config dialog: ',
+                    showUserConfigDialog.value
+                );
+            };
 
             return {
                 currentRoute,

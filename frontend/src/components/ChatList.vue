@@ -4,13 +4,13 @@
             <div
                 class="chatcard relative mb-2 py-2 cursor-pointer flex items-center"
             >
-                <h1 style="padding-top: 5px">Messages</h1>
                 <button
                     @click="showAddUserDialog = true"
                     class="bg-icon colro rounded-full text-white"
                 >
                     <i class="fas fa-plus"></i>
                 </button>
+                <h1 style="padding-top: 5px">Messages</h1>
             </div>
             <div v-if="filteredChatRequests.length > 0">
                 <h2 style="font-size: 1.5em">

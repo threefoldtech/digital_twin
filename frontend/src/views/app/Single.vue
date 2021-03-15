@@ -388,12 +388,7 @@
 
                 const id = crypto.SHA1(str);
 
-                popupCenter(
-                    `https://freeflowconnect.threefold.me/?roomName=${id}&username=${user.id}.3bot`,
-                    'video chat',
-                    800,
-                    550
-                );
+                popupCenter(`/videoroom/${id}`, 'video room', 800, 550);
             };
 
             const deleteChat = () => {

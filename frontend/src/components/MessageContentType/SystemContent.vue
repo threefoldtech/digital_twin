@@ -1,5 +1,9 @@
 <template>
-    {{ message.body }}
+    <div class="justify-around">
+        <u
+            ><i>{{ message.body }}</i></u
+        >
+    </div>
 </template>
 
 <script lang="ts">
