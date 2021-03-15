@@ -33,5 +33,7 @@
 
     "aliases": {},
 
-    "homeAlias": {"alias": "threefold", "isWebsite": true}
+    "homeAlias": {"alias": "threefold", "isWebsite": true},
+
+    "domains" : ["new.threefold.io"]
 }

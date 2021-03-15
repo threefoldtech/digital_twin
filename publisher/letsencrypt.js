@@ -7,7 +7,8 @@ const config = require("./config");
 async function process(){
     var letsencrypt = {}
 
-    for(var domain in config.domains){
+    for(var i=0; i<  config.domains.length; i++){
+        var domain = config.domains[i]
         letsencrypt[domain] = {"renewAt": 1, "altnames": [domain]}
     }
 
