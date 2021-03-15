@@ -14,10 +14,18 @@ async function rewriteRoles(content, info){
         host = `${scheme}://${info.host}:${info.port}`
     }
     var res = content
+
     for(var item in rewrite){
-        res = res.replace(new RegExp(item, "g"), `${host}${rewrite[item]}`)
+        if (item == 'load'){
+            continue
+        }
+        var suff = rewrite[item]
+        if(suff == "/"){
+            suff = ""
+        }
+        content = content.replace(new RegExp(item, "g"), `${host}${suff}`)
     }
-    return res
+    return content
 }
 
 async function update(req) {
