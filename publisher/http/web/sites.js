@@ -72,7 +72,6 @@ async function handleWebsiteFile(req, res, info){
     driveObj = info.drive
     var url = req.url.replace(`/${info.alias}/`, "")
     var filepath = `${info.dir}/${url}`
-    console.log(filepath)
     var encoding = 'utf-8'
     if(filepath.endsWith('png')){
         res.type("image/png")
@@ -129,6 +128,10 @@ async function handleWikiFile(req, res, info){
     
     if (filename == "_sidebar.md"){
         filename = "sidebar.md"
+    }
+
+    if (filename == "_navbar.md"){
+        filename = "navbar.md"
     }
     
     var splitted = filename.split("/")
