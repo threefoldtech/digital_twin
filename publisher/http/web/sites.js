@@ -200,7 +200,6 @@ async function handleWikiFile(req, res, info){
 // Home (list of wikis and sites)
 router.get('/publishtools/list', asyncHandler(async (req, res) =>  {
         var info = req.info
-        console.log
         var domains = []
 
         var wikis = new Set()
@@ -256,6 +255,34 @@ router.get('/', asyncHandler(async (req, res) =>  {
          console.log(e)
          return res.status(404).json('');
      }    
+}))
+
+router.get('/info', asyncHandler(async (req, res) =>  {
+    var info = req.info
+        var domains = []
+
+        var wikis = new Set()
+
+        for(var w in config.aliases.wikis){
+            var item = config.aliases.wikis[w]
+            var d = `${info.host}`
+            if(info.port != 80 && info.port != 443){
+                d = `${d}:${info.port}`
+            }
+            if(w == '/'){
+                w = ""
+            }
+
+            wikis.add({"name": item.alias, "url": `${d}/info/${w}`})
+        }
+
+        domains.push({"domain": info.host, "websites": [], "wikis": Array.from(wikis)})
+
+        res.render('sites/home.mustache', {
+            domains : domains,
+            port: info.port
+        });       
+    
 }))
 
 router.get('/:website', asyncHandler(async (req, res) =>  {

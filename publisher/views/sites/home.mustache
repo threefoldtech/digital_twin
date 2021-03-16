@@ -9,12 +9,14 @@
      <b>Domains</b> <br/>
 
       {{#domains}}
+            {{#websites.length}}
             &nbsp;&nbsp;&nbsp;&nbsp; <b>{{domain}}</b><br/>
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>websites</b><br/>
             {{#websites}}
                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="//{{url}}"> {{name}}</a><br>
             {{/websites}}
             <br/>
+            {{/websites.length}}
             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b>wikis</b><br/>
             {{#wikis}}
                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="//{{url}}"> {{name}}</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="//{{url}}/errors"> errors</a><br> 
