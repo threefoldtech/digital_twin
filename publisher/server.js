@@ -9,7 +9,7 @@ const utils = require('./drive/utils')
 const dnsserver = require("./servers/dns")
 var rewrite = require('./rewrite')
 
-const letsencrypt = require('./letsencrypt')
+// const letsencrypt = require('./letsencrypt')
 
 async function init(){
     var domainsList = []
@@ -59,7 +59,7 @@ async function main(){
     }else{
       
       // write new config
-      letsencrypt.process()
+      // letsencrypt.process()
 
       require('greenlock-express').init({
         packageRoot: __dirname,

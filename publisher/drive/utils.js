@@ -13,6 +13,8 @@ async function process(drive, dir){
     var groupObj = await groups.load(drive)
     dirs = dirs.filter((item) => {if(!item.startsWith(".")){return item}}).sort()
     
+    var defs = {}
+
     for(var i=0; i < dirs.length; i++){
         var dir = path.join(p, dirs[i])
 
@@ -81,6 +83,21 @@ async function process(drive, dir){
             continue
         }
 
+        // load defs from wikis
+        if(!isWebSite){
+            try{
+                var defpath = path.join(dir, 'defs.json')
+                var defdata = await  drive.promises.readFile(defpath, 'utf8');
+                defInfo = JSON.parse(defdata)
+                for(var k=0; k< defInfo.defs.length; k++){
+                    var obj = defInfo.defs[k]
+                    defs[obj.def] = {"wikiname": obj.site, "pagename": obj.page}
+                }
+            }catch(e){
+                console.log(chalk.red(`    ✓ (Drive (${drive.name}) Ignoring path: ${dir} Error reading: ${defpath}`))
+            }
+        }
+
         aliases[item][alias] = {
             "drive": drive,
             "dir": dir,
@@ -92,6 +109,7 @@ async function process(drive, dir){
             "domains": domainInfo.domains
         }
     }
+    aliases["defs"] = defs
     return aliases
 }
 
@@ -111,10 +129,15 @@ async function loadAliases(drive){
 }
 
 async function reduce(items){
-    var res = {"websites": {}, "wikis": {}}
+    var res = {"websites": {}, "wikis": {}, "defs": {}}
 
     for(var i=0; i<items.length; i++){
         var obj = items[i]
+        
+        for(var def in obj.defs){
+            res.defs[def] = obj.defs[def]
+        }
+
         for(var alias in obj["websites"]){
             if(alias in res["websites"]){
                 var driv = res["websites"][alias].drive
@@ -125,9 +148,8 @@ async function reduce(items){
                 
                 if(alias == config.homeAlias.alias && config.homeAlias.isWebsite){
                     res["websites"]["/"] = obj["websites"][alias]
-                }else{
-                    res["websites"][alias] =  obj["websites"][alias]
                 }
+                res["websites"][alias] =  obj["websites"][alias]
                 var domains = obj["websites"][alias].domains
                 for(var j=0; j< domains.length; j++){
                     var domain = domains[j]
@@ -145,9 +167,8 @@ async function reduce(items){
             }else{
                 if(obj["wikis"][alias] == config.homeAlias.alias && !config.homeAlias.isWebSite){
                     res["wikis"]["/"] = obj["wikis"][alias]
-                }else{
-                    res["wikis"][alias] =  obj["wikis"][alias]
                 }
+                res["wikis"][alias] =  obj["wikis"][alias]
                 var domains = obj["wikis"][alias].domains
                 for(var j=0; j< domains.length; j++){
                     var domain = domains[j]

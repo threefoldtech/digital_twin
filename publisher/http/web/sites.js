@@ -133,6 +133,10 @@ async function handleWikiFile(req, res, info){
     if (filename == "_navbar.md"){
         filename = "navbar.md"
     }
+
+    if (filename == "README.md"){
+        filename = "readme.md"
+    }
     
     var splitted = filename.split("/")
     if (splitted.length > 1){
@@ -181,19 +185,32 @@ async function handleWikiFile(req, res, info){
         return res.send(content)
        
     } catch (e) {
-        if (filename == "README.md"){
-            filepath = `/${wikiname}/readme.md`
+        
+        newfilename = filename.replace(".md", "")
+        var def = config.aliases.defs[newfilename]
+       
+        if (def){
+            wikiname = `wiki_${def.wikiname}`
+            filename = `${def.pagename}.md`
+            filepath = `/${wikiname}/${filename}`
+
+            for(var alias in config.aliases.wikis){
+                var item = config.aliases.wikis[alias]
+                if(item.dir == `/${wikiname}`){
+                    driveObj =  item.drive
+                }
+            }
+            
             try{
                 entry = await driveObj.promises.stat(filepath)
                 var content = await  driveObj.promises.readFile(filepath, encoding);
                 content = await(rewriteRoles(content, info))
                 return res.send(content)
             }catch(e){
-                var content =`# ${wikiname}`
-                return res.send(content)
+                return res.status(404).send('File not found');
             }            
         }
-        return res.status(404).json('');
+        return res.status(404).send('File not found');
     }
 }
 
